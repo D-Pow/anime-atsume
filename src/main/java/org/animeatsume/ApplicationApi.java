@@ -10,13 +10,8 @@ public class ApplicationApi {
     NovelPlanetController novelPlanetController;
 
 //    @CrossOrigin
-//    @RequestMapping("/greeting")
-//    public Greeting greeting(@RequestParam(value="name", defaultValue="World") String name) {
-//        return greetingController.greeting(name);
-//    }
-
-//    @PostMapping("/greeting")
-//    public Greeting greeting(@RequestParam(value="name", defaultValue="World") String name, @RequestBody String postBody) {
-//        return greetingController.greeting(name, postBody);
+//    @PostMapping("/novelPlanet")
+//    public void getNovelPlanetMp4Urls(@RequestBody String novelPlanetUrl, final HttpServletRequest request) {
+        // find out how to get request IP address here
 //    }
 }
