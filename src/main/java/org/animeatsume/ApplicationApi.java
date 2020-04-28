@@ -1,9 +1,11 @@
 package org.animeatsume;
 
 import org.animeatsume.api.controller.NovelPlanetController;
+import org.animeatsume.api.model.NovelPlanetUrlRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,9 +17,11 @@ public class ApplicationApi {
     NovelPlanetController novelPlanetController;
 
     @CrossOrigin
-    @PostMapping("/novelPlanet")
-    public void getNovelPlanetMp4Urls(ServerHttpRequest request) {
+    @PostMapping(value = "/novelPlanet", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public void getNovelPlanetMp4Urls(@RequestBody NovelPlanetUrlRequest novelPlanetRequest, ServerHttpRequest request) {
         log.info("Address is {}", request.getRemoteAddress().getAddress().toString());
         log.info("Port is {}", String.valueOf(request.getRemoteAddress().getPort()));
+
+        novelPlanetController.getNovelPlanetMp4Urls(novelPlanetRequest, request);
     }
 }
