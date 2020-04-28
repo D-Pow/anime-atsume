@@ -16,10 +16,10 @@ public class NovelPlanetSourceResponse {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class NovelPlanetSource {
-        String file;
-        String label;
-        String type;
+        private String file;
+        private String label;
+        private String type;
     }
 
-    List<NovelPlanetSource> data;
+    private List<NovelPlanetSource> data;
 }
