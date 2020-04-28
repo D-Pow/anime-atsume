@@ -1,6 +1,7 @@
 package org.animeatsume;
 
 import org.animeatsume.api.model.NovelPlanetSourceResponse;
+import org.animeatsume.api.utils.http.Requests;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
@@ -10,14 +11,8 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.*;
-import org.springframework.http.client.ClientHttpRequestFactory;
-import org.springframework.http.client.SimpleClientHttpRequestFactory;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-import java.io.IOException;
-import java.net.HttpURLConnection;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -55,18 +50,17 @@ public class ApplicationDriver {
             ResponseEntity<String> websiteHtml = websiteRequest.getForEntity(novelPlanetWebsiteUrl, String.class);
             String websiteCookie = websiteHtml.getHeaders().getFirst(HttpHeaders.SET_COOKIE);
 
-            HttpHeaders novelPlanetNecessaryHeaders = new HttpHeaders();
-            novelPlanetNecessaryHeaders.add("Origin", novelPlanetOrigin);
-            novelPlanetNecessaryHeaders.add("Referer", novelPlanetWebsiteUrl);
-            novelPlanetNecessaryHeaders.add("Cookie", websiteCookie);
-            novelPlanetNecessaryHeaders.add("sec-fetch-dest", "empty");
-            novelPlanetNecessaryHeaders.add("sec-fetch-mode", "cors");
-            novelPlanetNecessaryHeaders.add("sec-fetch-site", "same-origin");
-            novelPlanetNecessaryHeaders.add("dnt", "1");
-            novelPlanetNecessaryHeaders.add("Pragma", "no-cache");
-            novelPlanetNecessaryHeaders.add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.122 Safari/537.36");
-
-            HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(null, novelPlanetNecessaryHeaders);
+            HttpEntity<Void> request = Requests.getHttpEntityWithHeaders(null, new String[][] {
+                { "Origin", novelPlanetOrigin },
+                { "Referer", novelPlanetWebsiteUrl },
+                { "Cookie", websiteCookie },
+                { "sec-fetch-dest", "empty" },
+                { "sec-fetch-mode", "cors" },
+                { "sec-fetch-site", "same-origin" },
+                { "dnt", "1" },
+                { "Pragma", "no-cache" },
+                { "User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.122 Safari/537.36" }
+            });
 
             ResponseEntity<NovelPlanetSourceResponse> response = new RestTemplate().exchange(
                 novelPlanetApiUrl,
@@ -81,26 +75,15 @@ public class ApplicationDriver {
                 .map(novelPlanetSource -> {
                     String redirectorUrl = novelPlanetSource.getFile();
 
-                    HttpHeaders redirectorHeaders = new HttpHeaders();
-                    redirectorHeaders.add("Cookie", websiteCookie);
-                    redirectorHeaders.add("Referer", novelPlanetWebsiteUrl);
+                    HttpEntity<Void> mp4Request = Requests.getHttpEntityWithHeaders(null, new String[][] {
+                        { "Cookie", websiteCookie },
+                        { "Referer", novelPlanetWebsiteUrl }
+                    });
 
-                    HttpEntity<MultiValueMap<String, String>> mp4Request = new HttpEntity<>(null, redirectorHeaders);
+                    // will give 302 (Found) with redirect. Don't follow it, instead get the redirect URL
+                    // since that holds the URL to the MP4
+                    RestTemplate redirectorRequest = Requests.getNoFollowRedirectsRestTemplate();
 
-                    ClientHttpRequestFactory dontFollowRedirect = new SimpleClientHttpRequestFactory() {
-                        @Override
-                        protected void prepareConnection(HttpURLConnection connection, String httpMethod) throws IOException {
-                            super.prepareConnection(connection, httpMethod);
-                            connection.setInstanceFollowRedirects(false);
-                        }
-                    };
-
-                    RestTemplate redirectorRequest = new RestTemplate(dontFollowRedirect);
-                    MappingJackson2HttpMessageConverter httpMediaTypeConverter = new MappingJackson2HttpMessageConverter();
-                    httpMediaTypeConverter.setSupportedMediaTypes(Arrays.asList(MediaType.ALL)); // video/mp4 isn't a listed mime type for some reason
-                    redirectorRequest.getMessageConverters().add(httpMediaTypeConverter);
-
-                    // will give 302 (Found) with redirect. Don't follow it, instead get the redirect URL and serve that up
                     ResponseEntity<Void> redirectorResponse = redirectorRequest.exchange(
                         redirectorUrl,
                         HttpMethod.GET,
