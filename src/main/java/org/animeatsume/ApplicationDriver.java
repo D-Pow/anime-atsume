@@ -53,13 +53,7 @@ public class ApplicationDriver {
             HttpEntity<Void> request = Requests.getHttpEntityWithHeaders(null, new String[][] {
                 { "Origin", novelPlanetOrigin },
                 { "Referer", novelPlanetWebsiteUrl },
-                { "Cookie", websiteCookie },
-                { "sec-fetch-dest", "empty" },
-                { "sec-fetch-mode", "cors" },
-                { "sec-fetch-site", "same-origin" },
-                { "dnt", "1" },
-                { "Pragma", "no-cache" },
-                { "User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.122 Safari/537.36" }
+                { "Cookie", websiteCookie }
             });
 
             ResponseEntity<NovelPlanetSourceResponse> response = new RestTemplate().exchange(
