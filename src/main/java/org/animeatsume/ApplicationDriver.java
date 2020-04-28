@@ -1,6 +1,7 @@
 package org.animeatsume;
 
 import org.animeatsume.api.model.NovelPlanetSourceResponse;
+import org.animeatsume.api.utils.http.CorsProxy;
 import org.animeatsume.api.utils.http.Requests;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,7 +14,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -50,11 +50,8 @@ public class ApplicationDriver {
             ResponseEntity<String> websiteHtml = websiteRequest.getForEntity(novelPlanetWebsiteUrl, String.class);
             String websiteCookie = websiteHtml.getHeaders().getFirst(HttpHeaders.SET_COOKIE);
 
-            HttpEntity<Void> request = Requests.getHttpEntityWithHeaders(null, new String[][] {
-                { "Origin", novelPlanetOrigin },
-                { "Referer", novelPlanetWebsiteUrl },
-                { "Cookie", websiteCookie }
-            });
+            // TODO headers to consider: "X-Forwarded-For", "X-Real-IP", "Host"
+            HttpEntity<Void> request = CorsProxy.getCorsEntityWithCookie(null, novelPlanetOrigin, novelPlanetWebsiteUrl, websiteCookie);
 
             ResponseEntity<NovelPlanetSourceResponse> response = new RestTemplate().exchange(
                 novelPlanetApiUrl,
@@ -69,10 +66,7 @@ public class ApplicationDriver {
                 .map(novelPlanetSource -> {
                     String redirectorUrl = novelPlanetSource.getFile();
 
-                    HttpEntity<Void> mp4Request = Requests.getHttpEntityWithHeaders(null, new String[][] {
-                        { "Cookie", websiteCookie },
-                        { "Referer", novelPlanetWebsiteUrl }
-                    });
+                    HttpEntity<Void> mp4Request = CorsProxy.getCorsEntityWithCookie(null, novelPlanetOrigin, novelPlanetWebsiteUrl, websiteCookie);
 
                     // will give 302 (Found) with redirect. Don't follow it, instead get the redirect URL
                     // since that holds the URL to the MP4
