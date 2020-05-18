@@ -7,7 +7,6 @@ import org.animeatsume.api.utils.http.Requests;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.server.reactive.ServerHttpRequest;
@@ -17,6 +16,8 @@ import org.springframework.web.client.RestTemplate;
 import java.net.URL;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static org.animeatsume.api.utils.http.Cookies.getCookieFromWebsite;
 
 @Component
 public class NovelPlanetController {
@@ -44,12 +45,6 @@ public class NovelPlanetController {
             getRedirectorSourcesForVideo(origin, websiteUrl, novelPlanetApiUrl, cookie);
         List<String> mp4Urls = getMp4UrlsFromRedirectorUrls(sourcesForVideo, origin, websiteUrl, cookie);
         mp4Urls.forEach(log::info);
-    }
-
-    private String getCookieFromWebsite(String url) {
-        RestTemplate websiteRequest = new RestTemplate();
-        ResponseEntity<String> websiteHtml = websiteRequest.getForEntity(url, String.class);
-        return websiteHtml.getHeaders().getFirst(HttpHeaders.SET_COOKIE);
     }
 
     private List<NovelPlanetSourceResponse.NovelPlanetSource> getRedirectorSourcesForVideo(String origin, String websiteUrl, String apiUrl, String cookie) {
