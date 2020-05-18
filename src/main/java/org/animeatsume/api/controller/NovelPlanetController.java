@@ -41,13 +41,13 @@ public class NovelPlanetController {
         log.info("URL obj = {}, protocol = {}, hostAndPort = {}, path = {}, websiteUrl = {}, origin = {}, videoId = {}, novelApiUrl = {}", websiteUrlObj, protocol, hostAndPort, path, websiteUrl, origin, videoId, novelPlanetApiUrl);
 
         String cookie = getCookieFromWebsite(websiteUrl);
-        List<NovelPlanetSourceResponse.NovelPlanetSource> sourcesForVideo =
+        NovelPlanetSourceResponse sourcesForVideo =
             getRedirectorSourcesForVideo(origin, websiteUrl, novelPlanetApiUrl, cookie);
-        List<String> mp4Urls = getMp4UrlsFromRedirectorUrls(sourcesForVideo, origin, websiteUrl, cookie);
+        List<String> mp4Urls = getMp4UrlsFromRedirectorUrls(sourcesForVideo.getData(), origin, websiteUrl, cookie);
         mp4Urls.forEach(log::info);
     }
 
-    private List<NovelPlanetSourceResponse.NovelPlanetSource> getRedirectorSourcesForVideo(String origin, String websiteUrl, String apiUrl, String cookie) {
+    private NovelPlanetSourceResponse getRedirectorSourcesForVideo(String origin, String websiteUrl, String apiUrl, String cookie) {
         // TODO headers to consider: "X-Forwarded-For", "X-Real-IP", "Host"
         HttpEntity<Void> request = CorsProxy.getCorsEntityWithCookie(null, origin, websiteUrl, cookie);
 
@@ -58,10 +58,15 @@ public class NovelPlanetController {
             NovelPlanetSourceResponse.class
         );
 
-        return response.getBody().getData();
+        return response.getBody();
     }
 
-    private List<String> getMp4UrlsFromRedirectorUrls(List<NovelPlanetSourceResponse.NovelPlanetSource> redirectorSources, String novelPlanetOrigin, String novelPlanetWebsiteUrl, String novelPlanetCookie) {
+    private List<String> getMp4UrlsFromRedirectorUrls(
+        List<NovelPlanetSourceResponse.NovelPlanetSource> redirectorSources,
+        String novelPlanetOrigin,
+        String novelPlanetWebsiteUrl,
+        String novelPlanetCookie
+    ) {
         return redirectorSources.stream()
             .map(novelPlanetSource -> {
                 String redirectorUrl = novelPlanetSource.getFile();
