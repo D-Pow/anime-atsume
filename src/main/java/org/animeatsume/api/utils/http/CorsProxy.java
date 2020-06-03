@@ -13,14 +13,14 @@ public class CorsProxy {
 
         String[][] corsHeaders = cookie != null
             ? new String[][] {
-            originHeader,
-            refererHeader,
-            { "Cookie", cookie }
-        }
+                originHeader,
+                refererHeader,
+                { "Cookie", cookie }
+            }
             : new String[][] {
-            originHeader,
-            refererHeader
-        };
+                originHeader,
+                refererHeader
+            };
 
         return Requests.getHttpEntityWithHeaders(body, corsHeaders);
     }
