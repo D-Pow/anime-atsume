@@ -20,7 +20,7 @@ public class ApplicationApi {
     @PostMapping(value = "/novelPlanet", consumes = MediaType.APPLICATION_JSON_VALUE)
     public void getNovelPlanetMp4Urls(@RequestBody NovelPlanetUrlRequest novelPlanetRequest, ServerHttpRequest request) {
         log.info("Address is {}", request.getRemoteAddress().getAddress().toString());
-        log.info("Port is {}", String.valueOf(request.getRemoteAddress().getPort()));
+        log.info("Port is {}", request.getRemoteAddress().getPort());
 
         novelPlanetController.getNovelPlanetMp4Urls(novelPlanetRequest, request);
     }
