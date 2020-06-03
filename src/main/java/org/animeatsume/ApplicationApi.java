@@ -1,6 +1,7 @@
 package org.animeatsume;
 
 import org.animeatsume.api.controller.NovelPlanetController;
+import org.animeatsume.api.model.NovelPlanetSourceResponse;
 import org.animeatsume.api.model.NovelPlanetUrlRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,11 +18,11 @@ public class ApplicationApi {
     NovelPlanetController novelPlanetController;
 
     @CrossOrigin
-    @PostMapping(value = "/novelPlanet", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public void getNovelPlanetMp4Urls(@RequestBody NovelPlanetUrlRequest novelPlanetRequest, ServerHttpRequest request) {
+    @PostMapping(value = "/getNovelPlanetSources", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public NovelPlanetSourceResponse getNovelPlanetSources(@RequestBody NovelPlanetUrlRequest novelPlanetRequest, ServerHttpRequest request) {
         log.info("Address is {}", request.getRemoteAddress().getAddress().toString());
         log.info("Port is {}", request.getRemoteAddress().getPort());
 
-        novelPlanetController.getNovelPlanetMp4Urls(novelPlanetRequest, request);
+        return novelPlanetController.getNovelPlanetSources(novelPlanetRequest, request);
     }
 }

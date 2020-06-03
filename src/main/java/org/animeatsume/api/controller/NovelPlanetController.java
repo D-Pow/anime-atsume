@@ -26,7 +26,7 @@ public class NovelPlanetController {
     private static final String apiIdentifier = "/api/source/";
     private static final String protocolOriginSeparator = "://";
 
-    public void getNovelPlanetMp4Urls(NovelPlanetUrlRequest novelPlanetRequest, ServerHttpRequest request) {
+    public NovelPlanetSourceResponse getNovelPlanetSources(NovelPlanetUrlRequest novelPlanetRequest, ServerHttpRequest request) {
         // TODO forward client request instead of making new one
         //  in order to preserve original IP address
         URL websiteUrlObj = novelPlanetRequest.getNovelPlanetUrl();
@@ -44,7 +44,11 @@ public class NovelPlanetController {
         NovelPlanetSourceResponse sourcesForVideo =
             getRedirectorSourcesForVideo(origin, websiteUrl, novelPlanetApiUrl, cookie);
         List<String> mp4Urls = getMp4UrlsFromRedirectorUrls(sourcesForVideo.getData(), origin, websiteUrl, cookie);
+        setActualMp4UrlsFromNovelPlanetSources(sourcesForVideo, mp4Urls);
+
         mp4Urls.forEach(log::info);
+
+        return sourcesForVideo;
     }
 
     private NovelPlanetSourceResponse getRedirectorSourcesForVideo(String origin, String websiteUrl, String apiUrl, String cookie) {
@@ -87,5 +91,16 @@ public class NovelPlanetController {
                 return redirectorResponse.getHeaders().getFirst("Location");
             })
             .collect(Collectors.toList());
+    }
+
+    private void setActualMp4UrlsFromNovelPlanetSources(NovelPlanetSourceResponse novelPlanetSourceResponse, List<String> mp4Urls) {
+        List<NovelPlanetSourceResponse.NovelPlanetSource> novelPlanetSources = novelPlanetSourceResponse.getData();
+
+        for (int i = 0; i < novelPlanetSources.size(); i++) {
+            NovelPlanetSourceResponse.NovelPlanetSource novelPlanetSource = novelPlanetSources.get(i);
+            String mp4Url = mp4Urls.get(i);
+
+            novelPlanetSource.setFile(mp4Url);
+        }
     }
 }
