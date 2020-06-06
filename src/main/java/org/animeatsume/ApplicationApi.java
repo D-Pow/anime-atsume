@@ -6,9 +6,13 @@ import org.animeatsume.api.model.NovelPlanetUrlRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.web.bind.annotation.*;
+
+import java.net.MalformedURLException;
 
 @RestController
 public class ApplicationApi {
@@ -24,5 +28,17 @@ public class ApplicationApi {
         log.info("Port is {}", request.getRemoteAddress().getPort());
 
         return novelPlanetController.getNovelPlanetSources(novelPlanetRequest, request);
+    }
+
+    @CrossOrigin
+    @GetMapping(value = "/novelPlanetVideo")
+    public ResponseEntity<Resource> getNovelPlanetVideoStream(@RequestParam(value = "url") String novelPlanetUrl) {
+        try {
+            return novelPlanetController.getVideoSrcStreamFromMp4Url(novelPlanetUrl);
+        } catch (MalformedURLException e) {
+            log.error("Error getting NovelPlanet resource from redirector <{}> = {}", novelPlanetUrl, e.getStackTrace());
+        }
+
+        return ResponseEntity.noContent().build();
     }
 }
