@@ -2,7 +2,7 @@ plugins {
     id 'java'
     id 'idea'
     // adding plugins here removes the need to declare them in buildscript {}
-    id 'org.springframework.boot' version '2.2.4.RELEASE'
+    id 'org.springframework.boot' version '2.3.0.RELEASE'
     id 'io.spring.dependency-management' version '1.0.9.RELEASE'
 }
 
