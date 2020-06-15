@@ -6,14 +6,12 @@ import org.animeatsume.api.utils.http.CorsProxy;
 import org.animeatsume.api.utils.http.Requests;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
+import org.springframework.core.io.*;
 import org.springframework.http.*;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -118,29 +116,7 @@ public class NovelPlanetController {
         }
     }
 
-    public ResponseEntity<Resource> getVideoSrcStreamFromMp4Url(String url) throws MalformedURLException {
-        // TODO this is a "dumb" video forwarding system that doesn't
-        //  keep track of client's location, meaning that they can't
-        //  seek through the video; when they click on a certain
-        //  spot in the seek feed, the back-end reloads the whole video
-        //  and trashes whatever was cached.
-        //  Suggested tutorials:
-        //  - https://melgenek.github.io/spring-video-service
-        //  - https://www.baeldung.com/spring-resttemplate-download-large-file
-        //  These use StreamingResponseBody, which is spring-web, not spring-webflux
-        //  - https://dzone.com/articles/streaming-data-with-spring-boot-restful-web-servic
-        //  - https://stackoverflow.com/questions/47277640/how-to-proxy-a-http-video-stream-to-any-amount-of-clients-through-a-spring-webse
-        UrlResource videoResource = new UrlResource(url);
-
-        return ResponseEntity
-            .status(HttpStatus.PARTIAL_CONTENT)
-            .contentType(
-                MediaTypeFactory
-                    .getMediaType(videoResource)
-                    .orElse(MediaType.valueOf(
-                        MediaType.APPLICATION_OCTET_STREAM_VALUE
-                    ))
-            )
-            .body(videoResource);
+    public ResponseEntity<Resource> getVideoSrcStreamFromMp4Url(String url, String rangeHeader) {
+        return Requests.getUrlResourceStreamResponse(url);
     }
 }
