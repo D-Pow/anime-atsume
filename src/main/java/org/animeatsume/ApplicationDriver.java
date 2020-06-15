@@ -20,6 +20,8 @@ import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfigurat
  *      for each of these specific classes.
  */
 // Remove 'exclude' once database is added
+
+// TODO Replace blocking/synchronous RestTemplate usage with webflux's non-blocking/async WebClient
 @SpringBootApplication(exclude = { DataSourceAutoConfiguration.class, HibernateJpaAutoConfiguration.class })
 public class ApplicationDriver {
     private static final Logger log = LoggerFactory.getLogger(ApplicationDriver.class);

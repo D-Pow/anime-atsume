@@ -30,6 +30,8 @@ public class NovelPlanetController {
     public NovelPlanetSourceResponse getNovelPlanetSources(NovelPlanetUrlRequest novelPlanetRequest, ServerHttpRequest request) {
         // TODO forward client request instead of making new one
         //  in order to preserve original IP address
+        //
+        // TODO see if there's an easier way than all these URL.get() methods
         URL websiteUrlObj = novelPlanetRequest.getNovelPlanetUrl();
         String protocol = websiteUrlObj.getProtocol();
         String hostAndPort = websiteUrlObj.getAuthority();
@@ -89,20 +91,7 @@ public class NovelPlanetController {
                     Void.class
                 );
 
-                String mp4UrlFromRedirector = redirectorResponse.getHeaders().getFirst("Location");
-
-                boolean getMp4Headers = false;
-                if (getMp4Headers) {
-                    HttpHeaders mp4Headers = new RestTemplate().headForHeaders(mp4UrlFromRedirector);
-                    // TODO get "Content-Length" from header for front-end
-                    //  Might not be necessary depending on Range header for
-                    //  front-end's video-buffer requests.
-                    //  See for front-end buffering scheme:
-                    //  - https://developers.google.com/web/fundamentals/media/fast-playback-with-video-preload
-                    log.info("Headers for MP4 redirect request = {}", mp4Headers);
-                }
-
-                return mp4UrlFromRedirector;
+                return redirectorResponse.getHeaders().getFirst("Location");
             })
             .collect(Collectors.toList());
     }
