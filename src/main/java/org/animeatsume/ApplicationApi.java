@@ -1,6 +1,8 @@
 package org.animeatsume;
 
+import org.animeatsume.api.controller.KissanimeRuController;
 import org.animeatsume.api.controller.NovelPlanetController;
+import org.animeatsume.api.model.KissanimeSearchRequest;
 import org.animeatsume.api.model.NovelPlanetSourceResponse;
 import org.animeatsume.api.model.NovelPlanetUrlRequest;
 import org.slf4j.Logger;
@@ -16,7 +18,16 @@ public class ApplicationApi {
     private static final Logger log = LoggerFactory.getLogger(ApplicationApi.class);
 
     @Autowired
+    KissanimeRuController kissanimeRuController;
+
+    @Autowired
     NovelPlanetController novelPlanetController;
+
+    @CrossOrigin
+    @PostMapping(value = "/searchKissanime", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public void searchKissanime(@RequestBody KissanimeSearchRequest kissanimeSearchRequest) {
+        kissanimeRuController.searchKissanimeTitles(kissanimeSearchRequest);
+    }
 
     @CrossOrigin
     @PostMapping(value = "/getNovelPlanetSources", consumes = MediaType.APPLICATION_JSON_VALUE)
