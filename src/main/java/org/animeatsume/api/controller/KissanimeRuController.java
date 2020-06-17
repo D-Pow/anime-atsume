@@ -7,16 +7,18 @@ import io.webfolder.ui4j.api.browser.PageConfiguration;
 import io.webfolder.ui4j.api.interceptor.Interceptor;
 import io.webfolder.ui4j.api.interceptor.Request;
 import io.webfolder.ui4j.api.interceptor.Response;
-import javafx.application.Platform;
 import org.animeatsume.api.model.KissanimeSearchRequest;
 import org.animeatsume.api.utils.ui4j.PageUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.*;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.concurrent.CompletableFuture;
 
 @Component
 public class KissanimeRuController {
@@ -24,34 +26,24 @@ public class KissanimeRuController {
 
     // BrowserEngine is a singleton; improve performance by avoiding making `synchronized` calls in endpoint handling
     private static final BrowserEngine browser = BrowserFactory.getWebKit();
-    private static PageConfiguration pageConfiguration;
-    private static Response browserNavigateResponse;
 
     private static final String KISSANIME_ORIGIN = "https://kissanime.ru";
     private static final String CLOUDFLARE_TITLE = "Just a moment";
     private static final String KISSANIME_TITLE = "KissAnime";
-    private static final int NUM_ATTEMPTS_TO_BYPASS_CLOUDFLARE = 10;
     private static final String TITLE_SEARCH_URL = "https://kissanime.ru/Search/SearchSuggestx";
+    private static final int NUM_ATTEMPTS_TO_BYPASS_CLOUDFLARE = 10;
+    private static final String mockFirefoxUserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:77.0) Gecko/20100101 Firefox/77.0";
+    private static final String cookieAuthName = "cf_clearance";
 
-
-    static {
-        // Load Kissanime on app startup to avoid having to wait for
-        // Cloudflare's DDoS delay
-        setupPageConfigurationWithResponseInterceptor();
-        // TODO need to do Spring's async stuff
-        Platform.runLater(KissanimeRuController::bypassCloudflareDdosScreen);
+    public KissanimeRuController() {
+        setup();
     }
 
-    static void setupPageConfigurationWithResponseInterceptor() {
-        pageConfiguration = new PageConfiguration(new Interceptor() {
-            @Override
-            public void beforeLoad(Request request) {}
-
-            @Override
-            public void afterLoad(Response response) {
-                browserNavigateResponse = response;
-            }
-        });
+    @Async
+    public void setup() {
+        // Load Kissanime on app startup to avoid having to wait for
+        // Cloudflare's DDoS delay
+        bypassCloudflareDdosScreen();
     }
 
     /**
@@ -62,7 +54,11 @@ public class KissanimeRuController {
      * Browsing to the page and waiting for it to load all this gives our browser the
      * cookie it needs.
      */
-    private static void bypassCloudflareDdosScreen() {
+    @Async
+    CompletableFuture<Boolean> bypassCloudflareDdosScreen() {
+        PageConfiguration pageConfiguration = new PageConfiguration();
+        pageConfiguration.setUserAgent(mockFirefoxUserAgent);
+
         Page kissanimePage = browser.navigate(KISSANIME_ORIGIN, pageConfiguration);
 
         for (int attempt = 0; attempt < NUM_ATTEMPTS_TO_BYPASS_CLOUDFLARE; attempt++) {
@@ -70,7 +66,8 @@ public class KissanimeRuController {
 
             if (!pageTitle.contains(CLOUDFLARE_TITLE) && pageTitle.contains(KISSANIME_TITLE)) {
                 log.info("Cloudflare has been bypassed, Kissanime is now accessible");
-                return;
+                kissanimePage.close();
+                return CompletableFuture.completedFuture(true);
             }
 
             log.info("Cloudflare was not bypassed, trying attempt {}/10", attempt+1);
@@ -94,7 +91,26 @@ public class KissanimeRuController {
         throw new RuntimeException("Cannot bypass Cloudflare or access Kissanime");
     }
 
-    private static void waitForCloudflareToAllowAccessToKissanime() {
+    @Async
+    void getAuthCookie() {
+        PageConfiguration pageConfiguration = new PageConfiguration(new Interceptor() {
+            @Override
+            public void beforeLoad(Request request) {
+                request.setHeader("User-Agent", mockFirefoxUserAgent);
+            }
+
+            @Override
+            public void afterLoad(Response response) {
+                log.info("Response was = {}", response);
+                log.info("Headers were = {}", response.getHeaders());
+            }
+        });
+
+        pageConfiguration.setUserAgent(mockFirefoxUserAgent);
+        browser.navigate(KISSANIME_ORIGIN, pageConfiguration);
+    }
+
+    void waitForCloudflareToAllowAccessToKissanime() {
         bypassCloudflareDdosScreen();
     }
 
@@ -103,17 +119,15 @@ public class KissanimeRuController {
      * Origin, etc. doesn't
      */
     public void searchKissanimeTitles(KissanimeSearchRequest kissanimeSearchRequest) {
-        String title = kissanimeSearchRequest.getTitle();
-        log.info("User agent: {}", pageConfiguration.getUserAgent());
+        String searchTitle = kissanimeSearchRequest.getTitle();
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-        headers.set("Cookie", browserNavigateResponse.getCookie("cf_clearance").orElse(null).getValue());
-        headers.set("User-Agent", pageConfiguration.getUserAgent());
+        headers.set("User-Agent", mockFirefoxUserAgent);
 
         MultiValueMap<String, String> formDataBody = new LinkedMultiValueMap<>();
         formDataBody.add("type", "Anime");
-        formDataBody.add("keyword", title);
+        formDataBody.add("keyword", searchTitle);
 
         HttpEntity<MultiValueMap<String, String>> httpRequest = new HttpEntity<>(formDataBody, headers);
 
