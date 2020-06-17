@@ -125,13 +125,21 @@ public class KissanimeRuController {
         }
     }
 
+    private HttpHeaders getNecessaryRequestHeaders() {
+        HttpHeaders headers = new HttpHeaders();
+
+        headers.set("User-Agent", MOCK_FIREFOX_USER_AGENT);
+        headers.set("Cookie", COOKIE_AUTH_NAME + "=" + getAuthCookie().getValue());
+
+        return headers;
+    }
+
     public KissanimeSearchResponse searchKissanimeTitles(KissanimeSearchRequest kissanimeSearchRequest) {
         waitForCloudflareToAllowAccessToKissanime();
         String requestSearchTitle = kissanimeSearchRequest.getTitle();
 
-        HttpHeaders headers = new HttpHeaders();
+        HttpHeaders headers = getNecessaryRequestHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-        headers.set("User-Agent", MOCK_FIREFOX_USER_AGENT);
 
         MultiValueMap<String, String> formDataBody = new LinkedMultiValueMap<>();
         formDataBody.add("type", "Anime");
