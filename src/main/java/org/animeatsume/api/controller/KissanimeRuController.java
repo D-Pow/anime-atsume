@@ -19,10 +19,12 @@ import org.springframework.web.client.RestTemplate;
 import java.net.*;
 import java.net.HttpCookie;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Component
 public class KissanimeRuController {
@@ -141,18 +143,28 @@ public class KissanimeRuController {
 
         String searchResults = searchResponse.getBody();
 
-        log.info("Kissanime search response = {}", searchResults);
-
         if (searchResults != null && !searchResults.isEmpty()) {
-            Matcher urlMatches = Pattern.compile("(?<=href=\")[^\"]+").matcher(searchResults);
-            List<String> urls = new ArrayList<>();
+            String anchorResultsWithoutSpan = searchResults.replaceAll("</?span>", "");
+            List<String> anchorResultsList = Arrays.asList(anchorResultsWithoutSpan.split("><"));
 
-            while (urlMatches.find()) {
-                urls.add(urlMatches.group());
-            }
+            Pattern anchorUrlRegex = Pattern.compile("(?<=href=\")[^\"]+");
+            Pattern anchorTextRegex = Pattern.compile("(?<=\">)[^<]+");
 
-            log.info("Resulting URLs = {}", urls);
-            // TODO parse out URLs and titles
+            List<KissanimeSearchResponse.SearchResponse> searchResponses = anchorResultsList.stream()
+                .map(anchorString -> {
+                    Matcher urlMatcher = anchorUrlRegex.matcher(anchorString);
+                    urlMatcher.find();
+                    String url = urlMatcher.group();
+
+                    Matcher titleMatcher = anchorTextRegex.matcher(anchorString);
+                    titleMatcher.find();
+                    String title = titleMatcher.group();
+
+                    return new KissanimeSearchResponse.SearchResponse(url, title);
+                })
+                .collect(Collectors.toList());
+
+            return new KissanimeSearchResponse(searchResponses);
         }
 
         return new KissanimeSearchResponse();

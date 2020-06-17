@@ -3,6 +3,7 @@ package org.animeatsume;
 import org.animeatsume.api.controller.KissanimeRuController;
 import org.animeatsume.api.controller.NovelPlanetController;
 import org.animeatsume.api.model.KissanimeSearchRequest;
+import org.animeatsume.api.model.KissanimeSearchResponse;
 import org.animeatsume.api.model.NovelPlanetSourceResponse;
 import org.animeatsume.api.model.NovelPlanetUrlRequest;
 import org.slf4j.Logger;
@@ -25,8 +26,8 @@ public class ApplicationApi {
 
     @CrossOrigin
     @PostMapping(value = "/searchKissanime", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public void searchKissanime(@RequestBody KissanimeSearchRequest kissanimeSearchRequest) {
-        kissanimeRuController.searchKissanimeTitles(kissanimeSearchRequest);
+    public KissanimeSearchResponse searchKissanime(@RequestBody KissanimeSearchRequest kissanimeSearchRequest) {
+        return kissanimeRuController.searchKissanimeTitles(kissanimeSearchRequest);
     }
 
     @CrossOrigin
