@@ -6,6 +6,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
+import org.springframework.scheduling.annotation.EnableAsync;
 
 /**
  * SpringBootApplication is a combo of the following:
@@ -23,6 +24,7 @@ import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfigurat
 
 // TODO Replace blocking/synchronous RestTemplate usage with webflux's non-blocking/async WebClient
 @SpringBootApplication(exclude = { DataSourceAutoConfiguration.class, HibernateJpaAutoConfiguration.class })
+@EnableAsync
 public class ApplicationDriver {
     private static final Logger log = LoggerFactory.getLogger(ApplicationDriver.class);
 
