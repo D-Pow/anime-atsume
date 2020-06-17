@@ -4,9 +4,6 @@ import io.webfolder.ui4j.api.browser.BrowserEngine;
 import io.webfolder.ui4j.api.browser.BrowserFactory;
 import io.webfolder.ui4j.api.browser.Page;
 import io.webfolder.ui4j.api.browser.PageConfiguration;
-import io.webfolder.ui4j.api.interceptor.Interceptor;
-import io.webfolder.ui4j.api.interceptor.Request;
-import io.webfolder.ui4j.api.interceptor.Response;
 import org.animeatsume.api.model.KissanimeSearchRequest;
 import org.animeatsume.api.model.KissanimeSearchResponse;
 import org.animeatsume.api.utils.ui4j.PageUtils;
@@ -19,6 +16,8 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import java.net.*;
+import java.net.HttpCookie;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -48,6 +47,7 @@ public class KissanimeRuController {
     public void setup() {
         // Load Kissanime on app startup to avoid having to wait for
         // Cloudflare's DDoS delay
+        CookieHandler.setDefault(new CookieManager());
         bypassCloudflareDdosScreen();
     }
 
@@ -72,6 +72,7 @@ public class KissanimeRuController {
             if (!pageTitle.contains(CLOUDFLARE_TITLE) && pageTitle.contains(KISSANIME_TITLE)) {
                 log.info("Cloudflare has been bypassed, Kissanime is now accessible");
                 kissanimePage.close();
+                log.info("Auth cookie is = {}", getAuthCookie());
                 return CompletableFuture.completedFuture(true);
             }
 
@@ -96,23 +97,18 @@ public class KissanimeRuController {
         throw new RuntimeException("Cannot bypass Cloudflare or access Kissanime");
     }
 
-    @Async
-    void getAuthCookie() {
-        PageConfiguration pageConfiguration = new PageConfiguration(new Interceptor() {
-            @Override
-            public void beforeLoad(Request request) {
-                request.setHeader("User-Agent", mockFirefoxUserAgent);
-            }
+    HttpCookie getAuthCookie() {
+        CookieManager cookieManager = (CookieManager) CookieHandler.getDefault();
+        List<HttpCookie> kissanimeCookies = cookieManager.getCookieStore().get(URI.create(KISSANIME_ORIGIN));
 
-            @Override
-            public void afterLoad(Response response) {
-                log.info("Response was = {}", response);
-                log.info("Headers were = {}", response.getHeaders());
-            }
-        });
+        HttpCookie authCookie = kissanimeCookies.stream()
+            .filter(cookieKeyVal -> cookieKeyVal.getName().equals(cookieAuthName))
+            .findFirst()
+            .orElse(new HttpCookie(cookieAuthName, ""));
 
-        pageConfiguration.setUserAgent(mockFirefoxUserAgent);
-        browser.navigate(KISSANIME_ORIGIN, pageConfiguration);
+        log.info("Expired = {}, max age = {}", authCookie.hasExpired(), authCookie.getMaxAge());
+
+        return authCookie;
     }
 
     void waitForCloudflareToAllowAccessToKissanime() {
@@ -161,6 +157,4 @@ public class KissanimeRuController {
 
         return new KissanimeSearchResponse();
     }
-
-
 }
