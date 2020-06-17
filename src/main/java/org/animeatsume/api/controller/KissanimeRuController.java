@@ -18,7 +18,6 @@ import org.springframework.web.client.RestTemplate;
 
 import java.net.*;
 import java.net.HttpCookie;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -38,8 +37,8 @@ public class KissanimeRuController {
     private static final String KISSANIME_TITLE = "KissAnime";
     private static final String TITLE_SEARCH_URL = "https://kissanime.ru/Search/SearchSuggestx";
     private static final int NUM_ATTEMPTS_TO_BYPASS_CLOUDFLARE = 10;
-    private static final String mockFirefoxUserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:77.0) Gecko/20100101 Firefox/77.0";
-    private static final String cookieAuthName = "cf_clearance";
+    private static final String MOCK_FIREFOX_USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:77.0) Gecko/20100101 Firefox/77.0";
+    private static final String COOKIE_AUTH_NAME = "cf_clearance";
 
     public KissanimeRuController() {
         setup();
@@ -63,7 +62,7 @@ public class KissanimeRuController {
     @Async
     CompletableFuture<Boolean> bypassCloudflareDdosScreen() {
         PageConfiguration pageConfiguration = new PageConfiguration();
-        pageConfiguration.setUserAgent(mockFirefoxUserAgent);
+        pageConfiguration.setUserAgent(MOCK_FIREFOX_USER_AGENT);
 
         Page kissanimePage = browser.navigate(KISSANIME_ORIGIN, pageConfiguration);
 
@@ -103,9 +102,9 @@ public class KissanimeRuController {
         List<HttpCookie> kissanimeCookies = cookieManager.getCookieStore().get(URI.create(KISSANIME_ORIGIN));
 
         HttpCookie authCookie = kissanimeCookies.stream()
-            .filter(cookieKeyVal -> cookieKeyVal.getName().equals(cookieAuthName))
+            .filter(cookieKeyVal -> cookieKeyVal.getName().equals(COOKIE_AUTH_NAME))
             .findFirst()
-            .orElse(new HttpCookie(cookieAuthName, ""));
+            .orElse(new HttpCookie(COOKIE_AUTH_NAME, ""));
 
         log.info("Expired = {}, max age = {}", authCookie.hasExpired(), authCookie.getMaxAge());
 
@@ -125,7 +124,7 @@ public class KissanimeRuController {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-        headers.set("User-Agent", mockFirefoxUserAgent);
+        headers.set("User-Agent", MOCK_FIREFOX_USER_AGENT);
 
         MultiValueMap<String, String> formDataBody = new LinkedMultiValueMap<>();
         formDataBody.add("type", "Anime");
