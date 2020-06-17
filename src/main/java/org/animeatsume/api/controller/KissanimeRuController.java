@@ -72,7 +72,6 @@ public class KissanimeRuController {
             if (!pageTitle.contains(CLOUDFLARE_TITLE) && pageTitle.contains(KISSANIME_TITLE)) {
                 log.info("Cloudflare has been bypassed, Kissanime is now accessible");
                 kissanimePage.close();
-                log.info("Auth cookie is = {}", getAuthCookie());
                 return CompletableFuture.completedFuture(true);
             }
 
@@ -106,20 +105,28 @@ public class KissanimeRuController {
             .findFirst()
             .orElse(new HttpCookie(COOKIE_AUTH_NAME, ""));
 
-        log.info("Expired = {}, max age = {}", authCookie.hasExpired(), authCookie.getMaxAge());
-
         return authCookie;
     }
 
-    void waitForCloudflareToAllowAccessToKissanime() {
-        bypassCloudflareDdosScreen();
-    }
-
     /*
-     * User-Agent and cf_clearance cookie matter.
+     * User-Agent header and cf_clearance cookie matter.
      * Origin, etc. doesn't
      */
+    void waitForCloudflareToAllowAccessToKissanime() {
+        if (getAuthCookie().hasExpired()) {
+            try {
+                bypassCloudflareDdosScreen().get();
+            } catch (Exception e) {
+                log.error("Refreshing Kissanime auth token has failed. Error:");
+                e.printStackTrace();
+
+                throw new RuntimeException("Cannot bypass Cloudflare or access Kissanime");
+            }
+        }
+    }
+
     public KissanimeSearchResponse searchKissanimeTitles(KissanimeSearchRequest kissanimeSearchRequest) {
+        waitForCloudflareToAllowAccessToKissanime();
         String requestSearchTitle = kissanimeSearchRequest.getTitle();
 
         HttpHeaders headers = new HttpHeaders();
