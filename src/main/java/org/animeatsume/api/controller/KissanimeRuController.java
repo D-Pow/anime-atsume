@@ -120,7 +120,7 @@ public class KissanimeRuController {
      * Origin, etc. doesn't
      */
     public KissanimeSearchResponse searchKissanimeTitles(KissanimeSearchRequest kissanimeSearchRequest) {
-        String searchTitle = kissanimeSearchRequest.getTitle();
+        String requestSearchTitle = kissanimeSearchRequest.getTitle();
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
@@ -128,7 +128,7 @@ public class KissanimeRuController {
 
         MultiValueMap<String, String> formDataBody = new LinkedMultiValueMap<>();
         formDataBody.add("type", "Anime");
-        formDataBody.add("keyword", searchTitle);
+        formDataBody.add("keyword", requestSearchTitle);
 
         HttpEntity<MultiValueMap<String, String>> httpRequest = new HttpEntity<>(formDataBody, headers);
 
