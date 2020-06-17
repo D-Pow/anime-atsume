@@ -8,6 +8,7 @@ import io.webfolder.ui4j.api.interceptor.Interceptor;
 import io.webfolder.ui4j.api.interceptor.Request;
 import io.webfolder.ui4j.api.interceptor.Response;
 import org.animeatsume.api.model.KissanimeSearchRequest;
+import org.animeatsume.api.model.KissanimeSearchResponse;
 import org.animeatsume.api.utils.ui4j.PageUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +19,11 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Component
 public class KissanimeRuController {
@@ -118,7 +123,7 @@ public class KissanimeRuController {
      * User-Agent and cf_clearance cookie matter.
      * Origin, etc. doesn't
      */
-    public void searchKissanimeTitles(KissanimeSearchRequest kissanimeSearchRequest) {
+    public KissanimeSearchResponse searchKissanimeTitles(KissanimeSearchRequest kissanimeSearchRequest) {
         String searchTitle = kissanimeSearchRequest.getTitle();
 
         HttpHeaders headers = new HttpHeaders();
@@ -138,7 +143,24 @@ public class KissanimeRuController {
             String.class
         );
 
-        log.info("Kissanime search response = {}", searchResponse.getBody());
-//        Page kissanime = browser.navigate("https://kissanime.ru/Anime/Shigatsu-wa-Kimi-no-Uso");
+        String searchResults = searchResponse.getBody();
+
+        log.info("Kissanime search response = {}", searchResults);
+
+        if (searchResults != null && !searchResults.isEmpty()) {
+            Matcher urlMatches = Pattern.compile("(?<=href=\")[^\"]+").matcher(searchResults);
+            List<String> urls = new ArrayList<>();
+
+            while (urlMatches.find()) {
+                urls.add(urlMatches.group());
+            }
+
+            log.info("Resulting URLs = {}", urls);
+            // TODO parse out URLs and titles
+        }
+
+        return new KissanimeSearchResponse();
     }
+
+
 }
