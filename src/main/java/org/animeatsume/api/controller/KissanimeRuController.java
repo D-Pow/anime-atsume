@@ -45,7 +45,6 @@ public class KissanimeRuController {
         setup();
     }
 
-    @Async
     public void setup() {
         // Load Kissanime on app startup to avoid having to wait for
         // Cloudflare's DDoS delay
