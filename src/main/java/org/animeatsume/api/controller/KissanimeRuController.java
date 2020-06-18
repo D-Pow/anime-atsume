@@ -21,9 +21,11 @@ import org.springframework.web.client.RestTemplate;
 
 import java.net.*;
 import java.net.HttpCookie;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 @Component
@@ -161,17 +163,31 @@ public class KissanimeRuController {
         if (searchResults != null && !searchResults.isEmpty()) {
             String anchorResultsWithoutSpan = searchResults.replaceAll("</?span>", "");
             List<String> anchorResultsList = Arrays.asList(anchorResultsWithoutSpan.split("><"));
+            List<CompletableFuture<List<Anchor>>> episodeSearchResultsFutures = new ArrayList<>();
 
             List<KissanimeSearchResponse.SearchResults> searchResponses = anchorResultsList.stream()
                 .map(anchorString -> {
                     String url = HtmlParser.getUrlFromAnchor(anchorString);
                     String title = HtmlParser.getTextFromAnchor(anchorString);
 
-                    List<Anchor> episodeLinks = searchKissanimeEpisodes(url);
+                    episodeSearchResultsFutures.add(searchKissanimeEpisodes(url));
 
-                    return new KissanimeSearchResponse.SearchResults(url, title, episodeLinks);
+                    return new KissanimeSearchResponse.SearchResults(url, title);
                 })
                 .collect(Collectors.toList());
+
+            for (int i = 0; i < searchResponses.size(); i++) {
+                KissanimeSearchResponse.SearchResults episodeSearchResult = searchResponses.get(i);
+                List<Anchor> episodeLinks = new ArrayList<>();
+
+                try {
+                    episodeLinks = episodeSearchResultsFutures.get(i).get();
+                } catch (InterruptedException | ExecutionException e) {
+                    log.error("Could not get future. Cause = {}, Message = {}", e.getCause(), e.getMessage());
+                }
+
+                episodeSearchResult.setEpisodes(episodeLinks);
+            }
 
             return new KissanimeSearchResponse(searchResponses);
         }
@@ -179,7 +195,8 @@ public class KissanimeRuController {
         return new KissanimeSearchResponse();
     }
 
-    private List<Anchor> searchKissanimeEpisodes(String showUrl) {
+    @Async
+    public CompletableFuture<List<Anchor>> searchKissanimeEpisodes(String showUrl) {
         String showHtml = new RestTemplate().exchange(
             showUrl,
             HttpMethod.GET,
@@ -208,6 +225,6 @@ public class KissanimeRuController {
             })
             .collect(Collectors.toList());
 
-        return episodeLinks;
+        return CompletableFuture.completedFuture(episodeLinks);
     }
 }

@@ -16,6 +16,10 @@ public class KissanimeSearchResponse {
     public static class SearchResults extends Anchor {
         private List<Anchor> episodes;
 
+        public SearchResults(String url, String title) {
+            super(url, title);
+        }
+
         public SearchResults(String url, String title, List<Anchor> episodes) {
             super(url, title);
             this.episodes = episodes;
