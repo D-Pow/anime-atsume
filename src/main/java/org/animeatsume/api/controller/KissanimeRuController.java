@@ -40,6 +40,7 @@ public class KissanimeRuController {
     private static final int NUM_ATTEMPTS_TO_BYPASS_CLOUDFLARE = 10;
     private static final String MOCK_FIREFOX_USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:77.0) Gecko/20100101 Firefox/77.0";
     private static final String COOKIE_AUTH_NAME = "cf_clearance";
+    private static final String NOVEL_PLANET_QUERY_PARAM = "&s=nova";
 
     public KissanimeRuController() {
         setup();
@@ -197,6 +198,11 @@ public class KissanimeRuController {
 
                 // Remove leading spaces/tabs/etc.
                 title = title.replaceFirst("^\\s+", "");
+
+                // Add kissanime origin since URLs are relative.
+                // Also, make URL choose NovelPlanet by default
+                // since the NovelPlanet controller/scraper logic is already in place
+                url = KISSANIME_ORIGIN + url + NOVEL_PLANET_QUERY_PARAM;
 
                 return new Anchor(url, title);
             })
