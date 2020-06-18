@@ -8,6 +8,7 @@ import org.animeatsume.api.model.Anchor;
 import org.animeatsume.api.model.KissanimeSearchRequest;
 import org.animeatsume.api.model.KissanimeSearchResponse;
 import org.animeatsume.api.utils.regex.HtmlParser;
+import org.animeatsume.api.utils.regex.RegexUtils;
 import org.animeatsume.api.utils.ui4j.PageUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -160,12 +161,14 @@ public class KissanimeRuController {
             String anchorResultsWithoutSpan = searchResults.replaceAll("</?span>", "");
             List<String> anchorResultsList = Arrays.asList(anchorResultsWithoutSpan.split("><"));
 
-            List<Anchor> searchResponses = anchorResultsList.stream()
+            List<KissanimeSearchResponse.SearchResults> searchResponses = anchorResultsList.stream()
                 .map(anchorString -> {
                     String url = HtmlParser.getUrlFromAnchor(anchorString);
                     String title = HtmlParser.getTextFromAnchor(anchorString);
 
-                    return new Anchor(url, title);
+                    List<Anchor> episodeLinks = searchKissanimeEpisodes(url);
+
+                    return new KissanimeSearchResponse.SearchResults(url, title, episodeLinks);
                 })
                 .collect(Collectors.toList());
 
@@ -173,5 +176,34 @@ public class KissanimeRuController {
         }
 
         return new KissanimeSearchResponse();
+    }
+
+    public List<Anchor> searchKissanimeEpisodes(String showUrl) {
+        waitForCloudflareToAllowAccessToKissanime();
+
+        String showHtml = new RestTemplate().exchange(
+            showUrl,
+            HttpMethod.GET,
+            new HttpEntity<>(null, getNecessaryRequestHeaders()),
+            String.class
+        ).getBody();
+
+        String episodeAnchorRegex = "<a.*?href=\"/Anime[^\"]+\\?id[\\s\\S]+?</a>";
+
+        List<String> matchResults = RegexUtils.findAllMatches(episodeAnchorRegex, showHtml);
+
+        List<Anchor> episodeLinks = matchResults.stream()
+            .map(anchorString -> {
+                String url = HtmlParser.getUrlFromAnchor(anchorString);
+                String title = HtmlParser.getTextFromAnchor(anchorString);
+
+                // Remove leading spaces/tabs/etc.
+                title = title.replaceFirst("^\\s+", "");
+
+                return new Anchor(url, title);
+            })
+            .collect(Collectors.toList());
+
+        return episodeLinks;
     }
 }
