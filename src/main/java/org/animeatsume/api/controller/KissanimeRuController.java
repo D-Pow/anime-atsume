@@ -118,6 +118,8 @@ public class KissanimeRuController {
      */
     void waitForCloudflareToAllowAccessToKissanime() {
         if (getAuthCookie().hasExpired()) {
+            log.info("Cookie has expired. Refreshing now...");
+
             try {
                 bypassCloudflareDdosScreen().get();
             } catch (Exception e) {
@@ -142,6 +144,8 @@ public class KissanimeRuController {
         waitForCloudflareToAllowAccessToKissanime();
         String requestSearchTitle = kissanimeSearchRequest.getTitle();
 
+        log.info("Searching Kissanime for title ({}) ...", requestSearchTitle);
+
         HttpHeaders headers = getNecessaryRequestHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
@@ -149,12 +153,10 @@ public class KissanimeRuController {
         formDataBody.add("type", "Anime");
         formDataBody.add("keyword", requestSearchTitle);
 
-        HttpEntity<MultiValueMap<String, String>> httpRequest = new HttpEntity<>(formDataBody, headers);
-
         ResponseEntity<String> searchResponse = new RestTemplate().exchange(
             TITLE_SEARCH_URL,
             HttpMethod.POST,
-            httpRequest,
+            new HttpEntity<>(formDataBody, headers),
             String.class
         );
 
@@ -197,6 +199,8 @@ public class KissanimeRuController {
 
     @Async
     public CompletableFuture<List<Anchor>> searchKissanimeEpisodes(String showUrl) {
+        log.info("Searching Kissanime for episode list at ({}) ...", showUrl);
+
         String showHtml = new RestTemplate().exchange(
             showUrl,
             HttpMethod.GET,
