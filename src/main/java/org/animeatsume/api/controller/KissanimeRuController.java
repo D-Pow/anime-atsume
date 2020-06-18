@@ -6,6 +6,7 @@ import io.webfolder.ui4j.api.browser.Page;
 import io.webfolder.ui4j.api.browser.PageConfiguration;
 import org.animeatsume.api.model.KissanimeSearchRequest;
 import org.animeatsume.api.model.KissanimeSearchResponse;
+import org.animeatsume.api.utils.regex.RegexUtils;
 import org.animeatsume.api.utils.ui4j.PageUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,8 +22,6 @@ import java.net.HttpCookie;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Component
@@ -160,18 +159,13 @@ public class KissanimeRuController {
             String anchorResultsWithoutSpan = searchResults.replaceAll("</?span>", "");
             List<String> anchorResultsList = Arrays.asList(anchorResultsWithoutSpan.split("><"));
 
-            Pattern anchorUrlRegex = Pattern.compile("(?<=href=\")[^\"]+");
-            Pattern anchorTextRegex = Pattern.compile("(?<=\">)[^<]+");
+            String anchorUrlRegex = "(?<=href=\")[^\"]+";
+            String anchorTextRegex = "(?<=\">)[^<]+";
 
             List<KissanimeSearchResponse.SearchResponse> searchResponses = anchorResultsList.stream()
                 .map(anchorString -> {
-                    Matcher urlMatcher = anchorUrlRegex.matcher(anchorString);
-                    urlMatcher.find();
-                    String url = urlMatcher.group();
-
-                    Matcher titleMatcher = anchorTextRegex.matcher(anchorString);
-                    titleMatcher.find();
-                    String title = titleMatcher.group();
+                    String url = RegexUtils.getFirstMatch(anchorUrlRegex, anchorString);
+                    String title = RegexUtils.getFirstMatch(anchorTextRegex, anchorString);
 
                     return new KissanimeSearchResponse.SearchResponse(url, title);
                 })
