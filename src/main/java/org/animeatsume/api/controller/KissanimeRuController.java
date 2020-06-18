@@ -178,9 +178,7 @@ public class KissanimeRuController {
         return new KissanimeSearchResponse();
     }
 
-    public List<Anchor> searchKissanimeEpisodes(String showUrl) {
-        waitForCloudflareToAllowAccessToKissanime();
-
+    private List<Anchor> searchKissanimeEpisodes(String showUrl) {
         String showHtml = new RestTemplate().exchange(
             showUrl,
             HttpMethod.GET,
