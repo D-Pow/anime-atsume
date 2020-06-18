@@ -6,7 +6,7 @@ import io.webfolder.ui4j.api.browser.Page;
 import io.webfolder.ui4j.api.browser.PageConfiguration;
 import org.animeatsume.api.model.KissanimeSearchRequest;
 import org.animeatsume.api.model.KissanimeSearchResponse;
-import org.animeatsume.api.utils.regex.RegexUtils;
+import org.animeatsume.api.utils.regex.HtmlParser;
 import org.animeatsume.api.utils.ui4j.PageUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -159,13 +159,12 @@ public class KissanimeRuController {
             String anchorResultsWithoutSpan = searchResults.replaceAll("</?span>", "");
             List<String> anchorResultsList = Arrays.asList(anchorResultsWithoutSpan.split("><"));
 
-            String anchorUrlRegex = "(?<=href=\")[^\"]+";
-            String anchorTextRegex = "(?<=\">)[^<]+";
-
             List<KissanimeSearchResponse.SearchResponse> searchResponses = anchorResultsList.stream()
                 .map(anchorString -> {
-                    String url = RegexUtils.getFirstMatch(anchorUrlRegex, anchorString);
-                    String title = RegexUtils.getFirstMatch(anchorTextRegex, anchorString);
+                    String url = HtmlParser.getUrlFromAnchor(anchorString);
+                    String title = HtmlParser.getTextFromAnchor(anchorString);
+
+                    searchKissanimeEpisodes(url);
 
                     return new KissanimeSearchResponse.SearchResponse(url, title);
                 })
