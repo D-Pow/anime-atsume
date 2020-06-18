@@ -104,10 +104,13 @@ public class KissanimeRuService {
         CookieManager cookieManager = (CookieManager) CookieHandler.getDefault();
         List<HttpCookie> kissanimeCookies = cookieManager.getCookieStore().get(URI.create(KISSANIME_ORIGIN));
 
+        HttpCookie placeholderCookie = new HttpCookie(COOKIE_AUTH_NAME, "");
+        placeholderCookie.setMaxAge(0);
+
         HttpCookie authCookie = kissanimeCookies.stream()
             .filter(cookieKeyVal -> cookieKeyVal.getName().equals(COOKIE_AUTH_NAME))
             .findFirst()
-            .orElse(new HttpCookie(COOKIE_AUTH_NAME, ""));
+            .orElse(placeholderCookie);
 
         return authCookie;
     }
@@ -135,7 +138,7 @@ public class KissanimeRuService {
         HttpHeaders headers = new HttpHeaders();
 
         headers.set("User-Agent", MOCK_FIREFOX_USER_AGENT);
-        headers.set("Cookie", COOKIE_AUTH_NAME + "=" + getAuthCookie().getValue());
+        headers.set("Cookie", getAuthCookie().toString());
 
         return headers;
     }
