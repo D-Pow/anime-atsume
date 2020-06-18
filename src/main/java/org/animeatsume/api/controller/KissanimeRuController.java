@@ -4,6 +4,7 @@ import io.webfolder.ui4j.api.browser.BrowserEngine;
 import io.webfolder.ui4j.api.browser.BrowserFactory;
 import io.webfolder.ui4j.api.browser.Page;
 import io.webfolder.ui4j.api.browser.PageConfiguration;
+import org.animeatsume.api.model.Anchor;
 import org.animeatsume.api.model.KissanimeSearchRequest;
 import org.animeatsume.api.model.KissanimeSearchResponse;
 import org.animeatsume.api.utils.regex.HtmlParser;
@@ -159,14 +160,12 @@ public class KissanimeRuController {
             String anchorResultsWithoutSpan = searchResults.replaceAll("</?span>", "");
             List<String> anchorResultsList = Arrays.asList(anchorResultsWithoutSpan.split("><"));
 
-            List<KissanimeSearchResponse.SearchResponse> searchResponses = anchorResultsList.stream()
+            List<Anchor> searchResponses = anchorResultsList.stream()
                 .map(anchorString -> {
                     String url = HtmlParser.getUrlFromAnchor(anchorString);
                     String title = HtmlParser.getTextFromAnchor(anchorString);
 
-                    searchKissanimeEpisodes(url);
-
-                    return new KissanimeSearchResponse.SearchResponse(url, title);
+                    return new Anchor(url, title);
                 })
                 .collect(Collectors.toList());
 
