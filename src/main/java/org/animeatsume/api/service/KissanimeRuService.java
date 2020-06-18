@@ -194,10 +194,11 @@ public class KissanimeRuService {
 
         String episodeAnchorRegex = "<a.*?href=\"/Anime[^\"]+\\?id[\\s\\S]+?</a>";
 
-        List<String> matchResults = RegexUtils.findAllMatches(episodeAnchorRegex, showHtml);
+        List<List<String>> matchResults = RegexUtils.getAllMatchesAndGroups(episodeAnchorRegex, showHtml);
 
         List<Anchor> episodeLinks = matchResults.stream()
-            .map(anchorString -> {
+            .map(matchGroups -> {
+                String anchorString = matchGroups.get(0); // get first match group, containing the whole anchor element
                 String url = HtmlParser.getUrlFromAnchor(anchorString);
                 String title = HtmlParser.getTextFromAnchor(anchorString);
 
