@@ -7,6 +7,7 @@ import io.webfolder.ui4j.api.browser.PageConfiguration;
 import org.animeatsume.api.model.Anchor;
 import org.animeatsume.api.model.KissanimeSearchRequest;
 import org.animeatsume.api.model.KissanimeSearchResponse;
+import org.animeatsume.api.utils.ObjectUtils;
 import org.animeatsume.api.utils.regex.HtmlParser;
 import org.animeatsume.api.utils.regex.RegexUtils;
 import org.animeatsume.api.utils.ui4j.PageUtils;
@@ -25,7 +26,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 @Component
@@ -177,19 +177,16 @@ public class KissanimeRuController {
                     return new KissanimeSearchResponse.SearchResults(url, title);
                 })
                 .collect(Collectors.toList());
-
-            for (int i = 0; i < searchResponses.size(); i++) {
-                KissanimeSearchResponse.SearchResults episodeSearchResult = searchResponses.get(i);
+            ObjectUtils.getAllCompletableFutureResults(episodeSearchResultsFutures, (episodeAnchorList, index) -> {
+                KissanimeSearchResponse.SearchResults episodeSearchResult = searchResponses.get(index);
                 List<Anchor> episodeLinks = new ArrayList<>();
 
-                try {
-                    episodeLinks = episodeSearchResultsFutures.get(i).get();
-                } catch (InterruptedException | ExecutionException e) {
-                    log.error("Could not get future. Cause = {}, Message = {}", e.getCause(), e.getMessage());
+                if (episodeAnchorList != null) {
+                    episodeLinks = episodeAnchorList;
                 }
 
                 episodeSearchResult.setEpisodes(episodeLinks);
-            }
+            });
 
             return new KissanimeSearchResponse(searchResponses);
         }
