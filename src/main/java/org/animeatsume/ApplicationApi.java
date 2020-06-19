@@ -39,7 +39,7 @@ public class ApplicationApi {
         log.info("Address is {}", request.getRemoteAddress().getAddress().toString());
         log.info("Port is {}", request.getRemoteAddress().getPort());
 
-        return novelPlanetController.getNovelPlanetSources(novelPlanetRequest, request);
+        return novelPlanetController.getNovelPlanetSources(novelPlanetRequest);
     }
 
     @CrossOrigin

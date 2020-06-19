@@ -8,7 +8,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.*;
 import org.springframework.http.*;
-import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StreamUtils;
 import org.springframework.web.client.RestTemplate;
@@ -27,7 +26,7 @@ public class NovelPlanetController {
     private static final String apiIdentifier = "/api/source/";
     private static final String protocolOriginSeparator = "://";
 
-    public NovelPlanetSourceResponse getNovelPlanetSources(NovelPlanetUrlRequest novelPlanetRequest, ServerHttpRequest request) {
+    public NovelPlanetSourceResponse getNovelPlanetSources(NovelPlanetUrlRequest novelPlanetRequest) {
         // TODO forward client request instead of making new one
         //  in order to preserve original IP address
         //
