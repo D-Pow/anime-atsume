@@ -4,11 +4,10 @@ import io.webfolder.ui4j.api.browser.BrowserEngine;
 import io.webfolder.ui4j.api.browser.BrowserFactory;
 import io.webfolder.ui4j.api.browser.Page;
 import io.webfolder.ui4j.api.browser.PageConfiguration;
-import lombok.AllArgsConstructor;
-import lombok.Data;
 import org.animeatsume.api.model.Anchor;
 import org.animeatsume.api.model.KissanimeSearchRequest;
 import org.animeatsume.api.model.KissanimeSearchResponse;
+import org.animeatsume.api.model.KissanimeVideoHostResponse;
 import org.animeatsume.api.utils.http.Requests;
 import org.animeatsume.api.utils.regex.HtmlParser;
 import org.animeatsume.api.utils.regex.RegexUtils;
@@ -24,7 +23,6 @@ import org.springframework.web.client.RestTemplate;
 
 import java.net.*;
 import java.net.HttpCookie;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -40,6 +38,7 @@ public class KissanimeRuService {
 
     private static final String KISSANIME_ORIGIN = "https://kissanime.ru";
     private static final String TITLE_SEARCH_URL = KISSANIME_ORIGIN + "/Search/SearchSuggestx";
+    private static final String ARE_YOU_HUMAN_FORM_ACTION_URL = KISSANIME_ORIGIN + "/Special/AreYouHuman2";
     private static final String CLOUDFLARE_TITLE = "Just a moment";
     private static final String KISSANIME_TITLE = "KissAnime";
     private static final int NUM_ATTEMPTS_TO_BYPASS_CLOUDFLARE = 10;
@@ -239,15 +238,8 @@ public class KissanimeRuService {
         return response.getStatusCode() == HttpStatus.FOUND;
     }
 
-    @Data
-    @AllArgsConstructor
-    public static class BypassAreYouHumanCheckRequestFields {
-        private String formActionUrl;
-        private HttpHeaders headers;
-        private MultiValueMap<String, String> formDataBody;
-    }
-
-    public List<BypassAreYouHumanCheckRequestFields> getAllBypassAreYouHumanConfigurations(String url) {
+    public KissanimeVideoHostResponse getBypassAreYouHumanPromptContent(String url) {
+        log.info("Getting AreYouHuman images and prompt texts to bypass ({})", url);
         waitForCloudflareToAllowAccessToKissanime();
         String areYouHumanHtml = new RestTemplate().exchange(
             url,
@@ -259,79 +251,45 @@ public class KissanimeRuService {
         // Form action, images, and image-selection prompt texts are all nested inside the <form> element
         // so regex strings are relative to within the <form>, not the entire <html> string.
         String areYouHumanFormHtmlRegex = "(<form(?=[^>]+AreYouHuman)[\\s\\S]+?</form>)";
-        String formActionUrlPathRegex = "(?<=action=[\"'])([^\"']+)";
         String imgVerificationIdAndSrcRegex = "(<img[^>]+?indexValue=['\"])(\\w+)(.*?src=['\"])([^'\"]+)";
         String spanBodyRegex = "(<span[^>]+>)([^<]+)";
 
         String formHtml = RegexUtils.getFirstMatchGroups(areYouHumanFormHtmlRegex, areYouHumanHtml, Pattern.CASE_INSENSITIVE).get(0);
 
-        List<List<String>> imgVerificationIdsAndSrcs = RegexUtils.getAllMatchesAndGroups(imgVerificationIdAndSrcRegex, formHtml, Pattern.CASE_INSENSITIVE)
+        List<Anchor> imgVerificationIdsAndSrcs = RegexUtils.getAllMatchesAndGroups(imgVerificationIdAndSrcRegex, formHtml, Pattern.CASE_INSENSITIVE)
             .stream()
-            .map(imgMatchGroups -> Arrays.asList(imgMatchGroups.get(2), imgMatchGroups.get(4)))
+            .map(imgMatchGroups -> new Anchor(KISSANIME_ORIGIN + imgMatchGroups.get(4), imgMatchGroups.get(2)))
             .collect(Collectors.toList());
-        String formActionUrlPath = RegexUtils.getFirstMatchGroups(
-            formActionUrlPathRegex,
-            formHtml,
-            Pattern.CASE_INSENSITIVE
-        ).get(0);
         List<String> promptsForImagesToSelect = RegexUtils.getAllMatchesAndGroups(spanBodyRegex, formHtml, Pattern.CASE_INSENSITIVE)
             .stream()
             .map(spanMatchGroups -> RegexUtils.strip(spanMatchGroups.get(2)))
             .collect(Collectors.toList());
 
-        String formActionUrl = KISSANIME_ORIGIN + formActionUrlPath;
-        String urlPathWithQueryParams = url.replace(KISSANIME_ORIGIN, "");
+        return new KissanimeVideoHostResponse(null, new KissanimeVideoHostResponse.CaptchaContent(promptsForImagesToSelect, imgVerificationIdsAndSrcs));
+    }
+
+    public boolean executeBypassAreYouHumanCheck(String episodeUrl, String captchaAnswer) {
+        log.info("Attempting to bypass AreYouHuman check for URL ({}) and captcha answer ({})", episodeUrl, captchaAnswer);
+        waitForCloudflareToAllowAccessToKissanime();
+        String urlPathWithQueryParams = episodeUrl.replace(KISSANIME_ORIGIN, "");
 
         HttpHeaders headers = getNecessaryRequestHeaders();
-        headers.add("Referer", formActionUrl + "?reUrl=" + urlPathWithQueryParams);
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         headers.setAccept(Arrays.asList(MediaType.TEXT_HTML, MediaType.APPLICATION_XHTML_XML, MediaType.APPLICATION_XML));
 
-        log.info("imgVerificationIdsAndSrcs ({}), urlPathWithQuery ({}), formActionUrl ({}), referer ({})", imgVerificationIdsAndSrcs, urlPathWithQueryParams, formActionUrl, formActionUrl + "?reUrl=" + urlPathWithQueryParams);
+        MultiValueMap<String, String> formDataBody = new LinkedMultiValueMap<>();
+        formDataBody.add("reUrl", urlPathWithQueryParams);
+        formDataBody.add("answerCap", captchaAnswer);
 
-        List<BypassAreYouHumanCheckRequestFields> bypassConfigs = new ArrayList<>();
+        RestTemplate captchaSolverRequest = Requests.getNoFollowRedirectsRestTemplate();
 
-        for (int i = 0; i < imgVerificationIdsAndSrcs.size(); i++) {
-            for (int j = i+1; j < imgVerificationIdsAndSrcs.size(); j++) {
-                String imgVerificationId1 = imgVerificationIdsAndSrcs.get(i).get(0);
-                String imgVerificationId2 = imgVerificationIdsAndSrcs.get(j).get(0);
-
-                MultiValueMap<String, String> formDataBody = new LinkedMultiValueMap<>();
-                formDataBody.add("reUrl", urlPathWithQueryParams);
-                formDataBody.add("answerCap", String.format("%s,%s,", imgVerificationId1, imgVerificationId2));
-
-                bypassConfigs.add(new BypassAreYouHumanCheckRequestFields(formActionUrl, headers, formDataBody));
-            }
-        }
-
-        return bypassConfigs;
-    }
-
-    @Async
-    public CompletableFuture<String> executeBypassAreYouHumanCheck(BypassAreYouHumanCheckRequestFields configs) {
-        waitForCloudflareToAllowAccessToKissanime();
-        RestTemplate noFollowRedirectsRequest = Requests.getNoFollowRedirectsRestTemplate();
-
-        ResponseEntity<String> searchResponse = noFollowRedirectsRequest.exchange(
-            configs.getFormActionUrl(),
+        ResponseEntity<Void> captchaSolverResponse = captchaSolverRequest.exchange(
+            ARE_YOU_HUMAN_FORM_ACTION_URL,
             HttpMethod.POST,
-            new HttpEntity<>(configs.getFormDataBody(), configs.getHeaders()),
-            String.class
+            new HttpEntity<>(formDataBody, headers),
+            Void.class
         );
 
-        if (searchResponse.getStatusCode() == HttpStatus.FOUND) {
-            log.info("Redirect location = {}", searchResponse.getHeaders().getFirst("Location"));
-
-            String successHtml = new RestTemplate().exchange(
-                configs.getFormActionUrl(),
-                HttpMethod.POST,
-                new HttpEntity<>(configs.getFormDataBody(), configs.getHeaders()),
-                String.class
-            ).getBody();
-
-            return CompletableFuture.completedFuture(successHtml);
-        }
-
-        return CompletableFuture.completedFuture(null);
+        return captchaSolverResponse.getStatusCode() == HttpStatus.FOUND;
     }
 }
