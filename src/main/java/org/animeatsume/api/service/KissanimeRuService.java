@@ -36,9 +36,9 @@ public class KissanimeRuService {
     private static final BrowserEngine browser = BrowserFactory.getWebKit();
 
     private static final String KISSANIME_ORIGIN = "https://kissanime.ru";
+    private static final String TITLE_SEARCH_URL = KISSANIME_ORIGIN + "/Search/SearchSuggestx";
     private static final String CLOUDFLARE_TITLE = "Just a moment";
     private static final String KISSANIME_TITLE = "KissAnime";
-    private static final String TITLE_SEARCH_URL = "https://kissanime.ru/Search/SearchSuggestx";
     private static final int NUM_ATTEMPTS_TO_BYPASS_CLOUDFLARE = 10;
     private static final String MOCK_FIREFOX_USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:77.0) Gecko/20100101 Firefox/77.0";
     private static final String COOKIE_AUTH_NAME = "cf_clearance";
