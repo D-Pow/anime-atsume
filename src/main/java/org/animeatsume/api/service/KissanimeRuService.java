@@ -292,4 +292,20 @@ public class KissanimeRuService {
 
         return captchaSolverResponse.getStatusCode() == HttpStatus.FOUND;
     }
+
+    public KissanimeVideoHostResponse getVideoHostUrlFromEpisodePage(String episodeUrl) {
+        log.info("Getting video host iframe's src value for URL ({})", episodeUrl);
+        waitForCloudflareToAllowAccessToKissanime();
+        String episodePageHtml = new RestTemplate().exchange(
+            episodeUrl,
+            HttpMethod.GET,
+            new HttpEntity<>(null, getNecessaryRequestHeaders()),
+            String.class
+        ).getBody();
+
+        String videoIframeSrcRegex = "(<iframe[^>]+my_video_1[^>]+src=[\"'])([^\"']+)";
+        String videoHostUrl = RegexUtils.getFirstMatchGroups(videoIframeSrcRegex, episodePageHtml, Pattern.CASE_INSENSITIVE).get(2);
+
+        return new KissanimeVideoHostResponse(videoHostUrl, null);
+    }
 }
