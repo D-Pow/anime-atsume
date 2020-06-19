@@ -122,7 +122,7 @@ public class KissanimeRuService {
      * User-Agent header and cf_clearance cookie matter.
      * Origin, etc. doesn't
      */
-    public void waitForCloudflareToAllowAccessToKissanime() {
+    void waitForCloudflareToAllowAccessToKissanime() {
         if (getAuthCookie().hasExpired()) {
             log.info("Cookie has expired. Refreshing now...");
 
@@ -190,6 +190,7 @@ public class KissanimeRuService {
 
     @Async
     public CompletableFuture<List<Anchor>> searchKissanimeEpisodes(String showUrl) {
+        waitForCloudflareToAllowAccessToKissanime();
         log.info("Searching Kissanime for episode list at ({}) ...", showUrl);
 
         String showHtml = new RestTemplate().exchange(
@@ -225,6 +226,7 @@ public class KissanimeRuService {
     }
 
     public boolean requestIsRedirected(String url) {
+        waitForCloudflareToAllowAccessToKissanime();
         RestTemplate noFollowRedirectsRequest = Requests.getNoFollowRedirectsRestTemplate();
 
         ResponseEntity<Void> response = noFollowRedirectsRequest.exchange(
@@ -246,6 +248,7 @@ public class KissanimeRuService {
     }
 
     public List<BypassAreYouHumanCheckRequestFields> getAllBypassAreYouHumanConfigurations(String url) {
+        waitForCloudflareToAllowAccessToKissanime();
         String areYouHumanHtml = new RestTemplate().exchange(
             url,
             HttpMethod.GET,
@@ -297,6 +300,7 @@ public class KissanimeRuService {
 
     @Async
     public CompletableFuture<String> executeBypassAreYouHumanCheck(BypassAreYouHumanCheckRequestFields configs) {
+        waitForCloudflareToAllowAccessToKissanime();
         RestTemplate noFollowRedirectsRequest = Requests.getNoFollowRedirectsRestTemplate();
 
         ResponseEntity<String> searchResponse = noFollowRedirectsRequest.exchange(
