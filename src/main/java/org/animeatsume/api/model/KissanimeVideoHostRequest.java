@@ -5,4 +5,5 @@ import lombok.Data;
 @Data
 public class KissanimeVideoHostRequest {
     private String episodeUrl;
+    private String captchaAnswer;
 }
