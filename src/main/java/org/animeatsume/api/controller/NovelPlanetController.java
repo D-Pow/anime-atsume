@@ -19,6 +19,8 @@ import java.util.stream.Collectors;
 
 import static org.animeatsume.api.utils.http.Cookies.getCookieFromWebsite;
 
+// TODO convert to service, autowire in KissanimeRuController,
+//  and do all this novelplanet logic behind the scenes
 @Component
 public class NovelPlanetController {
     private static final Logger log = LoggerFactory.getLogger(NovelPlanetController.class);
@@ -67,6 +69,7 @@ public class NovelPlanetController {
         return response.getBody();
     }
 
+    // TODO make Async
     private List<String> getMp4UrlsFromRedirectorUrls(
         List<NovelPlanetSourceResponse.NovelPlanetSource> redirectorSources,
         String novelPlanetOrigin,
