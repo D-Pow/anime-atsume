@@ -291,15 +291,14 @@ public class KissanimeRuService {
 
         List<BypassAreYouHumanCheckRequestFields> bypassConfigs = new ArrayList<>();
 
-        for (int i = 0; i < imgVerificationIds.size(); i++) {
-            for (int j = 0; j < imgVerificationIds.size(); j++) {
-                if (i == j) {
-                    continue;
-                }
+        for (int i = 0; i < imgVerificationIdsAndSrcs.size(); i++) {
+            for (int j = i+1; j < imgVerificationIdsAndSrcs.size(); j++) {
+                String imgVerificationId1 = imgVerificationIdsAndSrcs.get(i).get(0);
+                String imgVerificationId2 = imgVerificationIdsAndSrcs.get(j).get(0);
 
                 MultiValueMap<String, String> formDataBody = new LinkedMultiValueMap<>();
                 formDataBody.add("reUrl", urlPathWithQueryParams);
-                formDataBody.add("answerCap", String.format("%d,%d,", i, j));
+                formDataBody.add("answerCap", String.format("%s,%s,", imgVerificationId1, imgVerificationId2));
 
                 bypassConfigs.add(new BypassAreYouHumanCheckRequestFields(formActionUrl, headers, formDataBody));
             }
