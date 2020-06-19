@@ -139,6 +139,7 @@ public class KissanimeRuService {
 
         headers.set("User-Agent", MOCK_FIREFOX_USER_AGENT);
         headers.set("Cookie", getAuthCookie().toString());
+        headers.add("Origin", KISSANIME_ORIGIN);
 
         return headers;
     }
