@@ -1,9 +1,6 @@
 package org.animeatsume.api.controller;
 
-import org.animeatsume.api.model.Anchor;
-import org.animeatsume.api.model.KissanimeSearchRequest;
-import org.animeatsume.api.model.KissanimeSearchResponse;
-import org.animeatsume.api.model.KissanimeVideoHostRequest;
+import org.animeatsume.api.model.*;
 import org.animeatsume.api.service.KissanimeRuService;
 import org.animeatsume.api.utils.ObjectUtils;
 import org.slf4j.Logger;
@@ -13,9 +10,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 
 @Component
 public class KissanimeRuController {
@@ -50,27 +45,25 @@ public class KissanimeRuController {
         return kissanimeSearchResponse;
     }
 
-    public void getNovelPlanetUrlForKissanimeEpisode(KissanimeVideoHostRequest request) {
+    public KissanimeVideoHostResponse getNovelPlanetUrlForKissanimeEpisode(KissanimeVideoHostRequest request) {
+        log.info("KissanimeVideoHostRequest = {}", request);
         String kissanimeEpisodeUrl = request.getEpisodeUrl();
 
-        if (kissanimeService.requestIsRedirected(kissanimeEpisodeUrl)) {
-            // Request is redirected because AreYouHuman verification needs to be completed
-            List<KissanimeRuService.BypassAreYouHumanCheckRequestFields> bypassAttemptConfigs =
-                kissanimeService.getAllBypassAreYouHumanConfigurations(kissanimeEpisodeUrl);
+        if (request.getCaptchaAnswer() == null || request.getCaptchaAnswer().equals("")) {
+            if (kissanimeService.requestIsRedirected(kissanimeEpisodeUrl)) {
+                // Request is redirected because AreYouHuman verification needs to be completed
+                return kissanimeService.getBypassAreYouHumanPromptContent(kissanimeEpisodeUrl);
+            }
 
-            List<CompletableFuture<String>> bypassAttempts = new ArrayList<>();
-
-            bypassAttemptConfigs.forEach(config -> {
-                bypassAttempts.add(kissanimeService.executeBypassAreYouHumanCheck(config));
-            });
-
-            List<String> attemptResults = ObjectUtils.getAllCompletableFutureResults(bypassAttempts);
-
-            List<String> successfulBypassHtmlStrings = attemptResults.stream()
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
-
-            log.info("Successful bypass HTML strings = {}", successfulBypassHtmlStrings);
+            return kissanimeService.getVideoHostUrlFromEpisodePage(request.getEpisodeUrl());
         }
+
+        boolean bypassSuccess = kissanimeService.executeBypassAreYouHumanCheck(request.getEpisodeUrl(), request.getCaptchaAnswer());
+
+        if (!bypassSuccess) {
+            return kissanimeService.getBypassAreYouHumanPromptContent(kissanimeEpisodeUrl);
+        }
+
+        return kissanimeService.getVideoHostUrlFromEpisodePage(request.getEpisodeUrl());
     };
 }
