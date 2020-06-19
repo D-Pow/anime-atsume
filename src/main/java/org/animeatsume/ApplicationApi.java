@@ -2,10 +2,7 @@ package org.animeatsume;
 
 import org.animeatsume.api.controller.KissanimeRuController;
 import org.animeatsume.api.controller.NovelPlanetController;
-import org.animeatsume.api.model.KissanimeSearchRequest;
-import org.animeatsume.api.model.KissanimeSearchResponse;
-import org.animeatsume.api.model.NovelPlanetSourceResponse;
-import org.animeatsume.api.model.NovelPlanetUrlRequest;
+import org.animeatsume.api.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +25,12 @@ public class ApplicationApi {
     @PostMapping(value = "/searchKissanime", consumes = MediaType.APPLICATION_JSON_VALUE)
     public KissanimeSearchResponse searchKissanime(@RequestBody KissanimeSearchRequest kissanimeSearchRequest) {
         return kissanimeRuController.searchKissanimeTitles(kissanimeSearchRequest);
+    }
+
+    @CrossOrigin
+    @PostMapping(value = "/getVideoHostForEpisode")
+    public void getNovelPlanetUrlForKissanimeEpisode(@RequestBody KissanimeVideoHostRequest kissanimeEpisodeRequest) {
+        kissanimeRuController.getNovelPlanetUrlForKissanimeEpisode(kissanimeEpisodeRequest);
     }
 
     @CrossOrigin

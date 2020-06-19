@@ -4,9 +4,12 @@ import io.webfolder.ui4j.api.browser.BrowserEngine;
 import io.webfolder.ui4j.api.browser.BrowserFactory;
 import io.webfolder.ui4j.api.browser.Page;
 import io.webfolder.ui4j.api.browser.PageConfiguration;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import org.animeatsume.api.model.Anchor;
 import org.animeatsume.api.model.KissanimeSearchRequest;
 import org.animeatsume.api.model.KissanimeSearchResponse;
+import org.animeatsume.api.utils.http.Requests;
 import org.animeatsume.api.utils.regex.HtmlParser;
 import org.animeatsume.api.utils.regex.RegexUtils;
 import org.animeatsume.api.utils.ui4j.PageUtils;
@@ -19,13 +22,13 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-import java.net.CookieHandler;
-import java.net.CookieManager;
+import java.net.*;
 import java.net.HttpCookie;
-import java.net.URI;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
@@ -219,5 +222,103 @@ public class KissanimeRuService {
             .collect(Collectors.toList());
 
         return CompletableFuture.completedFuture(episodeLinks);
+    }
+
+    public boolean requestIsRedirected(String url) {
+        RestTemplate noFollowRedirectsRequest = Requests.getNoFollowRedirectsRestTemplate();
+
+        ResponseEntity<Void> response = noFollowRedirectsRequest.exchange(
+            url,
+            HttpMethod.GET,
+            new HttpEntity<>(null, getNecessaryRequestHeaders()),
+            Void.class
+        );
+
+        return response.getStatusCode() == HttpStatus.FOUND;
+    }
+
+    @Data
+    @AllArgsConstructor
+    public static class BypassAreYouHumanCheckRequestFields {
+        private String formActionUrl;
+        private HttpHeaders headers;
+        private MultiValueMap<String, String> formDataBody;
+    }
+
+    public List<BypassAreYouHumanCheckRequestFields> getAllBypassAreYouHumanConfigurations(String url) {
+        String areYouHumanHtml = new RestTemplate().exchange(
+            url,
+            HttpMethod.GET,
+            new HttpEntity<>(null, getNecessaryRequestHeaders()),
+            String.class
+        ).getBody();
+
+        String imgVerificationIdRegex = "(<img[^>]+?indexValue=['\"])(\\w+)";
+        String formActionUrlPathRegex = "(<form(?=[^>]+AreYouHuman)[^>]+action=\")([^\"]+)";
+
+        List<String> imgVerificationIds = RegexUtils.getAllMatchesAndGroups(imgVerificationIdRegex, areYouHumanHtml, Pattern.CASE_INSENSITIVE)
+            .stream()
+            .map(imgTagMatches -> imgTagMatches.get(2))
+            .collect(Collectors.toList());
+        String formActionUrlPath = RegexUtils.getAllMatchesAndGroups(
+            formActionUrlPathRegex,
+            areYouHumanHtml,
+            Pattern.CASE_INSENSITIVE
+        ).get(0).get(2);
+        String formActionUrl = KISSANIME_ORIGIN + formActionUrlPath;
+
+        String urlPathWithQueryParams = url.replace(KISSANIME_ORIGIN, "");
+
+        HttpHeaders headers = getNecessaryRequestHeaders();
+        headers.add("Referer", formActionUrl + "?reUrl=" + urlPathWithQueryParams);
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        headers.setAccept(Arrays.asList(MediaType.TEXT_HTML, MediaType.APPLICATION_XHTML_XML, MediaType.APPLICATION_XML));
+
+        log.info("imgVerificationIds ({}), urlPathWithQuery ({}), formActionUrl ({}), referer ({})", imgVerificationIds, urlPathWithQueryParams, formActionUrl, formActionUrl + "?reUrl=" + urlPathWithQueryParams);
+
+        List<BypassAreYouHumanCheckRequestFields> bypassConfigs = new ArrayList<>();
+
+        for (int i = 0; i < imgVerificationIds.size(); i++) {
+            for (int j = 0; j < imgVerificationIds.size(); j++) {
+                if (i == j) {
+                    continue;
+                }
+
+                MultiValueMap<String, String> formDataBody = new LinkedMultiValueMap<>();
+                formDataBody.add("reUrl", urlPathWithQueryParams);
+                formDataBody.add("answerCap", String.format("%d,%d,", i, j));
+
+                bypassConfigs.add(new BypassAreYouHumanCheckRequestFields(formActionUrl, headers, formDataBody));
+            }
+        }
+
+        return bypassConfigs;
+    }
+
+    @Async
+    public CompletableFuture<String> executeBypassAreYouHumanCheck(BypassAreYouHumanCheckRequestFields configs) {
+        RestTemplate noFollowRedirectsRequest = Requests.getNoFollowRedirectsRestTemplate();
+
+        ResponseEntity<String> searchResponse = noFollowRedirectsRequest.exchange(
+            configs.getFormActionUrl(),
+            HttpMethod.POST,
+            new HttpEntity<>(configs.getFormDataBody(), configs.getHeaders()),
+            String.class
+        );
+
+        if (searchResponse.getStatusCode() == HttpStatus.FOUND) {
+            log.info("Redirect location = {}", searchResponse.getHeaders().getFirst("Location"));
+
+            String successHtml = new RestTemplate().exchange(
+                configs.getFormActionUrl(),
+                HttpMethod.POST,
+                new HttpEntity<>(configs.getFormDataBody(), configs.getHeaders()),
+                String.class
+            ).getBody();
+
+            return CompletableFuture.completedFuture(successHtml);
+        }
+
+        return CompletableFuture.completedFuture(null);
     }
 }
