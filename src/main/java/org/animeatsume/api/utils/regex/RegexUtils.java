@@ -10,14 +10,16 @@ public class RegexUtils {
      * Searches a given string, {@code toSearch}, with the respective {@code regex}.
      * Returns a list of lists, where each nested list contains all match groups of
      * the {@code regex}.
+     * Allows selection of Pattern.SOME_OPTION.
      *
      * @param regex Regex to apply to the {@code toSearch} string.
      * @param toSearch String to search for matches.
+     * @param patternOption Option from static Pattern config variable.
      * @return List of lists; top-level list contains separate matches,
      *          whereas each nested list contains match groups for a given match.
      */
-    public static List<List<String>> getAllMatchesAndGroups(String regex, String toSearch) {
-        Pattern regexPattern = Pattern.compile(regex);
+    public static List<List<String>> getAllMatchesAndGroups(String regex, String toSearch, int patternOption) {
+        Pattern regexPattern = Pattern.compile(regex, patternOption);
         Matcher strToSearchMatcher = regexPattern.matcher(toSearch);
         List<List<String>> allMatches = new ArrayList<>();
 
@@ -32,6 +34,20 @@ public class RegexUtils {
         }
 
         return allMatches;
+    }
+
+    /**
+     * Searches a given string, {@code toSearch}, with the respective {@code regex}.
+     * Returns a list of lists, where each nested list contains all match groups of
+     * the {@code regex}.
+     *
+     * @param regex Regex to apply to the {@code toSearch} string.
+     * @param toSearch String to search for matches.
+     * @return List of lists; top-level list contains separate matches,
+     *          whereas each nested list contains match groups for a given match.
+     */
+    public static List<List<String>> getAllMatchesAndGroups(String regex, String toSearch) {
+        return getAllMatchesAndGroups(regex, toSearch, 0);
     }
 
     /**
