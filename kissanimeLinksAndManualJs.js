@@ -100,15 +100,13 @@ function getCookie(cookie = document.cookie) {
     }, {});
 }
 
-(async function addVideoToCurrentScreen() {
+async function addVideoFromHostUrlToScreen(novelPlanetUrl) {
     const res = await fetch('/getNovelPlanetSources', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({
-            "novelPlanetUrl": "https://www.novelplanet.me/v/4dvj42p-yv1"
-        })
+        body: JSON.stringify({ novelPlanetUrl })
     }).then(res => res.json());
 
     const { file } = res.data[0];
@@ -129,7 +127,7 @@ function getCookie(cookie = document.cookie) {
     document.body.appendChild(video);
 
     console.log(file);
-})()
+}
 
 // https://kissanime.ru/Anime/Shigatsu-wa-Kimi-no-Uso
 document.querySelector('form').submit()
