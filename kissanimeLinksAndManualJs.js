@@ -34,6 +34,60 @@ async function searchKissanime(keyword, type = 'Anime') {
     // Note that 'your lie' and 'shigatsu wa kimi no uso' both return the same URL but different titles
 }
 
+async function searchTitle(title) {
+    const searchResults = await fetch('/searchKissanime', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            title
+        })
+    }).then(res => res.json());
+
+    console.log(searchResults);
+}
+
+async function getEpisodeHost(episodeUrl, captchaAnswer = null) {
+    document.body.innerHTML = '';
+
+    const { videoHostUrl, captchaContent } = await fetch('/getVideoHostForEpisode', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            episodeUrl,
+            captchaAnswer
+        })
+    }).then(res => res.json());
+
+    if (captchaContent) {
+        captchaContent.promptTexts.forEach(prompt => {
+            const h1 = document.createElement('h1');
+            h1.innerText = prompt;
+            document.body.appendChild(h1);
+        })
+
+        captchaContent.imgIdsAndSrcs.forEach(({ url, title }) => {
+            const img = document.createElement('img');
+            img.src = url;
+
+            const h3 = document.createElement('h3');
+            h3.innerText = title;
+
+            const div = document.createElement('div');
+            div.appendChild(h3);
+            div.appendChild(img);
+            document.body.appendChild(div);
+        });
+    } else if (videoHostUrl) {
+        const h1 = document.createElement('h1');
+        h1.innerText = videoHostUrl;
+        document.body.appendChild(h1);
+    }
+}
+
 function getCookie(cookie = document.cookie) {
     return cookie.split('; ').reduce((cookieObj, entry) => {
         const keyVal = entry.split('=');
@@ -47,7 +101,7 @@ function getCookie(cookie = document.cookie) {
 }
 
 (async function addVideoToCurrentScreen() {
-    const res = await fetch('http://localhost:8080/getNovelPlanetSources', {
+    const res = await fetch('/getNovelPlanetSources', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -58,7 +112,7 @@ function getCookie(cookie = document.cookie) {
     }).then(res => res.json());
 
     const { file } = res.data[0];
-    const urlPrefix = 'http://localhost:8080/novelPlanetVideo?url=';
+    const urlPrefix = '/novelPlanetVideo?url=';
 
     try {
         document.body.removeChild(document.querySelector('video'));
