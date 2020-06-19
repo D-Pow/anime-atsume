@@ -210,7 +210,7 @@ public class KissanimeRuService {
                 String title = HtmlParser.getTextFromAnchor(anchorString);
 
                 // Remove leading spaces/tabs/etc.
-                title = title.replaceFirst("^\\s+", "");
+                title = RegexUtils.strip(title);
 
                 // Add kissanime origin since URLs are relative.
                 // Also, make URL choose NovelPlanet by default

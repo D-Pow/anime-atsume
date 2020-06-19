@@ -68,4 +68,14 @@ public class RegexUtils {
     public static List<String> getFirstMatchGroups(String regex, String toSearch) {
         return getFirstMatchGroups(regex, toSearch, 0);
     }
+
+    /**
+     * Removes leading and trailing spaces from a string.
+     *
+     * @param str String from which to strip spaces.
+     * @return String without leading or trailing spaces.
+     */
+    public static String strip(String str) {
+        return str.replaceAll("^\\s+", "").replaceAll("\\s+$", "");
+    }
 }
