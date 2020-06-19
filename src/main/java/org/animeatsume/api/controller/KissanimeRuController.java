@@ -45,25 +45,27 @@ public class KissanimeRuController {
         return kissanimeSearchResponse;
     }
 
-    public KissanimeVideoHostResponse getNovelPlanetUrlForKissanimeEpisode(KissanimeVideoHostRequest request) {
+    public KissanimeVideoHostResponse getVideoHostUrlForKissanimeEpisode(KissanimeVideoHostRequest request) {
         log.info("KissanimeVideoHostRequest = {}", request);
-        String kissanimeEpisodeUrl = request.getEpisodeUrl();
 
-        if (request.getCaptchaAnswer() == null || request.getCaptchaAnswer().equals("")) {
+        String kissanimeEpisodeUrl = request.getEpisodeUrl();
+        String captchaAnswer = request.getCaptchaAnswer();
+
+        if (captchaAnswer == null || captchaAnswer.equals("")) {
             if (kissanimeService.requestIsRedirected(kissanimeEpisodeUrl)) {
                 // Request is redirected because AreYouHuman verification needs to be completed
                 return kissanimeService.getBypassAreYouHumanPromptContent(kissanimeEpisodeUrl);
             }
 
-            return kissanimeService.getVideoHostUrlFromEpisodePage(request.getEpisodeUrl());
+            return kissanimeService.getVideoHostUrlFromEpisodePage(kissanimeEpisodeUrl);
         }
 
-        boolean bypassSuccess = kissanimeService.executeBypassAreYouHumanCheck(request.getEpisodeUrl(), request.getCaptchaAnswer());
+        boolean bypassSuccess = kissanimeService.executeBypassAreYouHumanCheck(kissanimeEpisodeUrl, captchaAnswer);
 
         if (!bypassSuccess) {
             return kissanimeService.getBypassAreYouHumanPromptContent(kissanimeEpisodeUrl);
         }
 
-        return kissanimeService.getVideoHostUrlFromEpisodePage(request.getEpisodeUrl());
+        return kissanimeService.getVideoHostUrlFromEpisodePage(kissanimeEpisodeUrl);
     };
 }
