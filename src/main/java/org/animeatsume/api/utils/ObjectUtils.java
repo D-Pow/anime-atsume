@@ -13,6 +13,10 @@ import java.util.function.Consumer;
 public class ObjectUtils {
     private static final Logger log = LoggerFactory.getLogger(ObjectUtils.class);
 
+    public static <T> List<T> getAllCompletableFutureResults(List<CompletableFuture<T>> futures) {
+        return getAllCompletableFutureResults(futures, (result, index) -> {});
+    }
+
     public static <T> List<T> getAllCompletableFutureResults(
         List<CompletableFuture<T>> futures,
         Consumer<T> sideEffect
