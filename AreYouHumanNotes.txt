@@ -1,2 +1,0 @@
-HTTP status of correct answer is 302 (found). Will redirect afterwards
-HTTP status of incorrect is 200 (OK). Will show 'wrong answer, try again'
