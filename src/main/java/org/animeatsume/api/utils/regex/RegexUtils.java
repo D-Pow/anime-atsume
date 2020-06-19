@@ -56,11 +56,16 @@ public class RegexUtils {
      *
      * @param regex Regex to apply to the {@code toSearch} string.
      * @param toSearch String to search for matches.
+     * @param patternOption Option from static Pattern config variable.
      * @return List containing all match groups for the given {@code toSearch} string.
      */
-    public static List<String> getFirstMatchGroups(String regex, String toSearch) {
-        List<List<String>> allMatches = getAllMatchesAndGroups(regex, toSearch);
+    public static List<String> getFirstMatchGroups(String regex, String toSearch, int patternOption) {
+        List<List<String>> allMatches = getAllMatchesAndGroups(regex, toSearch, patternOption);
 
         return allMatches.size() > 0 ? allMatches.get(0) : new ArrayList<>();
+    }
+
+    public static List<String> getFirstMatchGroups(String regex, String toSearch) {
+        return getFirstMatchGroups(regex, toSearch, 0);
     }
 }
