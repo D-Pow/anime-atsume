@@ -256,20 +256,30 @@ public class KissanimeRuService {
             String.class
         ).getBody();
 
-        String imgVerificationIdRegex = "(<img[^>]+?indexValue=['\"])(\\w+)";
-        String formActionUrlPathRegex = "(<form(?=[^>]+AreYouHuman)[^>]+action=\")([^\"]+)";
+        // Form action, images, and image-selection prompt texts are all nested inside the <form> element
+        // so regex strings are relative to within the <form>, not the entire <html> string.
+        String areYouHumanFormHtmlRegex = "(<form(?=[^>]+AreYouHuman)[\\s\\S]+?</form>)";
+        String formActionUrlPathRegex = "(?<=action=[\"'])([^\"']+)";
+        String imgVerificationIdAndSrcRegex = "(<img[^>]+?indexValue=['\"])(\\w+)(.*?src=['\"])([^'\"]+)";
+        String spanBodyRegex = "(<span[^>]+>)([^<]+)";
 
-        List<String> imgVerificationIds = RegexUtils.getAllMatchesAndGroups(imgVerificationIdRegex, areYouHumanHtml, Pattern.CASE_INSENSITIVE)
+        String formHtml = RegexUtils.getFirstMatchGroups(areYouHumanFormHtmlRegex, areYouHumanHtml, Pattern.CASE_INSENSITIVE).get(0);
+
+        List<List<String>> imgVerificationIdsAndSrcs = RegexUtils.getAllMatchesAndGroups(imgVerificationIdAndSrcRegex, formHtml, Pattern.CASE_INSENSITIVE)
             .stream()
-            .map(imgTagMatches -> imgTagMatches.get(2))
+            .map(imgMatchGroups -> Arrays.asList(imgMatchGroups.get(2), imgMatchGroups.get(4)))
             .collect(Collectors.toList());
-        String formActionUrlPath = RegexUtils.getAllMatchesAndGroups(
+        String formActionUrlPath = RegexUtils.getFirstMatchGroups(
             formActionUrlPathRegex,
-            areYouHumanHtml,
+            formHtml,
             Pattern.CASE_INSENSITIVE
-        ).get(0).get(2);
-        String formActionUrl = KISSANIME_ORIGIN + formActionUrlPath;
+        ).get(0);
+        List<String> promptsForImagesToSelect = RegexUtils.getAllMatchesAndGroups(spanBodyRegex, formHtml, Pattern.CASE_INSENSITIVE)
+            .stream()
+            .map(spanMatchGroups -> RegexUtils.strip(spanMatchGroups.get(2)))
+            .collect(Collectors.toList());
 
+        String formActionUrl = KISSANIME_ORIGIN + formActionUrlPath;
         String urlPathWithQueryParams = url.replace(KISSANIME_ORIGIN, "");
 
         HttpHeaders headers = getNecessaryRequestHeaders();
@@ -277,7 +287,7 @@ public class KissanimeRuService {
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         headers.setAccept(Arrays.asList(MediaType.TEXT_HTML, MediaType.APPLICATION_XHTML_XML, MediaType.APPLICATION_XML));
 
-        log.info("imgVerificationIds ({}), urlPathWithQuery ({}), formActionUrl ({}), referer ({})", imgVerificationIds, urlPathWithQueryParams, formActionUrl, formActionUrl + "?reUrl=" + urlPathWithQueryParams);
+        log.info("imgVerificationIdsAndSrcs ({}), urlPathWithQuery ({}), formActionUrl ({}), referer ({})", imgVerificationIdsAndSrcs, urlPathWithQueryParams, formActionUrl, formActionUrl + "?reUrl=" + urlPathWithQueryParams);
 
         List<BypassAreYouHumanCheckRequestFields> bypassConfigs = new ArrayList<>();
 
