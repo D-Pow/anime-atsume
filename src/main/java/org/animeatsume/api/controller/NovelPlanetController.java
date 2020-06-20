@@ -7,10 +7,18 @@ import org.animeatsume.api.utils.http.Requests;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.*;
+import org.springframework.core.io.buffer.DataBuffer;
+import org.springframework.core.io.buffer.DataBufferUtils;
+import org.springframework.core.io.support.ResourceRegion;
 import org.springframework.http.*;
+import org.springframework.http.server.reactive.ServerHttpRequest;
+import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StreamUtils;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.server.ServerResponse;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.io.*;
 import java.net.URL;
@@ -149,6 +157,81 @@ public class NovelPlanetController {
     public ResponseEntity<Resource> getVideoSrcStreamFromMp4Url(String url, String rangeHeader) {
         return Requests.getUrlResourceStreamResponse(url);
 //        return getVideoSrcStreamFromMp4UrlFile(url, rangeHeader);
+    }
+
+    // Doesn't work for same reason as Mono: No encoder for 'video/mp4'
+    public ResponseEntity<ResourceRegion> getVideoSrcStreamFromMp4UrlResourceRegion(String url, ServerHttpRequest request) {
+        ResourceRegion urlResourceRegion = Requests.getUrlResourceRegion(url, request.getHeaders());
+
+        if (urlResourceRegion == null) {
+            return ResponseEntity.noContent().build();
+        }
+
+        HttpHeaders responseHeaders = new HttpHeaders();
+        responseHeaders.setContentType(
+            MediaTypeFactory
+                .getMediaType(urlResourceRegion.getResource())
+                .orElse(MediaType.APPLICATION_OCTET_STREAM)
+        );
+
+        return ResponseEntity
+            .status(HttpStatus.PARTIAL_CONTENT)
+            .contentLength(urlResourceRegion.getCount())
+            .contentType(
+                MediaTypeFactory
+                    .getMediaType(urlResourceRegion.getResource())
+                    .orElse(MediaType.APPLICATION_OCTET_STREAM)
+            )
+            .body(urlResourceRegion);
+    }
+
+    // Works but no better than returning UrlResource directly.
+    // Doesn't allow seeking b/c no new requests are accepted (caused by header: transfer-encoding: chunked).
+    // TODO find out how to accept new requests upon seek attempts
+    //  Might be possible if this returned Flux<SomethingElse> with a Resource-like object
+    public Flux<DataBuffer> getVideoSrcStreamFromMp4UrlFlux(String url, ServerHttpRequest request, ServerHttpResponse response) {
+        try {
+            UrlResource mp4Resource = new UrlResource(url);
+
+            HttpRange range = request.getHeaders().getRange().isEmpty() ? null : request.getHeaders().getRange().get(0);
+
+            long startPosition = range != null ? range.getRangeStart(mp4Resource.contentLength()) : 0;
+
+            return DataBufferUtils.read(mp4Resource, startPosition, response.bufferFactory(), 2048);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    // Doesn't work b/c No Encoder for ServerResponse of type 'video/mp4'
+    // from: https://github.com/Recks11/Webflux-Streaming-Service/blob/master/src/main/java/com/rexijie/webflixstreamingservice/services/impl/VideoServiceImpl.java
+    // usage: https://github.com/Recks11/Webflux-Streaming-Service/blob/c0362da0a52ad0fe74cf1cfd473da439d81e468e/src/main/java/com/rexijie/webflixstreamingservice/api/v1/handlers/VideoRouteHandler.java#L58
+    public Mono<ServerResponse> getVideoSrcStreamFromMp4UrlMono(String url, ServerHttpRequest request) {
+        Mono<ResourceRegion> resourceRegionMono = Mono.create(monoSink -> {
+            ResourceRegion urlResourceRegion = Requests.getUrlResourceRegion(url, request.getHeaders());
+
+            if (urlResourceRegion != null) {
+                monoSink.success(urlResourceRegion);
+            } else {
+                monoSink.error(new Exception("Could not obtain ResourceRegion for URL = " + url));
+            }
+        });
+
+        log.info("Resource region mono = {}", resourceRegionMono);
+
+        return resourceRegionMono.flatMap(
+            resourceRegion -> ServerResponse
+                .status(HttpStatus.PARTIAL_CONTENT)
+                .contentLength(resourceRegion.getCount())
+                .contentType( //MediaType.asMediaType(MimeType.valueOf("video/mp4"))
+                    MediaTypeFactory
+                        .getMediaType(resourceRegion.getResource())
+                        .orElse(MediaType.APPLICATION_OCTET_STREAM)
+                )
+                .body(resourceRegion, ResourceRegion.class)
+        );
     }
 
     public ResponseEntity<Resource> getVideoSrcStreamFromMp4UrlFile(String url, String rangeHeader) {
