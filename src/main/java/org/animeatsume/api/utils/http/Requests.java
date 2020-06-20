@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
+import org.springframework.core.io.support.ResourceRegion;
 import org.springframework.http.*;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
@@ -92,5 +93,40 @@ public class Requests {
 
             return ResponseEntity.noContent().build();
         }
+    }
+
+    private static final long BYTE_LENGTH = 1024;
+    private static final long CHUNK_SIZE_VERY_LOW = BYTE_LENGTH * 256;
+    private static final long CHUNK_SIZE_LOW = BYTE_LENGTH * 512;
+    private static final long CHUNK_SIZE_MED = BYTE_LENGTH * 1024;
+    private static final long CHUNK_SIZE_HIGH = BYTE_LENGTH * 2048;
+    private static final long CHUNK_SIZE_VERY_HIGH = CHUNK_SIZE_HIGH * 2;
+
+    public static ResourceRegion getUrlResourceRegion(String url, HttpHeaders headers) {
+        long chunkSize = CHUNK_SIZE_MED; // TODO choose which chunk size to use from above
+
+        try {
+            UrlResource urlResource = new UrlResource(url);
+            long contentLength = urlResource.contentLength();
+            HttpRange range = headers.getRange().isEmpty() ? null : headers.getRange().get(0);
+
+            if (range != null) {
+                long rangeStart = range.getRangeStart(contentLength);
+                long rangeEnd = range.getRangeEnd(contentLength);
+                long resourceLength = rangeEnd - rangeStart + 1;
+                long rangeLength = Math.min(chunkSize, resourceLength);
+
+                return new ResourceRegion(urlResource, rangeStart, rangeLength);
+            } else {
+                long rangeLength = Math.min(chunkSize, contentLength);
+
+                return new ResourceRegion(urlResource, 0, rangeLength);
+            }
+        } catch (IOException e) {
+            log.error("Could not get UrlResource or ResourceRegion for URL ({})", url);
+            e.printStackTrace();
+        }
+
+        return null;
     }
 }
