@@ -82,9 +82,7 @@ public class Requests {
                 .contentType(
                     MediaTypeFactory
                         .getMediaType(urlResource)
-                        .orElse(MediaType.valueOf(
-                            MediaType.APPLICATION_OCTET_STREAM_VALUE
-                        ))
+                        .orElse(MediaType.APPLICATION_OCTET_STREAM)
                 )
                 .body(urlResource);
         } catch (MalformedURLException e) {
