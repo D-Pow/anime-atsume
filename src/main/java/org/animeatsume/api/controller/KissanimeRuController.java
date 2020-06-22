@@ -108,6 +108,8 @@ public class KissanimeRuController {
 
         ObjectUtils.getAllCompletableFutureResults(mp4UrlCompletableFutures);
 
+        log.info("Obtained {} MP4 sources for NovelPlanet URL ({})", sourcesForVideo.getData().size(), novelPlanetApiUrl);
+
         return sourcesForVideo;
     }
 }
