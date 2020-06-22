@@ -37,6 +37,7 @@ public class NovelPlanetService {
     private static final String apiIdentifier = "/api/source/";
 
     public NovelPlanetSourceResponse getNovelPlanetSources(NovelPlanetUrlRequest novelPlanetRequest) {
+        log.info("Getting NovelPlanet MP4 sources for request ({})", novelPlanetRequest);
         URI websiteUrlObj = novelPlanetRequest.getNovelPlanetUrl();
         String websiteUrl = websiteUrlObj.toString();
         String origin = UriParser.getOrigin(websiteUrlObj);
@@ -48,7 +49,7 @@ public class NovelPlanetService {
         List<String> mp4Urls = getMp4UrlsFromRedirectorUrls(sourcesForVideo.getData(), origin, websiteUrl, cookie);
         setActualMp4UrlsFromNovelPlanetSources(sourcesForVideo, mp4Urls);
 
-        mp4Urls.forEach(log::info);
+        log.info("Obtained {} MP4 sources for NovelPlanet URL ({})", sourcesForVideo.getData().size(), novelPlanetApiUrl);
 
         return sourcesForVideo;
     }
