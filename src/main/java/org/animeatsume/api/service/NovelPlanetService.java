@@ -31,6 +31,7 @@ public class NovelPlanetService {
     private static final Logger log = LoggerFactory.getLogger(NovelPlanetService.class);
     private static final String websiteIdentifier = "/v/";
     private static final String apiIdentifier = "/api/source/";
+    public static final String DOMAIN = "novelplanet";
 
     public <T> HttpEntity<T> getCorsEntityForNovelPlanet(T body, URI uri) {
         String url = uri.toString();

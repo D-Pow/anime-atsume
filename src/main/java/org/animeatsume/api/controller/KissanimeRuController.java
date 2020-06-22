@@ -59,7 +59,7 @@ public class KissanimeRuController {
         String videoHostUrl = videoHost.getVideoHostUrl();
         Object body = videoHost;
 
-        if (videoHostUrl != null && !videoHostUrl.isEmpty()) {
+        if (videoHostUrl != null && !videoHostUrl.isEmpty() && videoHostUrl.contains(NovelPlanetService.DOMAIN)) {
             body = getVideoSourcesForNovelPlanetHost(videoHostUrl);
         }
 
