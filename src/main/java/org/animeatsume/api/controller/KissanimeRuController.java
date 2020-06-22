@@ -2,12 +2,16 @@ package org.animeatsume.api.controller;
 
 import org.animeatsume.api.model.*;
 import org.animeatsume.api.service.KissanimeRuService;
+import org.animeatsume.api.service.NovelPlanetService;
 import org.animeatsume.api.utils.ObjectUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -18,6 +22,9 @@ public class KissanimeRuController {
 
     @Autowired
     KissanimeRuService kissanimeService;
+
+    @Autowired
+    NovelPlanetService novelPlanetService;
 
     public KissanimeSearchResponse searchKissanimeTitles(KissanimeSearchRequest kissanimeSearchRequest) {
         KissanimeSearchResponse kissanimeSearchResponse = kissanimeService.searchKissanimeTitles(kissanimeSearchRequest);
@@ -45,7 +52,21 @@ public class KissanimeRuController {
         return kissanimeSearchResponse;
     }
 
-    public KissanimeVideoHostResponse getVideoHostUrlForKissanimeEpisode(KissanimeVideoHostRequest request) {
+    public ResponseEntity<Object> getVideosForKissanimeEpisode(KissanimeVideoHostRequest request) {
+        KissanimeVideoHostResponse videoHost = getVideoHostUrlForKissanimeEpisode(request);
+        String videoHostUrl = videoHost.getVideoHostUrl();
+        Object body = videoHost;
+
+        if (videoHostUrl != null && !videoHostUrl.isEmpty()) {
+            body = getVideoSourcesForNovelPlanetHost(videoHostUrl);
+        }
+
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(body);
+    }
+
+    private KissanimeVideoHostResponse getVideoHostUrlForKissanimeEpisode(KissanimeVideoHostRequest request) {
         log.info("KissanimeVideoHostRequest = {}", request);
 
         String kissanimeEpisodeUrl = request.getEpisodeUrl();
@@ -68,4 +89,8 @@ public class KissanimeRuController {
 
         return kissanimeService.getVideoHostUrlFromEpisodePage(kissanimeEpisodeUrl);
     };
+
+    private NovelPlanetSourceResponse getVideoSourcesForNovelPlanetHost(String videoHostUrl) {
+        return novelPlanetService.getNovelPlanetSources(new NovelPlanetUrlRequest(URI.create(videoHostUrl)));
+    }
 }

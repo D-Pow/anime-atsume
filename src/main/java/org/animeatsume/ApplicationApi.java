@@ -28,9 +28,9 @@ public class ApplicationApi {
     }
 
     @CrossOrigin
-    @PostMapping(value = "/getVideoHostForEpisode")
-    public KissanimeVideoHostResponse getVideoHostUrlForKissanimeEpisode(@RequestBody KissanimeVideoHostRequest kissanimeEpisodeRequest) {
-        return kissanimeRuController.getVideoHostUrlForKissanimeEpisode(kissanimeEpisodeRequest);
+    @PostMapping(value = "/getVideosForEpisode")
+    public ResponseEntity<Object> getVideoHostUrlForKissanimeEpisode(@RequestBody KissanimeVideoHostRequest kissanimeEpisodeRequest) {
+        return kissanimeRuController.getVideosForKissanimeEpisode(kissanimeEpisodeRequest);
     }
 
     @CrossOrigin

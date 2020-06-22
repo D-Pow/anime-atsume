@@ -51,7 +51,7 @@ async function searchTitle(title) {
 async function getEpisodeHost(episodeUrl, captchaAnswer = null) {
     document.body.innerHTML = '';
 
-    const { videoHostUrl, captchaContent } = await fetch('/getVideoHostForEpisode', {
+    const { videoHostUrl, captchaContent } = await fetch('/getVideosForEpisode', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
