@@ -1,7 +1,7 @@
 package org.animeatsume.api.service;
 
 import org.animeatsume.api.model.NovelPlanetSourceResponse;
-import org.animeatsume.api.model.NovelPlanetUrlRequest;
+import org.animeatsume.api.utils.http.Cookies;
 import org.animeatsume.api.utils.http.CorsProxy;
 import org.animeatsume.api.utils.http.Requests;
 import org.animeatsume.api.utils.http.UriParser;
@@ -14,6 +14,7 @@ import org.springframework.core.io.support.ResourceRegion;
 import org.springframework.http.*;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StreamUtils;
 import org.springframework.web.client.RestTemplate;
@@ -23,89 +24,60 @@ import reactor.core.publisher.Mono;
 
 import java.io.*;
 import java.net.URI;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.concurrent.CompletableFuture;
 
-import static org.animeatsume.api.utils.http.Cookies.getCookieFromWebsite;
-
-// TODO convert to service, autowire in KissanimeRuController,
-//  and do all this novelplanet logic behind the scenes
 @Service
 public class NovelPlanetService {
     private static final Logger log = LoggerFactory.getLogger(NovelPlanetService.class);
     private static final String websiteIdentifier = "/v/";
     private static final String apiIdentifier = "/api/source/";
 
-    public NovelPlanetSourceResponse getNovelPlanetSources(NovelPlanetUrlRequest novelPlanetRequest) {
-        log.info("Getting NovelPlanet MP4 sources for request ({})", novelPlanetRequest);
-        URI websiteUrlObj = novelPlanetRequest.getNovelPlanetUrl();
-        String websiteUrl = websiteUrlObj.toString();
-        String origin = UriParser.getOrigin(websiteUrlObj);
-        String novelPlanetApiUrl = websiteUrl.replace(websiteIdentifier, apiIdentifier);
+    public <T> HttpEntity<T> getCorsEntityForNovelPlanet(T body, URI uri) {
+        String url = uri.toString();
+        String origin = UriParser.getOrigin(uri);
+        String cookie = Cookies.getCookieFromWebsite(url);
 
-        String cookie = getCookieFromWebsite(websiteUrl);
-        NovelPlanetSourceResponse sourcesForVideo =
-            getRedirectorSourcesForVideo(origin, websiteUrl, novelPlanetApiUrl, cookie);
-        List<String> mp4Urls = getMp4UrlsFromRedirectorUrls(sourcesForVideo.getData(), origin, websiteUrl, cookie);
-        setActualMp4UrlsFromNovelPlanetSources(sourcesForVideo, mp4Urls);
-
-        log.info("Obtained {} MP4 sources for NovelPlanet URL ({})", sourcesForVideo.getData().size(), novelPlanetApiUrl);
-
-        return sourcesForVideo;
+        return CorsProxy.getCorsEntityWithCookie(body, origin, url, cookie);
     }
 
-    private NovelPlanetSourceResponse getRedirectorSourcesForVideo(String origin, String websiteUrl, String apiUrl, String cookie) {
-        // TODO headers to consider: "X-Forwarded-For", "X-Real-IP", "Host"
-        HttpEntity<Void> request = CorsProxy.getCorsEntityWithCookie(null, origin, websiteUrl, cookie);
+    public String getApiUrlForHost(URI websiteHost) {
+        return websiteHost.toString().replace(websiteIdentifier, apiIdentifier);
+    }
 
+    public NovelPlanetSourceResponse getRedirectorSourcesForVideo(String apiUrl, HttpEntity<Void> requestEntity) {
         ResponseEntity<NovelPlanetSourceResponse> response = new RestTemplate().exchange(
             apiUrl,
             HttpMethod.POST,
-            request,
+            requestEntity,
             NovelPlanetSourceResponse.class
         );
 
         return response.getBody();
     }
 
-    // TODO make Async
-    private List<String> getMp4UrlsFromRedirectorUrls(
-        List<NovelPlanetSourceResponse.NovelPlanetSource> redirectorSources,
-        String novelPlanetOrigin,
-        String novelPlanetWebsiteUrl,
-        String novelPlanetCookie
+    @Async
+    public CompletableFuture<Void> getMp4UrlFromRedirectorUrl(
+        NovelPlanetSourceResponse.NovelPlanetSource novelPlanetSource,
+        HttpEntity<Void> mp4RequestEntity
     ) {
-        return redirectorSources.stream()
-            .map(novelPlanetSource -> {
-                String redirectorUrl = novelPlanetSource.getFile();
+        String redirectorUrl = novelPlanetSource.getFile();
 
-                HttpEntity<Void> mp4Request = CorsProxy.getCorsEntityWithCookie(null, novelPlanetOrigin, novelPlanetWebsiteUrl, novelPlanetCookie);
+        // will give 302 (Found) with redirect. Don't follow it, instead get the redirect URL
+        // since that holds the URL to the MP4
+        RestTemplate redirectorRequest = Requests.getNoFollowRedirectsRestTemplate();
+        log.info("starting request");
+        ResponseEntity<Void> redirectorResponse = redirectorRequest.exchange(
+            redirectorUrl,
+            HttpMethod.GET,
+            mp4RequestEntity,
+            Void.class
+        );
+        log.info("request finished");
+        String mp4Url = redirectorResponse.getHeaders().getFirst("Location");
 
-                // will give 302 (Found) with redirect. Don't follow it, instead get the redirect URL
-                // since that holds the URL to the MP4
-                RestTemplate redirectorRequest = Requests.getNoFollowRedirectsRestTemplate();
+        novelPlanetSource.setFile(mp4Url);
 
-                ResponseEntity<Void> redirectorResponse = redirectorRequest.exchange(
-                    redirectorUrl,
-                    HttpMethod.GET,
-                    mp4Request,
-                    Void.class
-                );
-
-                return redirectorResponse.getHeaders().getFirst("Location");
-            })
-            .collect(Collectors.toList());
-    }
-
-    private void setActualMp4UrlsFromNovelPlanetSources(NovelPlanetSourceResponse novelPlanetSourceResponse, List<String> mp4Urls) {
-        List<NovelPlanetSourceResponse.NovelPlanetSource> novelPlanetSources = novelPlanetSourceResponse.getData();
-
-        for (int i = 0; i < novelPlanetSources.size(); i++) {
-            NovelPlanetSourceResponse.NovelPlanetSource novelPlanetSource = novelPlanetSources.get(i);
-            String mp4Url = mp4Urls.get(i);
-
-            novelPlanetSource.setFile(mp4Url);
-        }
+        return CompletableFuture.completedFuture(null);
     }
 
     /*

@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.*;
-import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -35,11 +34,8 @@ public class ApplicationApi {
 
     @CrossOrigin
     @PostMapping(value = "/getNovelPlanetSources", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public NovelPlanetSourceResponse getNovelPlanetSources(@RequestBody NovelPlanetUrlRequest novelPlanetRequest, ServerHttpRequest request) {
-        log.info("Address is {}", request.getRemoteAddress().getAddress().toString());
-        log.info("Port is {}", request.getRemoteAddress().getPort());
-
-        return novelPlanetService.getNovelPlanetSources(novelPlanetRequest);
+    public NovelPlanetSourceResponse getNovelPlanetSources(@RequestBody NovelPlanetUrlRequest novelPlanetRequest) {
+        return kissanimeRuController.getVideoSourcesForNovelPlanetHost(novelPlanetRequest.getNovelPlanetUrl().toString());
     }
 
     @CrossOrigin

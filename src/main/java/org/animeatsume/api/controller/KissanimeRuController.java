@@ -7,6 +7,7 @@ import org.animeatsume.api.utils.ObjectUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -15,6 +16,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 @Component
 public class KissanimeRuController {
@@ -90,7 +92,20 @@ public class KissanimeRuController {
         return kissanimeService.getVideoHostUrlFromEpisodePage(kissanimeEpisodeUrl);
     };
 
-    private NovelPlanetSourceResponse getVideoSourcesForNovelPlanetHost(String videoHostUrl) {
-        return novelPlanetService.getNovelPlanetSources(new NovelPlanetUrlRequest(URI.create(videoHostUrl)));
+    public NovelPlanetSourceResponse getVideoSourcesForNovelPlanetHost(String videoHostUrl) {
+        log.info("Getting NovelPlanet MP4 sources for ({})", videoHostUrl);
+        URI videoHostUri = URI.create(videoHostUrl);
+
+        HttpEntity<Void> corsEntity = novelPlanetService.getCorsEntityForNovelPlanet(null, videoHostUri);
+        String novelPlanetApiUrl = novelPlanetService.getApiUrlForHost(videoHostUri);
+        NovelPlanetSourceResponse sourcesForVideo = novelPlanetService.getRedirectorSourcesForVideo(novelPlanetApiUrl, corsEntity);
+
+        List<CompletableFuture<Void>> mp4UrlCompletableFutures = sourcesForVideo.getData().stream()
+            .map(novelPlanetSource -> novelPlanetService.getMp4UrlFromRedirectorUrl(novelPlanetSource, corsEntity))
+            .collect(Collectors.toList());
+
+        ObjectUtils.getAllCompletableFutureResults(mp4UrlCompletableFutures);
+
+        return sourcesForVideo;
     }
 }
