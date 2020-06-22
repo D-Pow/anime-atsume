@@ -77,6 +77,8 @@ public class KissanimeRuController {
         if (captchaAnswer == null || captchaAnswer.equals("")) {
             if (kissanimeService.requestIsRedirected(kissanimeEpisodeUrl)) {
                 // Request is redirected because AreYouHuman verification needs to be completed
+                // TODO img src URLs are inaccessible if the user doesn't have the Cloudflare
+                //  cookie set. Either download images here or set cookie in response.
                 return kissanimeService.getBypassAreYouHumanPromptContent(kissanimeEpisodeUrl);
             }
 
