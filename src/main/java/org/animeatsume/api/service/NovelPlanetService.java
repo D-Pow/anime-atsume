@@ -1,4 +1,4 @@
-package org.animeatsume.api.controller;
+package org.animeatsume.api.service;
 
 import org.animeatsume.api.model.NovelPlanetSourceResponse;
 import org.animeatsume.api.model.NovelPlanetUrlRequest;
@@ -13,7 +13,7 @@ import org.springframework.core.io.support.ResourceRegion;
 import org.springframework.http.*;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.util.StreamUtils;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.server.ServerResponse;
@@ -29,9 +29,9 @@ import static org.animeatsume.api.utils.http.Cookies.getCookieFromWebsite;
 
 // TODO convert to service, autowire in KissanimeRuController,
 //  and do all this novelplanet logic behind the scenes
-@Component
-public class NovelPlanetController {
-    private static final Logger log = LoggerFactory.getLogger(NovelPlanetController.class);
+@Service
+public class NovelPlanetService {
+    private static final Logger log = LoggerFactory.getLogger(NovelPlanetService.class);
     private static final String websiteIdentifier = "/v/";
     private static final String apiIdentifier = "/api/source/";
     private static final String protocolOriginSeparator = "://";

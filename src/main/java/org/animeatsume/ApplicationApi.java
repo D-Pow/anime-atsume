@@ -1,7 +1,7 @@
 package org.animeatsume;
 
 import org.animeatsume.api.controller.KissanimeRuController;
-import org.animeatsume.api.controller.NovelPlanetController;
+import org.animeatsume.api.service.NovelPlanetService;
 import org.animeatsume.api.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +19,7 @@ public class ApplicationApi {
     KissanimeRuController kissanimeRuController;
 
     @Autowired
-    NovelPlanetController novelPlanetController;
+    NovelPlanetService novelPlanetService;
 
     @CrossOrigin
     @PostMapping(value = "/searchKissanime", consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -39,7 +39,7 @@ public class ApplicationApi {
         log.info("Address is {}", request.getRemoteAddress().getAddress().toString());
         log.info("Port is {}", request.getRemoteAddress().getPort());
 
-        return novelPlanetController.getNovelPlanetSources(novelPlanetRequest);
+        return novelPlanetService.getNovelPlanetSources(novelPlanetRequest);
     }
 
     @CrossOrigin
@@ -48,6 +48,6 @@ public class ApplicationApi {
         @RequestParam("url") String novelPlanetUrl,
         @RequestHeader("Range") String rangeHeader
     ) {
-        return novelPlanetController.getVideoSrcStreamFromMp4Url(novelPlanetUrl, rangeHeader);
+        return novelPlanetService.getVideoSrcStreamFromMp4Url(novelPlanetUrl, rangeHeader);
     }
 }
