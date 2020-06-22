@@ -4,11 +4,11 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.net.URL;
+import java.net.URI;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class NovelPlanetUrlRequest {
-    private URL novelPlanetUrl;
+    private URI novelPlanetUrl;
 }

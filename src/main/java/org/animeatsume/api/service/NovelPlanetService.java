@@ -4,6 +4,7 @@ import org.animeatsume.api.model.NovelPlanetSourceResponse;
 import org.animeatsume.api.model.NovelPlanetUrlRequest;
 import org.animeatsume.api.utils.http.CorsProxy;
 import org.animeatsume.api.utils.http.Requests;
+import org.animeatsume.api.utils.http.UriParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.*;
@@ -21,7 +22,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.io.*;
-import java.net.URL;
+import java.net.URI;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,23 +35,12 @@ public class NovelPlanetService {
     private static final Logger log = LoggerFactory.getLogger(NovelPlanetService.class);
     private static final String websiteIdentifier = "/v/";
     private static final String apiIdentifier = "/api/source/";
-    private static final String protocolOriginSeparator = "://";
 
     public NovelPlanetSourceResponse getNovelPlanetSources(NovelPlanetUrlRequest novelPlanetRequest) {
-        // TODO forward client request instead of making new one
-        //  in order to preserve original IP address
-        //
-        // TODO see if there's an easier way than all these URL.get() methods
-        URL websiteUrlObj = novelPlanetRequest.getNovelPlanetUrl();
-        String protocol = websiteUrlObj.getProtocol();
-        String hostAndPort = websiteUrlObj.getAuthority();
-        String path = websiteUrlObj.getPath();
+        URI websiteUrlObj = novelPlanetRequest.getNovelPlanetUrl();
         String websiteUrl = websiteUrlObj.toString();
-        String origin = protocol + protocolOriginSeparator + hostAndPort;
-        String videoId = path.split(websiteIdentifier)[1];
-        String novelPlanetApiUrl = origin + apiIdentifier + videoId;
-
-        log.info("URL obj = {}, protocol = {}, hostAndPort = {}, path = {}, websiteUrl = {}, origin = {}, videoId = {}, novelApiUrl = {}", websiteUrlObj, protocol, hostAndPort, path, websiteUrl, origin, videoId, novelPlanetApiUrl);
+        String origin = UriParser.getOrigin(websiteUrlObj);
+        String novelPlanetApiUrl = websiteUrl.replace(websiteIdentifier, apiIdentifier);
 
         String cookie = getCookieFromWebsite(websiteUrl);
         NovelPlanetSourceResponse sourcesForVideo =
