@@ -65,14 +65,14 @@ public class NovelPlanetService {
         // will give 302 (Found) with redirect. Don't follow it, instead get the redirect URL
         // since that holds the URL to the MP4
         RestTemplate redirectorRequest = Requests.getNoFollowRedirectsRestTemplate();
-        log.info("starting request");
+
         ResponseEntity<Void> redirectorResponse = redirectorRequest.exchange(
             redirectorUrl,
             HttpMethod.GET,
             mp4RequestEntity,
             Void.class
         );
-        log.info("request finished");
+
         String mp4Url = redirectorResponse.getHeaders().getFirst("Location");
 
         novelPlanetSource.setFile(mp4Url);
