@@ -51,7 +51,7 @@ async function searchTitle(title) {
 async function getEpisodeHost(episodeUrl, captchaAnswer = null) {
     document.body.innerHTML = '';
 
-    const { videoHostUrl, captchaContent } = await fetch('/getVideosForEpisode', {
+    const { videoHostUrl, captchaContent, data } = await fetch('/getVideosForEpisode', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -85,6 +85,25 @@ async function getEpisodeHost(episodeUrl, captchaAnswer = null) {
         const h1 = document.createElement('h1');
         h1.innerText = videoHostUrl;
         document.body.appendChild(h1);
+    } else if (data) {
+        const { file } = data[0];
+        const urlPrefix = '/novelPlanetVideo?url=';
+
+        try {
+            document.body.removeChild(document.querySelector('video'));
+        } catch(e) {}
+
+        const video = document.createElement('video');
+        const source = document.createElement('source')
+
+        video.controls = true
+        source.type = 'video/mp4'
+        source.src = urlPrefix + file;
+
+        video.appendChild(source);
+        document.body.appendChild(video);
+
+        console.log(file);
     }
 }
 
