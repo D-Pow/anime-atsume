@@ -131,13 +131,6 @@ public class NovelPlanetService {
             return ResponseEntity.noContent().build();
         }
 
-        HttpHeaders responseHeaders = new HttpHeaders();
-        responseHeaders.setContentType(
-            MediaTypeFactory
-                .getMediaType(urlResourceRegion.getResource())
-                .orElse(MediaType.APPLICATION_OCTET_STREAM)
-        );
-
         return ResponseEntity
             .status(HttpStatus.PARTIAL_CONTENT)
             .contentLength(urlResourceRegion.getCount())
