@@ -22,4 +22,6 @@ public class NovelPlanetSourceResponse {
     }
 
     private List<NovelPlanetSource> data;
+
+    private String websiteUrl;
 }

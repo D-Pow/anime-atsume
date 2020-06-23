@@ -113,6 +113,7 @@ public class KissanimeRuController {
         HttpEntity<Void> corsEntity = novelPlanetService.getCorsEntityForNovelPlanet(null, videoHostUri);
         String novelPlanetApiUrl = novelPlanetService.getApiUrlForHost(videoHostUri);
         NovelPlanetSourceResponse sourcesForVideo = novelPlanetService.getRedirectorSourcesForVideo(novelPlanetApiUrl, corsEntity);
+        sourcesForVideo.setWebsiteUrl(videoHostUrl);
 
         List<CompletableFuture<Void>> mp4UrlCompletableFutures = sourcesForVideo.getData().stream()
             .map(novelPlanetSource -> novelPlanetService.getMp4UrlFromRedirectorUrl(novelPlanetSource, corsEntity))
