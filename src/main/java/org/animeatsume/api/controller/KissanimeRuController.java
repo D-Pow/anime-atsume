@@ -7,10 +7,12 @@ import org.animeatsume.api.utils.ObjectUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
 
@@ -121,5 +123,9 @@ public class KissanimeRuController {
         log.info("Obtained {} MP4 sources for NovelPlanet URL ({})", sourcesForVideo.getData().size(), novelPlanetApiUrl);
 
         return sourcesForVideo;
+    }
+
+    public ResponseEntity<Resource> getNovelPlanetVideoStream(String url, ServerHttpRequest request) {
+        return novelPlanetService.getVideoSrcStreamFromMp4Url(url, request);
     }
 }

@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.*;
+import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.web.bind.annotation.*;
 
@@ -43,8 +44,8 @@ public class ApplicationApi {
     @GetMapping(value = "/novelPlanetVideo", produces = { "video/mp4", MediaType.APPLICATION_OCTET_STREAM_VALUE })
     public ResponseEntity<Resource> getNovelPlanetVideoStream(
         @RequestParam("url") String novelPlanetUrl,
-        @RequestHeader("Range") String rangeHeader
+        ServerHttpRequest request
     ) {
-        return novelPlanetService.getVideoSrcStreamFromMp4Url(novelPlanetUrl, rangeHeader);
+        return kissanimeRuController.getNovelPlanetVideoStream(novelPlanetUrl, request);
     }
 }

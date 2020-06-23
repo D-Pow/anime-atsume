@@ -118,7 +118,7 @@ public class NovelPlanetService {
      *    - MultipartBodyBuilder (non-reactive)
      *    - Multipart (reactive): https://docs.spring.io/spring/docs/current/spring-framework-reference/integration.html#rest-template-multipart
      */
-    public ResponseEntity<Resource> getVideoSrcStreamFromMp4Url(String url, String rangeHeader) {
+    public ResponseEntity<Resource> getVideoSrcStreamFromMp4Url(String url, ServerHttpRequest request) {
         return Requests.getUrlResourceStreamResponse(url);
 //        return getVideoSrcStreamFromMp4UrlFile(url, rangeHeader);
     }
