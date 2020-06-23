@@ -308,4 +308,24 @@ public class KissanimeRuService {
 
         return new KissanimeVideoHostResponse(videoHostUrl, null);
     }
+
+    public String[] getShowAndEpisodeNamesFromEpisodeUrl(String url) {
+        try {
+            URI episodeUri = new URI(url);
+            String pathMinusFirstSlash = episodeUri.getPath().substring(1);
+            String[] split = pathMinusFirstSlash.split("/");
+            String showName = split[1];
+            String episodeName = split[2];
+
+            return new String[] { showName, episodeName };
+        } catch (Exception e) {
+            log.error("Could not parse Kissanime URL ({}) for show and episode names. Error cause ({}), message = {}",
+                url,
+                e.getCause(),
+                e.getMessage()
+            );
+        }
+
+        return null;
+    }
 }
