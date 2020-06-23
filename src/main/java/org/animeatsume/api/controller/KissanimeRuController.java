@@ -9,9 +9,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
 
+import java.net.HttpCookie;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
@@ -54,8 +57,8 @@ public class KissanimeRuController {
         return kissanimeSearchResponse;
     }
 
-    public ResponseEntity<Object> getVideosForKissanimeEpisode(KissanimeVideoHostRequest request) {
-        KissanimeVideoHostResponse videoHost = getVideoHostUrlForKissanimeEpisode(request);
+    public ResponseEntity<Object> getVideosForKissanimeEpisode(KissanimeVideoHostRequest request, ServerHttpResponse response) {
+        KissanimeVideoHostResponse videoHost = getVideoHostUrlForKissanimeEpisode(request, response);
         String videoHostUrl = videoHost.getVideoHostUrl();
         Object body = videoHost;
 
@@ -68,7 +71,7 @@ public class KissanimeRuController {
             .body(body);
     }
 
-    private KissanimeVideoHostResponse getVideoHostUrlForKissanimeEpisode(KissanimeVideoHostRequest request) {
+    private KissanimeVideoHostResponse getVideoHostUrlForKissanimeEpisode(KissanimeVideoHostRequest request, ServerHttpResponse response) {
         log.info("KissanimeVideoHostRequest = {}", request);
 
         String kissanimeEpisodeUrl = request.getEpisodeUrl();
@@ -79,6 +82,13 @@ public class KissanimeRuController {
                 // Request is redirected because AreYouHuman verification needs to be completed
                 // TODO img src URLs are inaccessible if the user doesn't have the Cloudflare
                 //  cookie set. Either download images here or set cookie in response.
+                HttpCookie authCookie = kissanimeService.getAuthCookie();
+                response.addCookie(ResponseCookie
+                    .from(authCookie.getName(), authCookie.getValue())
+                    .domain(".kissanime.ru")
+                    .build()
+                );
+
                 return kissanimeService.getBypassAreYouHumanPromptContent(kissanimeEpisodeUrl);
             }
 

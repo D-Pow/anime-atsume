@@ -102,7 +102,7 @@ public class KissanimeRuService {
         throw new RuntimeException("Cannot bypass Cloudflare or access Kissanime");
     }
 
-    HttpCookie getAuthCookie() {
+    public HttpCookie getAuthCookie() {
         CookieManager cookieManager = (CookieManager) CookieHandler.getDefault();
         List<HttpCookie> kissanimeCookies = cookieManager.getCookieStore().get(URI.create(KISSANIME_ORIGIN));
 

@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.*;
+import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -28,8 +29,8 @@ public class ApplicationApi {
 
     @CrossOrigin
     @PostMapping(value = "/getVideosForEpisode")
-    public ResponseEntity<Object> getVideoHostUrlForKissanimeEpisode(@RequestBody KissanimeVideoHostRequest kissanimeEpisodeRequest) {
-        return kissanimeRuController.getVideosForKissanimeEpisode(kissanimeEpisodeRequest);
+    public ResponseEntity<Object> getVideoHostUrlForKissanimeEpisode(@RequestBody KissanimeVideoHostRequest kissanimeEpisodeRequest, ServerHttpResponse response) {
+        return kissanimeRuController.getVideosForKissanimeEpisode(kissanimeEpisodeRequest, response);
     }
 
     @CrossOrigin
