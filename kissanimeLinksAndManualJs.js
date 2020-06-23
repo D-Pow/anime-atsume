@@ -34,6 +34,20 @@ async function searchKissanime(keyword, type = 'Anime') {
     // Note that 'your lie' and 'shigatsu wa kimi no uso' both return the same URL but different titles
 }
 
+function getCookie(cookie = document.cookie) {
+    return cookie.split('; ').reduce((cookieObj, entry) => {
+        const keyVal = entry.split('=');
+        const key = keyVal[0];
+        const value = keyVal.slice(1).join('=');
+
+        cookieObj[key] = value;
+
+        return cookieObj;
+    }, {});
+}
+
+
+
 async function searchTitle(title) {
     const searchResults = await fetch('/searchKissanime', {
         method: 'POST',
@@ -107,26 +121,18 @@ async function getEpisodeHost(episodeUrl, captchaAnswer = null) {
     }
 }
 
-function getCookie(cookie = document.cookie) {
-    return cookie.split('; ').reduce((cookieObj, entry) => {
-        const keyVal = entry.split('=');
-        const key = keyVal[0];
-        const value = keyVal.slice(1).join('=');
-
-        cookieObj[key] = value;
-
-        return cookieObj;
-    }, {});
-}
-
-async function addVideoFromHostUrlToScreen(novelPlanetUrl) {
-    const res = await fetch('/getNovelPlanetSources', {
+async function getNovelPlanetSources(novelPlanetUrl) {
+    return await fetch('/getNovelPlanetSources', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({ novelPlanetUrl })
     }).then(res => res.json());
+}
+
+async function addVideoFromHostUrlToScreen(novelPlanetUrl) {
+    const res = await getNovelPlanetSources(novelPlanetUrl);
 
     const { file } = res.data[0];
     const urlPrefix = '/novelPlanetVideo?url=';
