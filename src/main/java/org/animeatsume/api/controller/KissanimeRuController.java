@@ -1,6 +1,7 @@
 package org.animeatsume.api.controller;
 
 import org.animeatsume.api.model.*;
+import org.animeatsume.api.service.VideoFileService;
 import org.animeatsume.api.service.KissanimeRuService;
 import org.animeatsume.api.service.NovelPlanetService;
 import org.animeatsume.api.utils.ObjectUtils;
@@ -32,6 +33,9 @@ public class KissanimeRuController {
 
     @Autowired
     NovelPlanetService novelPlanetService;
+
+    @Autowired
+    VideoFileService videoFileService;
 
     public KissanimeSearchResponse searchKissanimeTitles(KissanimeSearchRequest kissanimeSearchRequest) {
         KissanimeSearchResponse kissanimeSearchResponse = kissanimeService.searchKissanimeTitles(kissanimeSearchRequest);
@@ -124,6 +128,29 @@ public class KissanimeRuController {
         log.info("Obtained {} MP4 sources for NovelPlanet URL ({})", sourcesForVideo.getData().size(), novelPlanetApiUrl);
 
         return sourcesForVideo;
+    }
+
+    private void initiateEpisodeVideoDownloads(String kissanimeEpisodeUrl, NovelPlanetSourceResponse novelPlanetSources) {
+        String[] showAndEpisodeNames = kissanimeService.getShowAndEpisodeNamesFromEpisodeUrl(kissanimeEpisodeUrl);
+
+        try {
+            String showName = showAndEpisodeNames[0];
+            String episodeName = showAndEpisodeNames[1];
+
+            novelPlanetSources.getData().forEach(novelPlanetSource -> {
+                String videoQuality = novelPlanetSource.getLabel();
+                String videoUrl = novelPlanetSource.getFile();
+
+                videoFileService.saveNewVideoFile(videoUrl, showName, episodeName, videoQuality);
+            });
+        } catch (Exception e) {
+            log.error("Error initiating episode downloads for kissanime episode URL ({}) and NovelPlanetSourceResponse ({}). Error cause ({}), message = {}",
+                kissanimeEpisodeUrl,
+                novelPlanetSources,
+                e.getCause(),
+                e.getMessage()
+            );
+        }
     }
 
     public ResponseEntity<Resource> getNovelPlanetVideoStream(String url, ServerHttpRequest request) {
