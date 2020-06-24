@@ -5,6 +5,7 @@ import io.webfolder.ui4j.api.browser.BrowserFactory;
 import io.webfolder.ui4j.api.browser.Page;
 import io.webfolder.ui4j.api.browser.PageConfiguration;
 import org.animeatsume.api.model.*;
+import org.animeatsume.api.utils.ObjectUtils;
 import org.animeatsume.api.utils.http.Requests;
 import org.animeatsume.api.utils.regex.HtmlParser;
 import org.animeatsume.api.utils.regex.RegexUtils;
@@ -256,12 +257,13 @@ public class KissanimeRuService {
 
         String formHtml = RegexUtils.getFirstMatchGroups(areYouHumanFormHtmlRegex, areYouHumanHtml, Pattern.CASE_INSENSITIVE).get(0);
 
-        List<Anchor> imgVerificationIdsAndSrcs = RegexUtils.getAllMatchesAndGroups(imgVerificationIdAndSrcRegex, formHtml, Pattern.CASE_INSENSITIVE)
+        List<CaptchaAttempt> imgVerificationIdsAndSrcs = RegexUtils.getAllMatchesAndGroups(imgVerificationIdAndSrcRegex, formHtml, Pattern.CASE_INSENSITIVE)
             .stream()
             .map(imgMatchGroups -> {
                 String imgSrcUrlRelativePath = imgMatchGroups.get(4);
                 String imageId = imgSrcUrlRelativePath.substring(imgSrcUrlRelativePath.lastIndexOf("/") + 1);
-                return new Anchor(imageId, imgMatchGroups.get(2));
+                String formId = imgMatchGroups.get(2);
+                return new CaptchaAttempt(formId, imageId, null, null);
             })
             .collect(Collectors.toList());
         List<String> promptsForImagesToSelect = RegexUtils.getAllMatchesAndGroups(spanBodyRegex, formHtml, Pattern.CASE_INSENSITIVE)
@@ -273,19 +275,19 @@ public class KissanimeRuService {
     }
 
     public boolean executeBypassAreYouHumanCheckWithDbEntries(String episodeUrl, List<String> captchaAnswers) {
-        List<KissanimeVideoHostRequest.CaptchaAnswerRequest> captchaAnswerRequests = captchaAnswers.stream()
-            .map(formId -> new KissanimeVideoHostRequest.CaptchaAnswerRequest(formId, null, null))
+        List<CaptchaAttempt> captchaAnswerRequests = captchaAnswers.stream()
+            .map(formId -> new CaptchaAttempt(formId, null, null, null))
             .collect(Collectors.toList());
 
         return executeBypassAreYouHumanCheck(episodeUrl, captchaAnswerRequests);
     }
 
-    public boolean executeBypassAreYouHumanCheck(String episodeUrl, List<KissanimeVideoHostRequest.CaptchaAnswerRequest> captchaAnswers) {
+    public boolean executeBypassAreYouHumanCheck(String episodeUrl, List<CaptchaAttempt> captchaAnswers) {
         log.info("Attempting to bypass AreYouHuman check for URL ({}) and captcha answer ({})", episodeUrl, captchaAnswers);
         waitForCloudflareToAllowAccessToKissanime();
         String urlPathWithQueryParams = episodeUrl.replace(KISSANIME_ORIGIN, "");
         String captchaAnswerTextForKissanimeForm = captchaAnswers.stream()
-            .map(KissanimeVideoHostRequest.CaptchaAnswerRequest::getFormId)
+            .map(CaptchaAttempt::getFormId)
             .collect(Collectors.joining(","));
 
         HttpHeaders headers = getNecessaryRequestHeaders();
@@ -318,6 +320,18 @@ public class KissanimeRuService {
             new HttpEntity<>(null, getNecessaryRequestHeaders()),
             Resource.class
         );
+    }
+
+    @Async
+    public CompletableFuture<String> getCaptchaImageHash(CaptchaAttempt captchaAttempt) {
+        String imageId = captchaAttempt.getImageId();
+        ResponseEntity<Resource> kissanimeCaptchaImage = getKissanimeCaptchaImage(imageId);
+        Resource imageResource = kissanimeCaptchaImage.getBody();
+        String imageHash = ObjectUtils.hashResource(imageResource);
+
+        captchaAttempt.setImageHash(imageHash);
+
+        return CompletableFuture.completedFuture(imageHash);
     }
 
     public KissanimeVideoHostResponse getVideoHostUrlFromEpisodePage(String episodeUrl) {

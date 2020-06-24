@@ -90,12 +90,12 @@ public class KissanimeRuController {
         log.info("KissanimeVideoHostRequest = {}", request);
 
         String kissanimeEpisodeUrl = request.getEpisodeUrl();
-        List<KissanimeVideoHostRequest.CaptchaAnswerRequest> captchaAnswers = request.getCaptchaAnswers();
+        List<CaptchaAttempt> captchaAnswers = request.getCaptchaAnswers();
 
         if (captchaAnswers == null || captchaAnswers.size() == 0) {
             if (kissanimeService.requestIsRedirected(kissanimeEpisodeUrl)) {
                 // Request is redirected because AreYouHuman verification needs to be completed
-                KissanimeVideoHostResponse responseWithCaptcha = kissanimeService.getBypassAreYouHumanPromptContent(kissanimeEpisodeUrl);
+                KissanimeVideoHostResponse responseWithCaptcha = getCaptchaContentWithImageHash(kissanimeEpisodeUrl);
 
                 List<String> captchaAnswersFoundInDb = attemptGettingCaptchaAnswerWithPreviousAnswers(responseWithCaptcha.getCaptchaContent());
 
@@ -105,7 +105,7 @@ public class KissanimeRuController {
 
                     if (!bypassSuccess) {
                         log.info("Failed to bypass captcha with database entries.");
-                        return kissanimeService.getBypassAreYouHumanPromptContent(kissanimeEpisodeUrl);
+                        return getCaptchaContentWithImageHash(kissanimeEpisodeUrl);
                     }
 
                     log.info("Succeeded in bypassing captcha with database entries.");
@@ -121,7 +121,7 @@ public class KissanimeRuController {
         boolean bypassSuccess = kissanimeService.executeBypassAreYouHumanCheck(kissanimeEpisodeUrl, captchaAnswers);
 
         if (!bypassSuccess) {
-            return kissanimeService.getBypassAreYouHumanPromptContent(kissanimeEpisodeUrl);
+            return getCaptchaContentWithImageHash(kissanimeEpisodeUrl);
         }
 
         saveCorrectCaptchaAnswers(request.getCaptchaAnswers());
@@ -129,28 +129,39 @@ public class KissanimeRuController {
         return kissanimeService.getVideoHostUrlFromEpisodePage(kissanimeEpisodeUrl);
     }
 
+    private KissanimeVideoHostResponse getCaptchaContentWithImageHash(String kissanimeEpisodeUrl) {
+        KissanimeVideoHostResponse response = kissanimeService.getBypassAreYouHumanPromptContent(kissanimeEpisodeUrl);
+        List<CompletableFuture<String>> imageHashes = response.getCaptchaContent().getImgIdsAndSrcs().stream()
+            .map(captchaAttempt -> kissanimeService.getCaptchaImageHash(captchaAttempt))
+            .collect(Collectors.toList());
+
+        ObjectUtils.getAllCompletableFutureResults(imageHashes);
+
+        return response;
+    }
+
     private List<String> attemptGettingCaptchaAnswerWithPreviousAnswers(KissanimeVideoHostResponse.CaptchaContent captchaContent) {
-        List<Anchor> captchaImgIdsAndSrcs = captchaContent.getImgIdsAndSrcs();
+        List<CaptchaAttempt> captchaImgIdsAndSrcs = captchaContent.getImgIdsAndSrcs();
         List<String> formIdsForImagesFoundInDb = new ArrayList<>();
 
         captchaContent.getPromptTexts().forEach(promptText -> {
             List<CaptchaAnswer> captchaAnswersForPrompt = dao.getAllCaptchaAnswersByPrompt(promptText);
 
             if (captchaAnswersForPrompt.size() > 0) {
-                List<String> savedImageNamesForPrompt = captchaAnswersForPrompt.stream()
-                    .map(CaptchaAnswer::getImageId)
+                List<String> savedImageHashesForPrompt = captchaAnswersForPrompt.stream()
+                    .map(CaptchaAnswer::getImageHash)
                     .collect(Collectors.toList());
-                Anchor captchaAnchorPromptThatExistsInDb = ObjectUtils.findObjectInList(
+                CaptchaAttempt captchaAttemptThatExistsInDb = ObjectUtils.findObjectInList(
                     captchaImgIdsAndSrcs,
-                    anchor -> savedImageNamesForPrompt.contains(anchor.getUrl())
+                    captchaAttempt -> savedImageHashesForPrompt.contains(captchaAttempt.getImageHash())
                 );
 
-                if (captchaAnchorPromptThatExistsInDb != null) {
+                if (captchaAttemptThatExistsInDb != null) {
                     log.info("Found captcha answer in DB for prompt text ({}) and prompt image ({})",
                         promptText,
-                        captchaAnchorPromptThatExistsInDb.getUrl()
+                        captchaAttemptThatExistsInDb.getImageHash()
                     );
-                    formIdsForImagesFoundInDb.add(captchaAnchorPromptThatExistsInDb.getTitle());
+                    formIdsForImagesFoundInDb.add(captchaAttemptThatExistsInDb.getFormId());
                 }
             }
         });
@@ -162,14 +173,14 @@ public class KissanimeRuController {
         return null;
     }
 
-    private void saveCorrectCaptchaAnswers(List<KissanimeVideoHostRequest.CaptchaAnswerRequest> captchaAnswers) {
+    private void saveCorrectCaptchaAnswers(List<CaptchaAttempt> captchaAnswers) {
         log.info("Saving correct captcha answers to the DB: {}", captchaAnswers);
 
         if (captchaAnswers != null && captchaAnswers.size() > 0) {
             List<CaptchaAnswer> answers = captchaAnswers.stream()
                 .map(captchaAnswerRequest -> new CaptchaAnswer(
                     captchaAnswerRequest.getPromptText(),
-                    captchaAnswerRequest.getImageId())
+                    captchaAnswerRequest.getImageHash())
                 )
                 .collect(Collectors.toList());
 

@@ -19,7 +19,7 @@ public class CaptchaAnswer {
     @NoArgsConstructor
     public static class CaptchaAnswerPk implements Serializable {
         private String prompt;
-        private String imageId;
+        private String imageHash;
     }
 
     @Id
@@ -27,6 +27,6 @@ public class CaptchaAnswer {
     private String prompt;
 
     @Id
-    @Column(name = "image_id")
-    private String imageId;
+    @Column(name = "image_hash")
+    private String imageHash;
 }

@@ -12,7 +12,7 @@ public class KissanimeVideoHostResponse {
     @AllArgsConstructor
     public static class CaptchaContent {
         private List<String> promptTexts;
-        private List<Anchor> imgIdsAndSrcs;
+        private List<CaptchaAttempt> imgIdsAndSrcs;
     }
 
     private String videoHostUrl;
