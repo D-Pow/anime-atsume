@@ -300,7 +300,7 @@ public class KissanimeRuService {
             Void.class
         );
 
-        return captchaSolverResponse.getStatusCode() == HttpStatus.FOUND;
+        return captchaSolverResponse.getStatusCode() == HttpStatus.FOUND && !captchaSolverResponse.getHeaders().getLocation().toString().contains(ARE_YOU_HUMAN_URL_PATH);
     }
 
     public ResponseEntity<Resource> getKissanimeCaptchaImage(String imageId) {
