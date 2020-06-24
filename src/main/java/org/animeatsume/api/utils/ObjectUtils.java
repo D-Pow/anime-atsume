@@ -2,7 +2,13 @@ package org.animeatsume.api.utils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.Resource;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -50,5 +56,24 @@ public class ObjectUtils {
         }
 
         return results;
+    }
+
+    public static String hashResource(Resource resource) {
+        if (resource == null) {
+            return null;
+        }
+
+        try (InputStream imageInputStream = resource.getInputStream()) {
+            byte[] imageBytes = new byte[(int) resource.contentLength()];
+            imageInputStream.read(imageBytes);
+
+            MessageDigest hash = MessageDigest.getInstance("SHA-256");
+            byte[] imageHash = hash.digest(imageBytes);
+            return new BigInteger(1, imageHash).toString(16);
+        } catch (IOException | NoSuchAlgorithmException e) {
+            log.error("Could not hash Resource ({}). Error cause ({}), message = {}", resource, e.getCause(), e.getMessage());
+        }
+
+        return null;
     }
 }
