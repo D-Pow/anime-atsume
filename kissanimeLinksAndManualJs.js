@@ -68,13 +68,16 @@ async function getEpisodeHost(episodeUrl, captchaAnswers = null) {
 
     if (captchaAnswers) {
         answers = captchaAnswers.map((answerId, i) => {
+            const captchaAttempt = window.captchaContent.imgIdsAndSrcs.find(captchaAttempt => Number(captchaAttempt.formId) === Number(answerId));
             const formId = answerId;
             const promptText = window.captchaContent.promptTexts[i];
-            const imageId = window.captchaContent.imgIdsAndSrcs.find(anchor => Number(anchor.title) === Number(answerId)).url;
+            const imageId = captchaAttempt.imageId;
+            const imageHash = captchaAttempt.imageHash;
 
             return {
                 formId,
                 imageId,
+                imageHash,
                 promptText
             };
         });
@@ -99,12 +102,12 @@ async function getEpisodeHost(episodeUrl, captchaAnswers = null) {
             document.body.appendChild(h1);
         })
 
-        captchaContent.imgIdsAndSrcs.forEach(({ url, title }) => {
+        captchaContent.imgIdsAndSrcs.forEach(({ imageId, formId }) => {
             const img = document.createElement('img');
-            img.src = `/image/${url}`;
+            img.src = `/image/${imageId}`;
 
             const h3 = document.createElement('h3');
-            h3.innerText = title;
+            h3.innerText = formId;
 
             const div = document.createElement('div');
             div.appendChild(h3);
