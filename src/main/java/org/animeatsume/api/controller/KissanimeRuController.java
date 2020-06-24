@@ -256,6 +256,11 @@ public class KissanimeRuController {
         }
 
         String rangeHeader = request.getHeaders().getFirst("Range");
+
+        if (rangeHeader == null) {
+            rangeHeader = "";
+        }
+
         List<String> matchesForRangeFirstByte = RegexUtils.getFirstMatchGroups("(?<=bytes=)(\\d+)(?=-)", rangeHeader);
         long firstBytePositionInRange = Long.parseLong(matchesForRangeFirstByte.size() > 0 ? matchesForRangeFirstByte.get(0) : "0");
         long minimumFileLength = 1000; // video files will definitely be larger than 1 kb
