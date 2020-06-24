@@ -95,15 +95,30 @@ public class KissanimeRuController {
         if (captchaAnswers == null || captchaAnswers.size() == 0) {
             if (kissanimeService.requestIsRedirected(kissanimeEpisodeUrl)) {
                 // Request is redirected because AreYouHuman verification needs to be completed
-                KissanimeVideoHostResponse captcha = kissanimeService.getBypassAreYouHumanPromptContent(kissanimeEpisodeUrl);
+                KissanimeVideoHostResponse responseWithCaptcha = kissanimeService.getBypassAreYouHumanPromptContent(kissanimeEpisodeUrl);
 
-                captcha.getCaptchaContent().getImgIdsAndSrcs().forEach(captchaAnchor -> {
+                responseWithCaptcha.getCaptchaContent().getImgIdsAndSrcs().forEach(captchaAnchor -> {
                     String absoluteUrl = captchaAnchor.getUrl();
                     String imageId = absoluteUrl.substring(absoluteUrl.lastIndexOf("/") + 1);
                     captchaAnchor.setUrl(imageId);
                 });
 
-                return captcha;
+                List<String> captchaAnswersFoundInDb = attemptGettingCaptchaAnswerWithPreviousAnswers(responseWithCaptcha.getCaptchaContent());
+
+                if (captchaAnswersFoundInDb != null) {
+                    log.info("Captcha answers found in database. Trying to bypass captcha using them.");
+                    boolean bypassSuccess = kissanimeService.executeBypassAreYouHumanCheckWithDbEntries(kissanimeEpisodeUrl, captchaAnswersFoundInDb);
+
+                    if (!bypassSuccess) {
+                        log.info("Failed to bypass captcha with database entries.");
+                        return kissanimeService.getBypassAreYouHumanPromptContent(kissanimeEpisodeUrl);
+                    }
+
+                    log.info("Succeeded in bypassing captcha with database entries.");
+                    return kissanimeService.getVideoHostUrlFromEpisodePage(kissanimeEpisodeUrl);
+                }
+
+                return responseWithCaptcha;
             }
 
             return kissanimeService.getVideoHostUrlFromEpisodePage(kissanimeEpisodeUrl);
