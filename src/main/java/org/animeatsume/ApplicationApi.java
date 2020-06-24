@@ -49,6 +49,25 @@ public class ApplicationApi {
         @RequestParam("url") String novelPlanetUrl,
         ServerHttpRequest request
     ) {
+        String validCharactersRegex = "^[a-zA-Z0-9-]+$"; // alphanumeric and '-'
+        boolean paramsAreValid = (
+            showName.matches(validCharactersRegex)
+            && episodeName.matches(validCharactersRegex)
+            && videoQuality.matches(validCharactersRegex)
+        );
+
+        if (!paramsAreValid) {
+            log.info("Invalid video stream parameters: showName ({}), episodeName ({}), videoQuality ({}), url ({})",
+                showName,
+                episodeName,
+                videoQuality,
+                novelPlanetUrl
+            );
+            return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .build();
+        }
+
         return kissanimeRuController.getNovelPlanetVideoStream(
             showName,
             episodeName,
