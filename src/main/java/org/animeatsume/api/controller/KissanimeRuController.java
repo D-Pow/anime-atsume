@@ -7,6 +7,8 @@ import org.animeatsume.api.service.NovelPlanetService;
 import org.animeatsume.api.utils.ObjectUtils;
 import org.animeatsume.api.utils.http.Requests;
 import org.animeatsume.api.utils.regex.RegexUtils;
+import org.animeatsume.dao.AnimeAtsumeDao;
+import org.animeatsume.dao.model.CaptchaAnswer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +38,9 @@ public class KissanimeRuController {
 
     @Autowired
     VideoFileService videoFileService;
+
+    @Autowired
+    AnimeAtsumeDao dao;
 
     public KissanimeSearchResponse searchKissanimeTitles(KissanimeSearchRequest kissanimeSearchRequest) {
         KissanimeSearchResponse kissanimeSearchResponse = kissanimeService.searchKissanimeTitles(kissanimeSearchRequest);
@@ -116,7 +121,18 @@ public class KissanimeRuController {
     }
 
     private void saveCorrectCaptchaAnswers(List<KissanimeVideoHostRequest.CaptchaAnswerRequest> captchaAnswers) {
-        // TODO add ability to save correct captcha answers to DB
+        log.info("Saving correct captcha answers to the DB: {}", captchaAnswers);
+
+        if (captchaAnswers != null && captchaAnswers.size() > 0) {
+            List<CaptchaAnswer> answers = captchaAnswers.stream()
+                .map(captchaAnswerRequest -> new CaptchaAnswer(
+                    captchaAnswerRequest.getPromptText(),
+                    captchaAnswerRequest.getImageId())
+                )
+                .collect(Collectors.toList());
+
+            dao.saveNewCaptchaAnswers(answers);
+        }
     }
 
     public ResponseEntity<Resource> getProxiedKissanimeCaptchaImage(String imageId) {
