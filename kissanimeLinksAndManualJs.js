@@ -105,11 +105,13 @@ async function getEpisodeHost(episodeUrl, captchaAnswers = null) {
         captchaContent.imgIdsAndSrcs.forEach(({ imageId, formId }) => {
             const img = document.createElement('img');
             img.src = `/image/${imageId}`;
+            img.style.width = '200px';
 
             const h3 = document.createElement('h3');
             h3.innerText = formId;
 
             const div = document.createElement('div');
+            div.style.display = 'inline-block';
             div.appendChild(h3);
             div.appendChild(img);
             document.body.appendChild(div);
