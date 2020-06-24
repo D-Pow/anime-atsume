@@ -100,24 +100,9 @@ async function getEpisodeHost(episodeUrl, captchaAnswer = null) {
         h1.innerText = videoHostUrl;
         document.body.appendChild(h1);
     } else if (data) {
-        const { file } = data[0];
-        const urlPrefix = '/novelPlanetVideo?url=';
-
-        try {
-            document.body.removeChild(document.querySelector('video'));
-        } catch(e) {}
-
-        const video = document.createElement('video');
-        const source = document.createElement('source')
-
-        video.controls = true
-        source.type = 'video/mp4'
-        source.src = urlPrefix + file;
-
-        video.appendChild(source);
-        document.body.appendChild(video);
-
-        console.log(file);
+        const [ blank, animeText, showName, episodeName ] = new URL(episodeUrl).pathname.split('/');
+        const { file: novelPlanetSrcUrl, label: videoQuality } = data[0];
+        addVideoFromHostUrlToScreen(showName, episodeName, videoQuality, novelPlanetSrcUrl);
     }
 }
 
@@ -131,11 +116,8 @@ async function getNovelPlanetSources(novelPlanetUrl) {
     }).then(res => res.json());
 }
 
-async function addVideoFromHostUrlToScreen(novelPlanetUrl) {
-    const res = await getNovelPlanetSources(novelPlanetUrl);
-
-    const { file } = res.data[0];
-    const urlPrefix = '/novelPlanetVideo?url=';
+function addVideoFromHostUrlToScreen(showName, episodeName, quality, novelPlanetUrl) {
+    const srcUrl = `/novelPlanetVideo?show=${showName}&episode=${episodeName}&quality=${quality}&url=${novelPlanetUrl}`;
 
     try {
         document.body.removeChild(document.querySelector('video'));
@@ -146,12 +128,10 @@ async function addVideoFromHostUrlToScreen(novelPlanetUrl) {
 
     video.controls = true
     source.type = 'video/mp4'
-    source.src = urlPrefix + file;
+    source.src = srcUrl;
 
     video.appendChild(source);
     document.body.appendChild(video);
-
-    console.log(file);
 }
 
 // https://kissanime.ru/Anime/Shigatsu-wa-Kimi-no-Uso
