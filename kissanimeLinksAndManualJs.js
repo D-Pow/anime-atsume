@@ -117,7 +117,7 @@ async function getNovelPlanetSources(novelPlanetUrl) {
 }
 
 function addVideoFromHostUrlToScreen(showName, episodeName, quality, novelPlanetUrl) {
-    const srcUrl = `/novelPlanetVideo?show=${showName}&episode=${episodeName}&quality=${quality}&url=${novelPlanetUrl}`;
+    const srcUrl = `/video/${showName}/${episodeName}/${quality}?url=${novelPlanetUrl}`;
 
     try {
         document.body.removeChild(document.querySelector('video'));

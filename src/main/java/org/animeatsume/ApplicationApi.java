@@ -41,11 +41,11 @@ public class ApplicationApi {
     }
 
     @CrossOrigin
-    @GetMapping(value = "/novelPlanetVideo", produces = { "video/mp4", MediaType.APPLICATION_OCTET_STREAM_VALUE })
+    @GetMapping(value = "/video/{show}/{episode}/{quality}", produces = { "video/mp4", MediaType.APPLICATION_OCTET_STREAM_VALUE })
     public ResponseEntity<Resource> getNovelPlanetVideoStream(
-        @RequestParam("show") String showName,
-        @RequestParam("episode") String episodeName,
-        @RequestParam("quality") String videoQuality,
+        @PathVariable("show") String showName,
+        @PathVariable("episode") String episodeName,
+        @PathVariable("quality") String videoQuality,
         @RequestParam("url") String novelPlanetUrl,
         ServerHttpRequest request
     ) {
