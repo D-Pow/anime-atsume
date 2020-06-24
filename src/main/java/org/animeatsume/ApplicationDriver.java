@@ -20,10 +20,9 @@ import org.springframework.scheduling.annotation.EnableAsync;
  *      JpaRepository interfaces, @DataSource, factories, etc.) so you don't have to manually create a beans.xml file
  *      for each of these specific classes.
  */
-// Remove 'exclude' once database is added
 
 // TODO Replace blocking/synchronous RestTemplate usage with webflux's non-blocking/async WebClient
-@SpringBootApplication(exclude = { DataSourceAutoConfiguration.class, HibernateJpaAutoConfiguration.class })
+@SpringBootApplication
 @EnableAsync
 public class ApplicationDriver {
     private static final Logger log = LoggerFactory.getLogger(ApplicationDriver.class);
