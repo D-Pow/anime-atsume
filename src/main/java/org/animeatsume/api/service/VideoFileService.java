@@ -81,8 +81,10 @@ public class VideoFileService {
     }
 
     public File getVideoFile(String showName, String episodeName, String quality) {
-        if (createFileIfNotExists(showName, episodeName, quality)) {
-            return new File(getEpisodeFilePath(showName, episodeName, quality));
+        File videoFile = new File(getEpisodeFilePath(showName, episodeName, quality));
+
+        if (videoFile.exists()) {
+            return videoFile;
         }
 
         return null;
@@ -90,51 +92,58 @@ public class VideoFileService {
 
     @Async
     public CompletableFuture<Boolean> saveNewVideoFile(String url, String showName, String episodeName, String quality) {
-        File videoFile = getVideoFile(showName, episodeName, quality);
+        File videoFileAlreadyOnDisk = getVideoFile(showName, episodeName, quality);
 
-        if (videoFile != null) {
-            RestTemplate mp4Request = new RestTemplate();
-            Requests.addAcceptableMediaTypes(mp4Request, MediaType.parseMediaType("video/mp4"));
-
-            Boolean success = mp4Request.execute(
-                url,
-                HttpMethod.GET,
-                null,
-                clientHttpResponse -> {
-                    log.info("Video request at ({}) returned with status ({})",
-                        url,
-                        clientHttpResponse.getStatusCode()
-                    );
-
-                    try (
-                        InputStream responseBodyInputStream = clientHttpResponse.getBody();
-                        FileOutputStream fileOutputStream = new FileOutputStream(videoFile)
-                    ) {
-                        StreamUtils.copy(responseBodyInputStream, fileOutputStream);
-                    } catch (IOException e) {
-                        log.error("Failed to download video from URL ({}) to file ({}). Error cause ({}), message = {}",
-                            url,
-                            videoFile.getAbsolutePath(),
-                            e.getCause(),
-                            e.getMessage()
-                        );
-
-                        return false;
-                    }
-
-                    log.info(
-                        "Video from URL ({}} downloaded to ({})",
-                        url,
-                        videoFile.getAbsolutePath()
-                    );
-
-                    return true;
-                }
-            );
-
-            return CompletableFuture.completedFuture(success != null && success);
+        if (videoFileAlreadyOnDisk != null) {
+            return CompletableFuture.completedFuture(true);
         }
 
-        return CompletableFuture.completedFuture(false);
+        boolean fileCreated = createFileIfNotExists(showName, episodeName, quality);
+
+        if (!fileCreated) {
+            return CompletableFuture.completedFuture(false);
+        }
+
+        File newVideoFile = getVideoFile(showName, episodeName, quality);
+        RestTemplate mp4Request = new RestTemplate();
+        Requests.addAcceptableMediaTypes(mp4Request, MediaType.parseMediaType("video/mp4"));
+
+        Boolean success = mp4Request.execute(
+            url,
+            HttpMethod.GET,
+            null,
+            clientHttpResponse -> {
+                log.info("Video request at ({}) returned with status ({})",
+                    url,
+                    clientHttpResponse.getStatusCode()
+                );
+
+                try (
+                    InputStream responseBodyInputStream = clientHttpResponse.getBody();
+                    FileOutputStream fileOutputStream = new FileOutputStream(newVideoFile)
+                ) {
+                    StreamUtils.copy(responseBodyInputStream, fileOutputStream);
+                } catch (IOException e) {
+                    log.error("Failed to download video from URL ({}) to file ({}). Error cause ({}), message = {}",
+                        url,
+                        newVideoFile.getAbsolutePath(),
+                        e.getCause(),
+                        e.getMessage()
+                    );
+
+                    return false;
+                }
+
+                log.info(
+                    "Video from URL ({}} downloaded to ({})",
+                    url,
+                    newVideoFile.getAbsolutePath()
+                );
+
+                return true;
+            }
+        );
+
+        return CompletableFuture.completedFuture(success != null && success);
     }
 }
