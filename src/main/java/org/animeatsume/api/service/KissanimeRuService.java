@@ -267,6 +267,14 @@ public class KissanimeRuService {
         return new KissanimeVideoHostResponse(null, new KissanimeVideoHostResponse.CaptchaContent(promptsForImagesToSelect, imgVerificationIdsAndSrcs));
     }
 
+    public boolean executeBypassAreYouHumanCheckWithDbEntries(String episodeUrl, List<String> captchaAnswers) {
+        List<KissanimeVideoHostRequest.CaptchaAnswerRequest> captchaAnswerRequests = captchaAnswers.stream()
+            .map(formId -> new KissanimeVideoHostRequest.CaptchaAnswerRequest(formId, null, null))
+            .collect(Collectors.toList());
+
+        return executeBypassAreYouHumanCheck(episodeUrl, captchaAnswerRequests);
+    }
+
     public boolean executeBypassAreYouHumanCheck(String episodeUrl, List<KissanimeVideoHostRequest.CaptchaAnswerRequest> captchaAnswers) {
         log.info("Attempting to bypass AreYouHuman check for URL ({}) and captcha answer ({})", episodeUrl, captchaAnswers);
         waitForCloudflareToAllowAccessToKissanime();
