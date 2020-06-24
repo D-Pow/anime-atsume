@@ -37,7 +37,8 @@ public class KissanimeRuService {
     private static final String KISSANIME_ORIGIN = "https://kissanime.ru";
     private static final String ARE_YOU_HUMAN_IMG_PATH = "/Special/CapImg/";
     private static final String TITLE_SEARCH_URL = KISSANIME_ORIGIN + "/Search/SearchSuggestx";
-    private static final String ARE_YOU_HUMAN_FORM_ACTION_URL = KISSANIME_ORIGIN + "/Special/AreYouHuman2";
+    private static final String ARE_YOU_HUMAN_URL_PATH = "/Special/AreYouHuman2";
+    private static final String ARE_YOU_HUMAN_FORM_ACTION_URL = KISSANIME_ORIGIN + ARE_YOU_HUMAN_URL_PATH;
     private static final String CLOUDFLARE_TITLE = "Just a moment";
     private static final String KISSANIME_TITLE = "KissAnime";
     private static final int NUM_ATTEMPTS_TO_BYPASS_CLOUDFLARE = 10;
@@ -257,7 +258,11 @@ public class KissanimeRuService {
 
         List<Anchor> imgVerificationIdsAndSrcs = RegexUtils.getAllMatchesAndGroups(imgVerificationIdAndSrcRegex, formHtml, Pattern.CASE_INSENSITIVE)
             .stream()
-            .map(imgMatchGroups -> new Anchor(KISSANIME_ORIGIN + imgMatchGroups.get(4), imgMatchGroups.get(2)))
+            .map(imgMatchGroups -> {
+                String imgSrcUrlRelativePath = imgMatchGroups.get(4);
+                String imageId = imgSrcUrlRelativePath.substring(imgSrcUrlRelativePath.lastIndexOf("/") + 1);
+                return new Anchor(imageId, imgMatchGroups.get(2));
+            })
             .collect(Collectors.toList());
         List<String> promptsForImagesToSelect = RegexUtils.getAllMatchesAndGroups(spanBodyRegex, formHtml, Pattern.CASE_INSENSITIVE)
             .stream()

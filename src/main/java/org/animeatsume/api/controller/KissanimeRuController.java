@@ -97,12 +97,6 @@ public class KissanimeRuController {
                 // Request is redirected because AreYouHuman verification needs to be completed
                 KissanimeVideoHostResponse responseWithCaptcha = kissanimeService.getBypassAreYouHumanPromptContent(kissanimeEpisodeUrl);
 
-                responseWithCaptcha.getCaptchaContent().getImgIdsAndSrcs().forEach(captchaAnchor -> {
-                    String absoluteUrl = captchaAnchor.getUrl();
-                    String imageId = absoluteUrl.substring(absoluteUrl.lastIndexOf("/") + 1);
-                    captchaAnchor.setUrl(imageId);
-                });
-
                 List<String> captchaAnswersFoundInDb = attemptGettingCaptchaAnswerWithPreviousAnswers(responseWithCaptcha.getCaptchaContent());
 
                 if (captchaAnswersFoundInDb != null) {
