@@ -6,6 +6,7 @@ import org.animeatsume.api.service.KissanimeRuService;
 import org.animeatsume.api.service.NovelPlanetService;
 import org.animeatsume.api.utils.ObjectUtils;
 import org.animeatsume.api.utils.http.Requests;
+import org.animeatsume.api.utils.regex.RegexUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -174,6 +175,19 @@ public class KissanimeRuController {
 
         if (videoFile == null) {
             log.info("Video file not found. Serving content from UrlResource at URL ({})", novelPlanetSourceUrl);
+            return Requests.getUrlResourceStreamResponse(novelPlanetSourceUrl);
+        }
+
+        String rangeHeader = request.getHeaders().getFirst("Range");
+        List<String> matchesForRangeFirstByte = RegexUtils.getFirstMatchGroups("(?<=bytes=)(\\d+)(?=-)", rangeHeader);
+        long firstBytePositionInRange = Long.parseLong(matchesForRangeFirstByte.size() > 0 ? matchesForRangeFirstByte.get(0) : "0");
+        long minimumFileLength = 1000; // video files will definitely be larger than 1 kb
+
+        if (videoFile.length() <= minimumFileLength || videoFile.length() <= firstBytePositionInRange) {
+            log.info("Video file not finished downloading. File length ({}), requested first byte in 'Range' ({})",
+                videoFile.length(),
+                firstBytePositionInRange
+            );
             return Requests.getUrlResourceStreamResponse(novelPlanetSourceUrl);
         }
 
