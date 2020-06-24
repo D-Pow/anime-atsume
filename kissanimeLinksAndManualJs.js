@@ -85,7 +85,7 @@ async function getEpisodeHost(episodeUrl, captchaAnswer = null) {
 
         captchaContent.imgIdsAndSrcs.forEach(({ url, title }) => {
             const img = document.createElement('img');
-            img.src = url;
+            img.src = `/image/${url}`;
 
             const h3 = document.createElement('h3');
             h3.innerText = title;
