@@ -85,9 +85,9 @@ public class KissanimeRuController {
         log.info("KissanimeVideoHostRequest = {}", request);
 
         String kissanimeEpisodeUrl = request.getEpisodeUrl();
-        String captchaAnswer = request.getCaptchaAnswer();
+        List<KissanimeVideoHostRequest.CaptchaAnswerRequest> captchaAnswers = request.getCaptchaAnswers();
 
-        if (captchaAnswer == null || captchaAnswer.equals("")) {
+        if (captchaAnswers == null || captchaAnswers.size() == 0) {
             if (kissanimeService.requestIsRedirected(kissanimeEpisodeUrl)) {
                 // Request is redirected because AreYouHuman verification needs to be completed
                 KissanimeVideoHostResponse captcha = kissanimeService.getBypassAreYouHumanPromptContent(kissanimeEpisodeUrl);
@@ -104,14 +104,20 @@ public class KissanimeRuController {
             return kissanimeService.getVideoHostUrlFromEpisodePage(kissanimeEpisodeUrl);
         }
 
-        boolean bypassSuccess = kissanimeService.executeBypassAreYouHumanCheck(kissanimeEpisodeUrl, captchaAnswer);
+        boolean bypassSuccess = kissanimeService.executeBypassAreYouHumanCheck(kissanimeEpisodeUrl, captchaAnswers);
 
         if (!bypassSuccess) {
             return kissanimeService.getBypassAreYouHumanPromptContent(kissanimeEpisodeUrl);
         }
 
+        saveCorrectCaptchaAnswers(request.getCaptchaAnswers());
+
         return kissanimeService.getVideoHostUrlFromEpisodePage(kissanimeEpisodeUrl);
-    };
+    }
+
+    private void saveCorrectCaptchaAnswers(List<KissanimeVideoHostRequest.CaptchaAnswerRequest> captchaAnswers) {
+        // TODO add ability to save correct captcha answers to DB
+    }
 
     public ResponseEntity<Resource> getProxiedKissanimeCaptchaImage(String imageId) {
         return kissanimeService.getKissanimeCaptchaImage(imageId);

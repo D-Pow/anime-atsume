@@ -4,10 +4,7 @@ import io.webfolder.ui4j.api.browser.BrowserEngine;
 import io.webfolder.ui4j.api.browser.BrowserFactory;
 import io.webfolder.ui4j.api.browser.Page;
 import io.webfolder.ui4j.api.browser.PageConfiguration;
-import org.animeatsume.api.model.Anchor;
-import org.animeatsume.api.model.KissanimeSearchRequest;
-import org.animeatsume.api.model.KissanimeSearchResponse;
-import org.animeatsume.api.model.KissanimeVideoHostResponse;
+import org.animeatsume.api.model.*;
 import org.animeatsume.api.utils.http.Requests;
 import org.animeatsume.api.utils.regex.HtmlParser;
 import org.animeatsume.api.utils.regex.RegexUtils;
@@ -270,10 +267,13 @@ public class KissanimeRuService {
         return new KissanimeVideoHostResponse(null, new KissanimeVideoHostResponse.CaptchaContent(promptsForImagesToSelect, imgVerificationIdsAndSrcs));
     }
 
-    public boolean executeBypassAreYouHumanCheck(String episodeUrl, String captchaAnswer) {
-        log.info("Attempting to bypass AreYouHuman check for URL ({}) and captcha answer ({})", episodeUrl, captchaAnswer);
+    public boolean executeBypassAreYouHumanCheck(String episodeUrl, List<KissanimeVideoHostRequest.CaptchaAnswerRequest> captchaAnswers) {
+        log.info("Attempting to bypass AreYouHuman check for URL ({}) and captcha answer ({})", episodeUrl, captchaAnswers);
         waitForCloudflareToAllowAccessToKissanime();
         String urlPathWithQueryParams = episodeUrl.replace(KISSANIME_ORIGIN, "");
+        String captchaAnswerTextForKissanimeForm = captchaAnswers.stream()
+            .map(KissanimeVideoHostRequest.CaptchaAnswerRequest::getFormId)
+            .collect(Collectors.joining(","));
 
         HttpHeaders headers = getNecessaryRequestHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
@@ -281,7 +281,7 @@ public class KissanimeRuService {
 
         MultiValueMap<String, String> formDataBody = new LinkedMultiValueMap<>();
         formDataBody.add("reUrl", urlPathWithQueryParams);
-        formDataBody.add("answerCap", captchaAnswer);
+        formDataBody.add("answerCap", captchaAnswerTextForKissanimeForm);
 
         RestTemplate captchaSolverRequest = Requests.getNoFollowRedirectsRestTemplate();
 

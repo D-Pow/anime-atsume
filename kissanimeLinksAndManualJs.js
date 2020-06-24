@@ -62,8 +62,23 @@ async function searchTitle(title) {
     console.log(searchResults);
 }
 
-async function getEpisodeHost(episodeUrl, captchaAnswer = null) {
+async function getEpisodeHost(episodeUrl, captchaAnswers = null) {
     document.body.innerHTML = '';
+    let answers = null;
+
+    if (captchaAnswers) {
+        answers = captchaAnswers.map((answerId, i) => {
+            const formId = answerId;
+            const promptText = window.captchaContent.promptTexts[i];
+            const imageId = window.captchaContent.imgIdsAndSrcs.find(anchor => Number(anchor.title) === Number(answerId)).url;
+
+            return {
+                formId,
+                imageId,
+                promptText
+            };
+        });
+    }
 
     const { videoHostUrl, captchaContent, data } = await fetch('/getVideosForEpisode', {
         method: 'POST',
@@ -72,11 +87,12 @@ async function getEpisodeHost(episodeUrl, captchaAnswer = null) {
         },
         body: JSON.stringify({
             episodeUrl,
-            captchaAnswer
+            captchaAnswers: answers
         })
     }).then(res => res.json());
 
     if (captchaContent) {
+        window.captchaContent = captchaContent;
         captchaContent.promptTexts.forEach(prompt => {
             const h1 = document.createElement('h1');
             h1.innerText = prompt;
