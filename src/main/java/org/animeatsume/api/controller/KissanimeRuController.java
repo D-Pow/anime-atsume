@@ -5,18 +5,18 @@ import org.animeatsume.api.service.VideoFileService;
 import org.animeatsume.api.service.KissanimeRuService;
 import org.animeatsume.api.service.NovelPlanetService;
 import org.animeatsume.api.utils.ObjectUtils;
+import org.animeatsume.api.utils.http.Requests;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseCookie;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
 
+import java.io.File;
 import java.net.HttpCookie;
 import java.net.URI;
 import java.util.ArrayList;
@@ -157,7 +157,36 @@ public class KissanimeRuController {
         }
     }
 
-    public ResponseEntity<Resource> getNovelPlanetVideoStream(String url, ServerHttpRequest request) {
-        return novelPlanetService.getVideoSrcStreamFromMp4Url(url, request);
+    public ResponseEntity<Resource> getNovelPlanetVideoStream(
+        String showName,
+        String episodeName,
+        String videoQuality,
+        String novelPlanetSourceUrl,
+        ServerHttpRequest request
+    ) {
+        log.info("Serving video stream: show name ({}), episode name ({}), video quality ({}), source URL ({})",
+            showName,
+            episodeName,
+            videoQuality,
+            novelPlanetSourceUrl
+        );
+        File videoFile = videoFileService.getVideoFile(showName, episodeName, videoQuality);
+
+        if (videoFile == null) {
+            log.info("Video file not found. Serving content from UrlResource at URL ({})", novelPlanetSourceUrl);
+            return Requests.getUrlResourceStreamResponse(novelPlanetSourceUrl);
+        }
+
+        FileSystemResource fileResource = new FileSystemResource(videoFile);
+        log.info("Video file found. Serving FileSystemResource");
+
+        return ResponseEntity
+            .status(HttpStatus.PARTIAL_CONTENT)
+            .contentType(
+                MediaTypeFactory
+                    .getMediaType(fileResource)
+                    .orElse(MediaType.APPLICATION_OCTET_STREAM)
+            )
+            .body(fileResource);
     }
 }

@@ -43,9 +43,18 @@ public class ApplicationApi {
     @CrossOrigin
     @GetMapping(value = "/novelPlanetVideo", produces = { "video/mp4", MediaType.APPLICATION_OCTET_STREAM_VALUE })
     public ResponseEntity<Resource> getNovelPlanetVideoStream(
+        @RequestParam("show") String showName,
+        @RequestParam("episode") String episodeName,
+        @RequestParam("quality") String videoQuality,
         @RequestParam("url") String novelPlanetUrl,
         ServerHttpRequest request
     ) {
-        return kissanimeRuController.getNovelPlanetVideoStream(novelPlanetUrl, request);
+        return kissanimeRuController.getNovelPlanetVideoStream(
+            showName,
+            episodeName,
+            videoQuality,
+            novelPlanetUrl,
+            request
+        );
     }
 }
