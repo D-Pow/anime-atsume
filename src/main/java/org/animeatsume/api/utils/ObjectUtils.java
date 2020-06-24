@@ -9,9 +9,14 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 public class ObjectUtils {
     private static final Logger log = LoggerFactory.getLogger(ObjectUtils.class);
+
+    public static <T> T findObjectInList(List<T> list, Predicate<T> filterPredicate) {
+        return list.stream().filter(filterPredicate).findFirst().orElse(null);
+    }
 
     public static <T> List<T> getAllCompletableFutureResults(List<CompletableFuture<T>> futures) {
         return getAllCompletableFutureResults(futures, (result, index) -> {});
