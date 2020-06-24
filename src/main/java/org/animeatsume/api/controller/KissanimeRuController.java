@@ -120,6 +120,39 @@ public class KissanimeRuController {
         return kissanimeService.getVideoHostUrlFromEpisodePage(kissanimeEpisodeUrl);
     }
 
+    private List<String> attemptGettingCaptchaAnswerWithPreviousAnswers(KissanimeVideoHostResponse.CaptchaContent captchaContent) {
+        List<Anchor> captchaImgIdsAndSrcs = captchaContent.getImgIdsAndSrcs();
+        List<String> formIdsForImagesFoundInDb = new ArrayList<>();
+
+        captchaContent.getPromptTexts().forEach(promptText -> {
+            List<CaptchaAnswer> captchaAnswersForPrompt = dao.getAllCaptchaAnswersByPrompt(promptText);
+
+            if (captchaAnswersForPrompt.size() > 0) {
+                List<String> savedImageNamesForPrompt = captchaAnswersForPrompt.stream()
+                    .map(CaptchaAnswer::getImageId)
+                    .collect(Collectors.toList());
+                Anchor captchaAnchorPromptThatExistsInDb = ObjectUtils.findObjectInList(
+                    captchaImgIdsAndSrcs,
+                    anchor -> savedImageNamesForPrompt.contains(anchor.getUrl())
+                );
+
+                if (captchaAnchorPromptThatExistsInDb != null) {
+                    log.info("Found captcha answer in DB for prompt text ({}) and prompt image ({})",
+                        promptText,
+                        captchaAnchorPromptThatExistsInDb.getUrl()
+                    );
+                    formIdsForImagesFoundInDb.add(captchaAnchorPromptThatExistsInDb.getTitle());
+                }
+            }
+        });
+
+        if (formIdsForImagesFoundInDb.size() == captchaContent.getPromptTexts().size()) {
+            return formIdsForImagesFoundInDb;
+        }
+
+        return null;
+    }
+
     private void saveCorrectCaptchaAnswers(List<KissanimeVideoHostRequest.CaptchaAnswerRequest> captchaAnswers) {
         log.info("Saving correct captcha answers to the DB: {}", captchaAnswers);
 
