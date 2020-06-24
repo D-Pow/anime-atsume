@@ -56,7 +56,7 @@ public class ApplicationApi {
             && videoQuality.matches(validCharactersRegex)
         );
 
-        if (!paramsAreValid) {
+        if (!paramsAreValid || novelPlanetUrl == null || novelPlanetUrl.isEmpty()) {
             log.info("Invalid video stream parameters: showName ({}), episodeName ({}), videoQuality ({}), url ({})",
                 showName,
                 episodeName,
