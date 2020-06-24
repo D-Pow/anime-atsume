@@ -19,9 +19,14 @@ public class RegexUtils {
      *          whereas each nested list contains match groups for a given match.
      */
     public static List<List<String>> getAllMatchesAndGroups(String regex, String toSearch, int patternOption) {
+        List<List<String>> allMatches = new ArrayList<>();
+
+        if (regex == null || toSearch == null) {
+            return allMatches;
+        }
+
         Pattern regexPattern = Pattern.compile(regex, patternOption);
         Matcher strToSearchMatcher = regexPattern.matcher(toSearch);
-        List<List<String>> allMatches = new ArrayList<>();
 
         while(strToSearchMatcher.find()) {
             List<String> matchGroups = new ArrayList<>();
