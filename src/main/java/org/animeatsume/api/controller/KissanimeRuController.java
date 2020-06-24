@@ -18,7 +18,6 @@ import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
-import java.net.HttpCookie;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
@@ -91,16 +90,15 @@ public class KissanimeRuController {
         if (captchaAnswer == null || captchaAnswer.equals("")) {
             if (kissanimeService.requestIsRedirected(kissanimeEpisodeUrl)) {
                 // Request is redirected because AreYouHuman verification needs to be completed
-                // TODO img src URLs are inaccessible if the user doesn't have the Cloudflare
-                //  cookie set. Either download images here or set cookie in response.
-                HttpCookie authCookie = kissanimeService.getAuthCookie();
-                response.addCookie(ResponseCookie
-                    .from(authCookie.getName(), authCookie.getValue())
-                    .domain(".kissanime.ru")
-                    .build()
-                );
+                KissanimeVideoHostResponse captcha = kissanimeService.getBypassAreYouHumanPromptContent(kissanimeEpisodeUrl);
 
-                return kissanimeService.getBypassAreYouHumanPromptContent(kissanimeEpisodeUrl);
+                captcha.getCaptchaContent().getImgIdsAndSrcs().forEach(captchaAnchor -> {
+                    String absoluteUrl = captchaAnchor.getUrl();
+                    String imageId = absoluteUrl.substring(absoluteUrl.lastIndexOf("/") + 1);
+                    captchaAnchor.setUrl(imageId);
+                });
+
+                return captcha;
             }
 
             return kissanimeService.getVideoHostUrlFromEpisodePage(kissanimeEpisodeUrl);
@@ -114,6 +112,10 @@ public class KissanimeRuController {
 
         return kissanimeService.getVideoHostUrlFromEpisodePage(kissanimeEpisodeUrl);
     };
+
+    public ResponseEntity<Resource> getProxiedKissanimeCaptchaImage(String imageId) {
+        return kissanimeService.getKissanimeCaptchaImage(imageId);
+    }
 
     public NovelPlanetSourceResponse getVideoSourcesForNovelPlanetHost(String videoHostUrl) {
         log.info("Getting NovelPlanet MP4 sources for ({})", videoHostUrl);

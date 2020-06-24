@@ -14,6 +14,7 @@ import org.animeatsume.api.utils.regex.RegexUtils;
 import org.animeatsume.api.utils.ui4j.PageUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.Resource;
 import org.springframework.http.*;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -37,6 +38,7 @@ public class KissanimeRuService {
     private static final BrowserEngine browser = BrowserFactory.getWebKit();
 
     private static final String KISSANIME_ORIGIN = "https://kissanime.ru";
+    private static final String ARE_YOU_HUMAN_IMG_PATH = "/Special/CapImg/";
     private static final String TITLE_SEARCH_URL = KISSANIME_ORIGIN + "/Search/SearchSuggestx";
     private static final String ARE_YOU_HUMAN_FORM_ACTION_URL = KISSANIME_ORIGIN + "/Special/AreYouHuman2";
     private static final String CLOUDFLARE_TITLE = "Just a moment";
@@ -291,6 +293,18 @@ public class KissanimeRuService {
         );
 
         return captchaSolverResponse.getStatusCode() == HttpStatus.FOUND;
+    }
+
+    public ResponseEntity<Resource> getKissanimeCaptchaImage(String imageId) {
+        String areYouHumanImgUrlPrefix = KISSANIME_ORIGIN + ARE_YOU_HUMAN_IMG_PATH;
+        String url = areYouHumanImgUrlPrefix + imageId;
+
+        return new RestTemplate().exchange(
+            url,
+            HttpMethod.GET,
+            new HttpEntity<>(null, getNecessaryRequestHeaders()),
+            Resource.class
+        );
     }
 
     public KissanimeVideoHostResponse getVideoHostUrlFromEpisodePage(String episodeUrl) {

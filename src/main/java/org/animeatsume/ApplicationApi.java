@@ -76,4 +76,10 @@ public class ApplicationApi {
             request
         );
     }
+
+    @CrossOrigin
+    @GetMapping(value = "/image/{id}", produces = { MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_PNG_VALUE })
+    public ResponseEntity<Resource> getKissanimeCaptchaImage(@PathVariable("id") String imageId) {
+        return kissanimeRuController.getProxiedKissanimeCaptchaImage(imageId);
+    }
 }
