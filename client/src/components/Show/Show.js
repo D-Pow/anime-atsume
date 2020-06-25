@@ -29,6 +29,27 @@ function Show(props) {
         fetchShowAndEpisodesList();
     }, []);
 
+    const renderPossibleMatchesAndEpisodes = ({ title: showTitle, episodes: showEpisodes }, i) => (
+        <ul className={'text-left'} key={i}>
+            <li>
+                <h4>
+                    <a className={'text-primary cursor-pointer'} data-toggle={'collapse'}>
+                        {showTitle} - {showEpisodes.length}
+                    </a>
+                </h4>
+                <ul className={'collapse'}>
+                    {showEpisodes.map(({ title: episodeTitle, url }, j) => (
+                        <li key={`${i}-${j}`}>
+                            <a className={'text-primary cursor-pointer'}>
+                                {episodeTitle}
+                            </a>
+                        </li>
+                    ))}
+                </ul>
+            </li>
+        </ul>
+    )
+
     const renderBody = () => {
         if (!kitsuResult || !episodeResults) {
             return (
@@ -67,7 +88,11 @@ function Show(props) {
             },
             {
                 tabTitle: 'Possible Show/Episode Matches',
-                content: 'TODO episode list'
+                content: (
+                    <React.Fragment>
+                        {episodeResults.results.map(renderPossibleMatchesAndEpisodes)}
+                    </React.Fragment>
+                )
             }
         ];
 
