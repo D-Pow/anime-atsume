@@ -16,9 +16,6 @@ import Spinner from 'components/ui/Spinner';
 const homeImportPromise = import(/* webpackChunkName: 'Home' */ 'components/Home');
 const Home = React.lazy(() => homeImportPromise);
 
-const aboutImportPromise = import(/* webpackChunkName: 'About' */ 'components/About');
-const About = React.lazy(() => aboutImportPromise);
-
 const routes = [
     {
         path: '/',
@@ -31,11 +28,6 @@ const routes = [
         component: Home,
         name: 'Home',
         exact: true
-    },
-    {
-        path: '/about',
-        component: About,
-        name: 'About'
     }
 ];
 
@@ -44,7 +36,7 @@ function App() {
         <React.Suspense
             fallback={<Spinner className={'w-25 h-25 absolute-center'} show={true} />}
         >
-            <div className={'app container-fluid text-center full-screen-minus-scrollbar'}>
+            <div className={'app container-fluid text-center'}>
                 <div className={'col-12'}>
                     <Router>
                         <React.Fragment>
