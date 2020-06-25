@@ -142,6 +142,10 @@ $container-max-widths: (
   }
 }
 
+.cursor-pointer {
+  cursor: pointer;
+}
+
 .segment-bar {
   background: $primary;
   height: 5px;
