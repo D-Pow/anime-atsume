@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { fetchKitsuTitleSearch } from 'services/KitsuAnimeSearchService';
+import { searchForShow } from 'services/ShowSearchService';
 import Spinner from 'components/ui/Spinner';
 
 function Show(props) {
@@ -8,6 +9,7 @@ function Show(props) {
 
     const [ selectedTab, setSelectedTab ] = useState(0);
     const [ kitsuResult, setKitsuResult ] = useState(null);
+    const [ episodes, setEpisodes ] = useState(null);
 
     async function fetchKitsuInfo() {
         const response = await fetchKitsuTitleSearch(title.toLowerCase());
@@ -17,8 +19,15 @@ function Show(props) {
         setKitsuResult(showInfo);
     }
 
+    async function fetchEpisodeList() {
+        const episodeResults = await searchForShow(title);
+        setEpisodes(episodeResults);
+        console.log(episodeResults)
+    }
+
     useEffect(() => {
         fetchKitsuInfo();
+        fetchEpisodeList();
     }, []);
 
     const renderBody = () => {
@@ -58,7 +67,7 @@ function Show(props) {
                 )
             },
             {
-                tabTitle: 'Episodes',
+                tabTitle: 'Possible Episode Matches',
                 content: 'TODO episode list'
             }
         ];
