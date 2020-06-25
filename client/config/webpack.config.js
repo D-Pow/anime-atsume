@@ -25,7 +25,7 @@ const indexHtmlMetaTagData = {
 // output path for webpack build on machine, not relative paths for index.html
 const relativeBuildOutputPaths = {
     development: '',
-    production: 'dist'
+    production: '../server/src/main/resources/public/'
 };
 const relativeBuildOutputPath = process.env.NODE_ENV === 'production' ? relativeBuildOutputPaths.production : relativeBuildOutputPaths.development;
 const absoluteBuildOutputPath = path.resolve(paths.root, relativeBuildOutputPath);

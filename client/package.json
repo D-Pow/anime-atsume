@@ -12,13 +12,11 @@
   "scripts": {
     "start": "webpack-dev-server --config ./config/webpack.config.js",
     "mock": "cross-env MOCK=true npm start",
-    "clean": "npx shx rm -rf dist",
+    "clean": "npx shx rm -rf ../server/src/main/resources/public/",
     "prebuild": "npm run clean",
     "build": "cross-env NODE_ENV=production webpack --mode production --config ./config/webpack.config.js",
     "test": "jest --coverage tests",
-    "create": "node scripts/createComponent.js",
-    "predeploy": "npm run build",
-    "deploy": "gh-pages -d dist"
+    "create": "node scripts/createComponent.js"
   },
   "dependencies": {
     "prop-types": "^15.7.2",
