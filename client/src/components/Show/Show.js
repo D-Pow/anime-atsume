@@ -7,9 +7,9 @@ import Spinner from 'components/ui/Spinner';
 function Show(props) {
     const title = decodeURIComponent(props.title);
 
-    const [ selectedTab, setSelectedTab ] = useState(0);
     const [ kitsuResult, setKitsuResult ] = useState(null);
     const [ episodeResults, setEpisodeResults ] = useState(null);
+    const [ selectedTab, setSelectedTab ] = useState(0);
     const [ selectedShow, setSelectedShow ] = useState(null);
 
     async function fetchKitsuInfo() {
