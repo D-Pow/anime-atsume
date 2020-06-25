@@ -10,6 +10,7 @@ function Show(props) {
     const [ selectedTab, setSelectedTab ] = useState(0);
     const [ kitsuResult, setKitsuResult ] = useState(null);
     const [ episodeResults, setEpisodeResults ] = useState(null);
+    const [ showsExpanded, setShowsExpanded ] = useState([]);
 
     async function fetchKitsuInfo() {
         const response = await fetchKitsuTitleSearch(title.toLowerCase());
@@ -22,6 +23,11 @@ function Show(props) {
     async function fetchShowAndEpisodesList() {
         const episodeResults = await searchForShow(title);
         setEpisodeResults(episodeResults);
+        setShowsExpanded(
+            Array
+                .from({ length: episodeResults.results.length })
+                .map(() => false)
+        );
     }
 
     useEffect(() => {
@@ -29,15 +35,23 @@ function Show(props) {
         fetchShowAndEpisodesList();
     }, []);
 
+    const toggleIsShowExpanded = showIndex => {
+        setShowsExpanded(prevState => {
+            const prevShowsExpanded = [...prevState];
+            prevShowsExpanded[showIndex] = !prevShowsExpanded[showIndex];
+            return prevShowsExpanded;
+        });
+    };
+
     const renderPossibleMatchesAndEpisodes = ({ title: showTitle, episodes: showEpisodes }, i) => (
         <ul className={'text-left'} key={i}>
             <li>
                 <h4>
-                    <a className={'text-primary cursor-pointer'} data-toggle={'collapse'}>
+                    <a className={'text-primary cursor-pointer'} onClick={() => toggleIsShowExpanded(i)}>
                         {showTitle} - {showEpisodes.length}
                     </a>
                 </h4>
-                <ul className={'collapse'}>
+                <ul className={`collapse ${showsExpanded[i] ? 'show' : ''}`}>
                     {showEpisodes.map(({ title: episodeTitle, url }, j) => (
                         <li key={`${i}-${j}`}>
                             <a className={'text-primary cursor-pointer'}>
