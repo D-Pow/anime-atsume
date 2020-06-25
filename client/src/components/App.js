@@ -16,6 +16,9 @@ import Spinner from 'components/ui/Spinner';
 const homeImportPromise = import(/* webpackChunkName: 'Home' */ 'components/Home');
 const Home = React.lazy(() => homeImportPromise);
 
+const showImportPromise = import(/* webpackChunkName: 'Home' */ 'components/Show');
+const Show = React.lazy(() => showImportPromise);
+
 const routes = [
     {
         path: '/',
@@ -28,6 +31,11 @@ const routes = [
         component: Home,
         name: 'Home',
         exact: true
+    },
+    {
+        path: '/show/:showName',
+        render: ({ match }) => <Show title={match.params.showName} />,
+        name: 'Show'
     }
 ];
 
