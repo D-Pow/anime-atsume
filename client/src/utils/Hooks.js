@@ -143,6 +143,34 @@ export function useWindowResize() {
 }
 
 /**
+ * Blocks the `document.body` from being scrollable as long as
+ * the `shouldBlockScrolling` function returns true.
+ *
+ * @param {function(): boolean} shouldBlockScrolling - Function to determine if scrolling should be disabled
+ */
+export function useBlockDocumentScrolling(shouldBlockScrolling) {
+    /**
+     * Don't return a cleanup function to handle activating scrolling.
+     *
+     * React calls cleanup functions upon both component unmount
+     * and component re-render.
+     *
+     * If re-activating scrolling were returned in the cleanup function,
+     * then anytime the component re-rendered, document scrolling
+     * would be re-activated, even if the `shouldBlockScrolling()` returned true.
+     *
+     * Thus, handle the cleanup manually in else-block.
+     */
+    useEffect(() => {
+        if (shouldBlockScrolling()) {
+            setDocumentScrolling(false);
+        } else {
+            setDocumentScrolling();
+        }
+    }, [ shouldBlockScrolling ]);
+}
+
+/**
  * Determines if the mouse is hovering over an element using JavaScript.
  * Useful for the times where JavaScript calculations need to be done,
  * where CSS `:hover` classes aren't enough.
@@ -188,4 +216,18 @@ export function useHover(overrideBoundingClientRect) {
     });
 
     return [ ref, isHovered ];
+}
+
+/**
+ * Sets the scrolling ability of the whole `document.body`.
+ * Useful for controlling the app's ability to scroll from any
+ * component.
+ *
+ * Since `document.body` is outside of the control of React,
+ * set the style manually. Default value is ''.
+ *
+ * @param allowScrolling
+ */
+export function setDocumentScrolling(allowScrolling = true) {
+    document.body.style.overflow = allowScrolling ? 'auto' : 'hidden';
 }
