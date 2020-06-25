@@ -32,11 +32,9 @@ function Show(props) {
     }, []);
 
     const renderEpisodesForSelectedShow = ({ title: episodeTitle, url }, i) => (
-        <li key={i}>
-            <a className={'text-primary cursor-pointer'}>
-                {episodeTitle}
-            </a>
-        </li>
+        <a className={'list-group-item text-primary cursor-pointer'} key={i}>
+            {episodeTitle}
+        </a>
     );
 
     const renderPossibleShowMatches = ({ title: showTitle, episodes: showEpisodes}, i) => (
@@ -95,9 +93,9 @@ function Show(props) {
                 content: (
                     <div className={'row'}>
                         <div className={'col-6 overflow-auto'} style={{ maxHeight: '400px' }}>
-                            <ul className={'text-left list-group'}>
+                            <div className={'text-left list-group'}>
                                 {episodeResults.results.map(renderPossibleShowMatches)}
-                            </ul>
+                            </div>
                         </div>
                         <div className={'col-6 overflow-auto'} style={{ maxHeight: '400px' }}>
                             <div className={'text-left'}>
