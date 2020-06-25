@@ -129,8 +129,8 @@ function Show(props) {
         return (
             <div className={'row pt-5'}>
                 <div className={'card mb-5 col-12'}>
-                    <div className={'row'}>
-                        <div className={'card-body'}>
+                    <div className={'card-body'}>
+                        <div className={'row'}>
                             <div className={'col-centered col-lg-4 my-3 d-inline-block'}>
                                 <img className={'my-auto flex-center'} src={small} alt={canonicalTitle} />
                             </div>
