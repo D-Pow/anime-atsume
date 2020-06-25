@@ -72,6 +72,20 @@ function Show(props) {
             }
         ];
 
+        const renderedTabNavigation = (
+            <nav>
+                <ul className={'pagination'}>
+                    {tabs.map(({ tabTitle }, i) => (
+                        <li className={'page-item'} key={i} onClick={() => setSelectedTab(i)}>
+                            <a className={'page-link cursor-pointer'}>
+                                {tabTitle}
+                            </a>
+                        </li>
+                    ))}
+                </ul>
+            </nav>
+        );
+
         return (
             <div className={'row pt-5'}>
                 <div className={'card mb-5 col-12'}>
@@ -83,17 +97,7 @@ function Show(props) {
 
                             <div className={'col-sm-12 col-lg-8 d-inline-block'}>
                                 <div className={'card d-inline-block w-100'}>
-                                    <nav>
-                                        <ul className={'pagination'}>
-                                            {tabs.map(({ tabTitle }, i) => (
-                                                <li className={'page-item'} key={i} onClick={() => setSelectedTab(i)}>
-                                                    <a className={'page-link cursor-pointer'}>
-                                                        {tabTitle}
-                                                    </a>
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    </nav>
+                                    {renderedTabNavigation}
 
                                     <div className={'card-body'}>
                                         {tabs[selectedTab].content}
