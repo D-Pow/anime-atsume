@@ -18,7 +18,7 @@ ReactDOM.render(
     rootDiv
 );
 
-registerServiceWorker();
+// registerServiceWorker();
 
 // hot reloading
 if (process.env.NODE_ENV !== 'production' && module.hot) {
