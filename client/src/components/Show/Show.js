@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { fetchKitsuTitleSearch } from 'services/KitsuAnimeSearchService';
 import { searchForShow } from 'services/ShowSearchService';
 import Spinner from 'components/ui/Spinner';
+import VideoModal from 'components/VideoModal';
 
 function Show(props) {
     const title = decodeURIComponent(props.title);
@@ -11,6 +12,7 @@ function Show(props) {
     const [ episodeResults, setEpisodeResults ] = useState(null);
     const [ selectedTab, setSelectedTab ] = useState(0);
     const [ selectedShow, setSelectedShow ] = useState(null);
+    const [ selectedEpisode, setSelectedEpisode ] = useState(null);
 
     async function fetchKitsuInfo() {
         const response = await fetchKitsuTitleSearch(title.toLowerCase());
@@ -36,8 +38,12 @@ function Show(props) {
         fetchShowAndEpisodesList();
     }, []);
 
-    const renderEpisodesForSelectedShow = ({ title: episodeTitle, url }, i) => (
-        <a className={'list-group-item text-primary cursor-pointer'} key={i}>
+    const renderEpisodesForSelectedShow = ({ title: episodeTitle, url: episodeUrl }, i) => (
+        <a
+            className={'list-group-item text-primary cursor-pointer'}
+            key={i}
+            onClick={() => setSelectedEpisode({ episodeTitle, episodeUrl })}
+        >
             {episodeTitle}
         </a>
     );
@@ -159,6 +165,12 @@ function Show(props) {
                     </div>
                 </div>
             </div>
+
+            <VideoModal
+                {...selectedEpisode}
+                show={selectedEpisode != null}
+                onClose={() => setSelectedEpisode(null)}
+            />
         </React.Fragment>
     );
 }
