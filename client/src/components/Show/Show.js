@@ -114,7 +114,12 @@ function Show(props) {
             <nav>
                 <ul className={'pagination'}>
                     {tabs.map(({ tabTitle }, i) => (
-                        <li className={`page-item ${selectedTab === i ? 'active' : ''}`} key={i} onClick={() => setSelectedTab(i)}>
+                        <li
+                            className={`page-item ${selectedTab === i ? 'active' : ''}`}
+                            key={i}
+                            onClick={() => setSelectedTab(i)}
+                            style={{ width: `${100 / tabs.length}%`}}
+                        >
                             <a className={'page-link cursor-pointer'}>
                                 {tabTitle}
                             </a>
