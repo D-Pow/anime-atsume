@@ -40,14 +40,13 @@ function Show(props) {
     ));
 
     const renderPossibleShowMatches = ({ title: showTitle, episodes: showEpisodes}, i) => (
-        <li key={i}>
+        <li
+            className={`list-group-item cursor-pointer ${selectedShow === i ? 'active' : ''}`}
+            key={i}
+            onClick={() => setSelectedShow(i)}
+        >
             <h4>
-                <button
-                    className={`btn remove-focus-highlight btn${selectedShow === i ? '' : '-outline'}-primary`}
-                    onClick={() => setSelectedShow(i)}
-                >
-                    {showTitle} - {showEpisodes.length}
-                </button>
+                {showTitle} - {showEpisodes.length}
             </h4>
         </li>
     );
@@ -93,7 +92,7 @@ function Show(props) {
                 content: (
                     <div className={'row'}>
                         <div className={'col-6 overflow-auto'} style={{ maxHeight: '400px' }}>
-                            <ul className={'text-left'}>
+                            <ul className={'text-left list-group'}>
                                 {episodeResults.results.map(renderPossibleShowMatches)}
                             </ul>
                         </div>
