@@ -19,6 +19,8 @@
     "create": "node scripts/createComponent.js"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-free": "^5.13.1",
+    "bootstrap": "^4.5.0",
     "prop-types": "^15.7.2",
     "react": "^16.12.0",
     "react-dom": "^16.12.0",

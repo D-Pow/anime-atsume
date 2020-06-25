@@ -1,9 +1,6 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { HashRouter as Router, Route, Redirect } from 'react-router-dom';
-import SpinnerCircle from 'components/ui/SpinnerCircle';
-import IncompatibleBrowserFallback from 'components/IncompatibleBrowserFallback';
-import AppContext from 'utils/AppContext';
-import { isMicrosoftBrowser } from 'utils/BrowserIdentification';
+import Spinner from 'components/ui/Spinner';
 
 /**
  * Lazy-load components so the page spinner is prioritized, loaded quickly, and unblocked from animating.
@@ -22,9 +19,6 @@ const Home = React.lazy(() => homeImportPromise);
 const aboutImportPromise = import(/* webpackChunkName: 'About' */ 'components/About');
 const About = React.lazy(() => aboutImportPromise);
 
-const animeSearchImportPromise = import(/* webpackChunkName: 'AnimeSearch' */ 'components/AnimeSearch');
-const AnimeSearch = React.lazy(() => animeSearchImportPromise);
-
 const routes = [
     {
         path: '/',
@@ -42,38 +36,24 @@ const routes = [
         path: '/about',
         component: About,
         name: 'About'
-    },
-    {
-        path: '/animeSearch',
-        component: AnimeSearch,
-        name: 'AnimeSearch',
-        exact: true
     }
 ];
 
-const blockMicrosoftBrowsers = false;
-
 function App() {
-    const { contextState, setContextState } = useContext(AppContext.Context);
-
-    if (blockMicrosoftBrowsers && isMicrosoftBrowser()) {
-        return <IncompatibleBrowserFallback />
-    }
-
-    const renderedRoutes = routes.map(routeAria => (
-        <Route key={routeAria.path} {...routeAria} />
-    ));
-
     return (
         <React.Suspense
-            fallback={<SpinnerCircle show={true} />}
+            fallback={<Spinner className={'w-25 h-25 absolute-center'} show={true} />}
         >
-            <div className={'app text-center'}>
-                <Router>
-                    <React.Fragment>
-                        {renderedRoutes}
-                    </React.Fragment>
-                </Router>
+            <div className={'app container-fluid text-center full-screen-minus-scrollbar'}>
+                <div className={'col-12'}>
+                    <Router>
+                        <React.Fragment>
+                            {routes.map(routeAria => (
+                                <Route key={routeAria.path} {...routeAria} />
+                            ))}
+                        </React.Fragment>
+                    </Router>
+                </div>
             </div>
         </React.Suspense>
     );

@@ -1,0 +1,30 @@
+@import "Animations/Spin";
+
+.animated {
+    opacity: 0;
+    animation-fill-mode: forwards;
+}
+
+.show {
+    opacity: 1;
+}
+
+.animation-infinite {
+    animation-iteration-count: infinite;
+}
+
+@for $time from 1 through 20 {
+    $duration: $time/10 * 1s;
+    .duration-#{$time} {
+        animation-duration: $duration !important;
+        transition-duration: $duration !important;
+    }
+}
+
+.ease-in {
+    animation-timing-function: ease-in;
+}
+
+.linear {
+    animation-timing-function: linear;
+}

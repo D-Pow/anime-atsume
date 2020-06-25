@@ -1,19 +1,57 @@
 import React, { useState } from 'react';
-import { Redirect } from "react-router";
+import { fetchKitsuTitleSearch } from 'services/KitsuAnimeSearchService';
+import SearchBar from 'components/ui/SearchBar';
+import KitsuSearchResults from 'components/ui/KitsuSearch/KitsuSearchResults';
+import Spinner from 'components/ui/Spinner';
 
 function Home() {
-    const [ redirect, setRedirect ] = useState();
+    const pageText = {
+        title: 'Anime Atsume',
+        description: 'Search aggregator for many anime shows.'
+    };
 
-    if (redirect) {
-        return <Redirect push to={redirect} />;
-    }
+    const [ typedText, setTypedText ] = useState('');
+    const [ kitsuResults, setKitsuResults ] = useState(null);
+    const [ showSpinner, setShowSpinner ] = useState(false);
+
+    const handleSubmit = async selectedDropdownText => {
+        setShowSpinner(true);
+        const searchQuery = selectedDropdownText || typedText;
+        const response = await fetchKitsuTitleSearch(searchQuery.toLowerCase());
+        setKitsuResults(response);
+        setShowSpinner(false);
+    };
+
+    const renderedTitle = (
+        <div className={'row'}>
+            <div className={'col-12 text-center mx-auto mt-5'}>
+                <h1>{pageText.title}</h1>
+            </div>
+        </div>
+    );
+
+    const renderedDescription = (
+        <div className={'row mt-3'}>
+            <div className={'col-12 col-md-6 text-center mx-auto'}>
+                <h6>{pageText.description}</h6>
+            </div>
+        </div>
+    );
+
+    const renderedSearchButtonContent = showSpinner ? <Spinner type={Spinner.Type.CIRCLE} show={showSpinner} /> : null;
 
     return (
-        <React.Fragment>
-            <div>Home</div>
-            <button onClick={() => setRedirect('/about')}>Go to About</button>
-            <button onClick={() => setRedirect('/animeSearch')}>Go to anime search</button>
-        </React.Fragment>
+        <div className={'text-center mx-auto'}>
+            {renderedTitle}
+            {renderedDescription}
+            <SearchBar
+                btnDisplay={renderedSearchButtonContent}
+                value={typedText}
+                handleTyping={setTypedText}
+                handleSubmit={handleSubmit}
+            />
+            <KitsuSearchResults kitsuResults={kitsuResults} />
+        </div>
     );
 }
 

@@ -3,6 +3,8 @@ import ReactDOM from 'react-dom';
 import App from 'components/App';
 import AppContext from 'utils/AppContext';
 import registerServiceWorker from './registerServiceWorker';
+import '@fortawesome/fontawesome-free/js/fontawesome';
+import '@fortawesome/fontawesome-free/js/solid';
 import 'styles/index.scss';
 
 const { Provider } = AppContext;
