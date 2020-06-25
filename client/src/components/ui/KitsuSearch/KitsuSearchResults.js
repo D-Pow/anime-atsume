@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import KitsuResultCard from './KitsuResultCard';
 
-function KitsuSearchResults({ kitsuResults }) {
+function KitsuSearchResults({ kitsuResults, ...resultCardProps }) {
     if (!kitsuResults) {
         return '';
     }
@@ -14,7 +14,10 @@ function KitsuSearchResults({ kitsuResults }) {
                     {kitsuResults.data.map(kitsuResult => {
                         return (
                             <li className={'media row w-75 mb-5 mx-auto'} key={kitsuResult.id}>
-                                <KitsuResultCard kitsuResult={kitsuResult} />
+                                <KitsuResultCard
+                                    {...resultCardProps}
+                                    kitsuResult={kitsuResult}
+                                />
                             </li>
                         );
                     })}
@@ -25,6 +28,7 @@ function KitsuSearchResults({ kitsuResults }) {
 }
 
 KitsuSearchResults.propTypes = {
+    ...KitsuResultCard.propTypes,
     kitsuResults: PropTypes.object
 };
 
