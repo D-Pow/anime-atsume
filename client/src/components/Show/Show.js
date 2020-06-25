@@ -9,7 +9,7 @@ function Show(props) {
 
     const [ selectedTab, setSelectedTab ] = useState(0);
     const [ kitsuResult, setKitsuResult ] = useState(null);
-    const [ episodes, setEpisodes ] = useState(null);
+    const [ episodeResults, setEpisodeResults ] = useState(null);
 
     async function fetchKitsuInfo() {
         const response = await fetchKitsuTitleSearch(title.toLowerCase());
@@ -19,19 +19,18 @@ function Show(props) {
         setKitsuResult(showInfo);
     }
 
-    async function fetchEpisodeList() {
+    async function fetchShowAndEpisodesList() {
         const episodeResults = await searchForShow(title);
-        setEpisodes(episodeResults);
-        console.log(episodeResults)
+        setEpisodeResults(episodeResults);
     }
 
     useEffect(() => {
         fetchKitsuInfo();
-        fetchEpisodeList();
+        fetchShowAndEpisodesList();
     }, []);
 
     const renderBody = () => {
-        if (!kitsuResult || !episodes) {
+        if (!kitsuResult || !episodeResults) {
             return (
                 <div className={'full-screen-minus-scrollbar'}>
                     <Spinner className={'w-25 h-25 absolute-center'} show={true} />
@@ -67,7 +66,7 @@ function Show(props) {
                 )
             },
             {
-                tabTitle: 'Possible Episode Matches',
+                tabTitle: 'Possible Show/Episode Matches',
                 content: 'TODO episode list'
             }
         ];
