@@ -10,7 +10,7 @@ function Show(props) {
     const [ selectedTab, setSelectedTab ] = useState(0);
     const [ kitsuResult, setKitsuResult ] = useState(null);
     const [ episodeResults, setEpisodeResults ] = useState(null);
-    const [ showsExpanded, setShowsExpanded ] = useState([]);
+    const [ selectedShow, setSelectedShow ] = useState(null);
 
     async function fetchKitsuInfo() {
         const response = await fetchKitsuTitleSearch(title.toLowerCase());
@@ -22,11 +22,7 @@ function Show(props) {
 
     async function fetchShowAndEpisodesList() {
         const episodeResults = await searchForShow(title);
-        setShowsExpanded(
-            Array
-                .from({ length: episodeResults.results.length })
-                .map(() => false)
-        );
+        setSelectedShow(0);
         setEpisodeResults(episodeResults);
     }
 
@@ -35,34 +31,26 @@ function Show(props) {
         fetchShowAndEpisodesList();
     }, []);
 
-    const toggleIsShowExpanded = showIndex => {
-        setShowsExpanded(prevState => {
-            const prevShowsExpanded = [...prevState];
-            prevShowsExpanded[showIndex] = !prevShowsExpanded[showIndex];
-            return prevShowsExpanded;
-        });
-    };
+    const renderEpisodesForSelectedShow = chosenShow => chosenShow.episodes.map(({ title: episodeTitle, url }, i) => (
+        <li key={i}>
+            <a className={'text-primary cursor-pointer'}>
+                {episodeTitle}
+            </a>
+        </li>
+    ));
 
-    const renderPossibleMatchesAndEpisodes = ({ title: showTitle, episodes: showEpisodes }, i) => (
-        <ul className={'text-left'} key={i}>
-            <li>
-                <h4>
-                    <a className={'text-primary cursor-pointer'} onClick={() => toggleIsShowExpanded(i)}>
-                        {showTitle} - {showEpisodes.length}
-                    </a>
-                </h4>
-                <ul className={`collapse ${showsExpanded[i] ? 'show' : ''}`}>
-                    {showEpisodes.map(({ title: episodeTitle, url }, j) => (
-                        <li key={`${i}-${j}`}>
-                            <a className={'text-primary cursor-pointer'}>
-                                {episodeTitle}
-                            </a>
-                        </li>
-                    ))}
-                </ul>
-            </li>
-        </ul>
-    )
+    const renderPossibleShowMatches = ({ title: showTitle, episodes: showEpisodes}, i) => (
+        <li key={i}>
+            <h4>
+                <button
+                    className={`btn remove-focus-highlight btn${selectedShow === i ? '' : '-outline'}-primary`}
+                    onClick={() => setSelectedShow(i)}
+                >
+                    {showTitle} - {showEpisodes.length}
+                </button>
+            </h4>
+        </li>
+    );
 
     const renderBody = () => {
         if (!kitsuResult || !episodeResults) {
@@ -103,9 +91,18 @@ function Show(props) {
             {
                 tabTitle: 'Possible Show/Episode Matches',
                 content: (
-                    <React.Fragment>
-                        {episodeResults.results.map(renderPossibleMatchesAndEpisodes)}
-                    </React.Fragment>
+                    <div className={'row'}>
+                        <div className={'col-6 overflow-auto'} style={{ maxHeight: '400px' }}>
+                            <ul className={'text-left'}>
+                                {episodeResults.results.map(renderPossibleShowMatches)}
+                            </ul>
+                        </div>
+                        <div className={'col-6 overflow-auto'} style={{ maxHeight: '400px' }}>
+                            <ul className={'text-left'}>
+                                {selectedShow !== null && renderEpisodesForSelectedShow(episodeResults.results[selectedShow])}
+                            </ul>
+                        </div>
+                    </div>
                 )
             }
         ];
