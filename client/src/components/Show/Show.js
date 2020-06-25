@@ -39,16 +39,18 @@ function Show(props) {
 
         return (
             <div className={'row pt-5'}>
-                <div className={'card'}>
-                    <div className={'card-body'}>
-                        <div className={'col-sm-4 d-inline-block'}>
-                            <img className={'my-auto flex-center'} src={small} alt={canonicalTitle} />
-                        </div>
+                <div className={'card mb-5 col-12'}>
+                    <div className={'row'}>
+                        <div className={'card-body'}>
+                            <div className={'col-sm-4 d-inline-block'}>
+                                <img className={'my-auto flex-center'} src={small} alt={canonicalTitle} />
+                            </div>
 
-                        <div className={'col-sm-8 d-inline-block'}>
-                            <div className={'card d-inline-block'}>
-                                <div className={'card-body'}>
-                                    {synopsis}
+                            <div className={'col-sm-8 d-inline-block'}>
+                                <div className={'card d-inline-block'}>
+                                    <div className={'card-body'}>
+                                        {synopsis}
+                                    </div>
                                 </div>
                             </div>
                         </div>
