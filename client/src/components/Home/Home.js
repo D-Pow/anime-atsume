@@ -22,7 +22,7 @@ function Home() {
         setShowSpinner(false);
     };
 
-    const anchorHrefFunction = title => `#/show/${title.replace(/\s+/g, '-')}`;
+    const anchorHrefFunction = title => `#/show/${encodeURIComponent(title)}`;
 
     const renderedTitle = (
         <div className={'row'}>
