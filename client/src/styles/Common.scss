@@ -146,6 +146,10 @@ $container-max-widths: (
   cursor: pointer;
 }
 
+.capitalize-first {
+  text-transform: capitalize;
+}
+
 .segment-bar {
   background: $primary;
   height: 5px;

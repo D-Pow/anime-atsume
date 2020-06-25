@@ -33,6 +33,8 @@ function Show(props) {
         const {
             canonicalTitle,
             synopsis,
+            episodeCount,
+            showType,
             posterImage: {
                 small
             }
@@ -41,7 +43,19 @@ function Show(props) {
         const tabs = [
             {
                 tabTitle: 'Overview',
-                content: synopsis
+                content: (
+                    <React.Fragment>
+                        <h5 className={'capitalize-first'}>
+                            {episodeCount === 1
+                                ? showType
+                                : episodeCount + ' episodes'
+                            }
+                        </h5>
+                        <p>
+                            {synopsis}
+                        </p>
+                    </React.Fragment>
+                )
             },
             {
                 tabTitle: 'Episodes',
