@@ -22,6 +22,8 @@ function Home() {
         setShowSpinner(false);
     };
 
+    const anchorHrefFunction = title => `#/show/${title.replace(/\s+/g, '-')}`;
+
     const renderedTitle = (
         <div className={'row'}>
             <div className={'col-12 text-center mx-auto mt-5'}>
@@ -50,7 +52,11 @@ function Home() {
                 handleTyping={setTypedText}
                 handleSubmit={handleSubmit}
             />
-            <KitsuSearchResults kitsuResults={kitsuResults} />
+            <KitsuSearchResults
+                anchorImageFunc={anchorHrefFunction}
+                anchorTitleFunc={anchorHrefFunction}
+                kitsuResults={kitsuResults}
+            />
         </div>
     );
 }
