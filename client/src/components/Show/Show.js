@@ -31,13 +31,13 @@ function Show(props) {
         fetchShowAndEpisodesList();
     }, []);
 
-    const renderEpisodesForSelectedShow = chosenShow => chosenShow.episodes.map(({ title: episodeTitle, url }, i) => (
+    const renderEpisodesForSelectedShow = ({ title: episodeTitle, url }, i) => (
         <li key={i}>
             <a className={'text-primary cursor-pointer'}>
                 {episodeTitle}
             </a>
         </li>
-    ));
+    );
 
     const renderPossibleShowMatches = ({ title: showTitle, episodes: showEpisodes}, i) => (
         <button
@@ -98,7 +98,7 @@ function Show(props) {
                         </div>
                         <div className={'col-6 overflow-auto'} style={{ maxHeight: '400px' }}>
                             <div className={'text-left'}>
-                                {selectedShow !== null && renderEpisodesForSelectedShow(episodeResults.results[selectedShow])}
+                                {episodeResults.results[selectedShow].episodes.map(renderEpisodesForSelectedShow)}
                             </div>
                         </div>
                     </div>
