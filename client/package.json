@@ -1,13 +1,13 @@
 {
-  "name": "react-app-boilerplate",
+  "name": "anime-atsume",
   "version": "0.1.0",
-  "description": "A simplified boilerplate app for websites that's better organized than create-react-app",
+  "description": "A unified website that aggregates and serves anime videos",
   "main": "index.js",
   "author": "D-Pow",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/D-Pow/react-app-boilerplate.git"
+    "url": "git+https://github.com/D-Pow/anime-atsume.git"
   },
   "scripts": {
     "start": "webpack-dev-server --config ./config/webpack.config.js",
@@ -100,7 +100,7 @@
     }
   },
   "keywords": [
-    "boilerplate",
+    "anime",
     "web development",
     "create-react-app",
     "typescript",

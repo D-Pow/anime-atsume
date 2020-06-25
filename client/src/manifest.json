@@ -1,6 +1,6 @@
 {
-  "short_name": "react-app-boilerplate",
-  "name": "A better create-react-app",
+  "short_name": "anime-atsume",
+  "name": "Anime Atsume",
   "icons": [
     {
       "src": "favicon-144.png",

@@ -15,7 +15,7 @@ const paths = { // resolved relative to root dir since that's where the initial 
     root: path.resolve('./')
 };
 
-const indexHtmlTitle = 'React App Boilerplate';
+const indexHtmlTitle = 'Anime Atsume';
 const indexHtmlMetaTagData = {
     description: packageJson.description,
     keywords: packageJson.keywords.join(', '),
