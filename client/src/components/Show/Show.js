@@ -31,7 +31,7 @@ function Show(props) {
     }, []);
 
     const renderBody = () => {
-        if (!kitsuResult) {
+        if (!kitsuResult || !episodes) {
             return (
                 <div className={'full-screen-minus-scrollbar'}>
                     <Spinner className={'w-25 h-25 absolute-center'} show={true} />
