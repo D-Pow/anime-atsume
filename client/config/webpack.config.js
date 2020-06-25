@@ -235,6 +235,11 @@ module.exports = {
     stats: { modules: false, children: false }, // clean up npm output
     devServer: {
         port: 3000,
+        proxy: {
+            '/**': {
+                target: 'http://localhost:8080'
+            }
+        },
         stats: 'minimal',  // silence superfluous webpack-dev-server "emitted" output
         open: true, // open browser window upon build
         hot: hotReloading, // for `module.hot` hot-reloading block in index.js
