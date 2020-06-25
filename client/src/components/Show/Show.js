@@ -40,15 +40,15 @@ function Show(props) {
     ));
 
     const renderPossibleShowMatches = ({ title: showTitle, episodes: showEpisodes}, i) => (
-        <li
-            className={`list-group-item cursor-pointer ${selectedShow === i ? 'active' : ''}`}
+        <button
+            className={`list-group-item remove-focus-highlight ${selectedShow === i ? 'active' : ''}`}
             key={i}
             onClick={() => setSelectedShow(i)}
         >
             <h4>
                 {showTitle} - {showEpisodes.length}
             </h4>
-        </li>
+        </button>
     );
 
     const renderBody = () => {
@@ -97,9 +97,9 @@ function Show(props) {
                             </ul>
                         </div>
                         <div className={'col-6 overflow-auto'} style={{ maxHeight: '400px' }}>
-                            <ul className={'text-left'}>
+                            <div className={'text-left'}>
                                 {selectedShow !== null && renderEpisodesForSelectedShow(episodeResults.results[selectedShow])}
-                            </ul>
+                            </div>
                         </div>
                     </div>
                 )
