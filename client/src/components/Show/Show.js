@@ -57,81 +57,87 @@ function Show(props) {
         </button>
     );
 
-    const renderBody = () => {
-        if (!kitsuResult || !episodeResults) {
-            return (
-                <div className={'full-screen-minus-scrollbar'}>
-                    <Spinner className={'w-25 h-25 absolute-center'} show={true} />
-                </div>
-            );
+    if (!kitsuResult || !episodeResults) {
+        return (
+            <div className={'full-screen-minus-scrollbar'}>
+                <Spinner className={'w-25 h-25 absolute-center'} show={true} />
+            </div>
+        );
+    }
+
+    const {
+        canonicalTitle,
+        synopsis,
+        episodeCount,
+        showType,
+        posterImage: {
+            small
         }
+    } = kitsuResult.attributes;
 
-        const {
-            canonicalTitle,
-            synopsis,
-            episodeCount,
-            showType,
-            posterImage: {
-                small
-            }
-        } = kitsuResult.attributes;
-
-        const tabs = [
-            {
-                tabTitle: 'Overview',
-                content: (
-                    <React.Fragment>
-                        <h5 className={'capitalize-first'}>
-                            {episodeCount === 1
-                                ? showType
-                                : episodeCount + ' episodes'
-                            }
-                        </h5>
-                        <p>
-                            {synopsis}
-                        </p>
-                    </React.Fragment>
-                )
-            },
-            {
-                tabTitle: 'Possible Show/Episode Matches',
-                content: (
-                    <div className={'row'}>
-                        <div className={'col-6 overflow-auto'} style={{ maxHeight: '400px' }}>
-                            <div className={'text-left list-group'}>
-                                {episodeResults.results.map(renderPossibleShowMatches)}
-                            </div>
-                        </div>
-                        <div className={'col-6 overflow-auto'} style={{ maxHeight: '400px' }}>
-                            <div className={'text-left'}>
-                                {episodeResults.results[selectedShow].episodes.map(renderEpisodesForSelectedShow)}
-                            </div>
+    const tabs = [
+        {
+            tabTitle: 'Overview',
+            content: (
+                <React.Fragment>
+                    <h5 className={'capitalize-first'}>
+                        {episodeCount === 1
+                            ? showType
+                            : episodeCount + ' episodes'
+                        }
+                    </h5>
+                    <p>
+                        {synopsis}
+                    </p>
+                </React.Fragment>
+            )
+        },
+        {
+            tabTitle: 'Possible Show/Episode Matches',
+            content: (
+                <div className={'row'}>
+                    <div className={'col-6 overflow-auto'} style={{ maxHeight: '400px' }}>
+                        <div className={'text-left list-group'}>
+                            {episodeResults.results.map(renderPossibleShowMatches)}
                         </div>
                     </div>
-                )
-            }
-        ];
+                    <div className={'col-6 overflow-auto'} style={{ maxHeight: '400px' }}>
+                        <div className={'text-left'}>
+                            {episodeResults.results[selectedShow].episodes.map(renderEpisodesForSelectedShow)}
+                        </div>
+                    </div>
+                </div>
+            )
+        }
+    ];
 
-        const renderedTabNavigation = (
-            <nav>
-                <ul className={'pagination'}>
-                    {tabs.map(({ tabTitle }, i) => (
-                        <li
-                            className={`page-item ${selectedTab === i ? 'active' : ''}`}
-                            key={i}
-                            onClick={() => setSelectedTab(i)}
-                            style={{ width: `${100 / tabs.length}%`}}
-                        >
-                            <a className={'page-link cursor-pointer'}>
-                                {tabTitle}
-                            </a>
-                        </li>
-                    ))}
-                </ul>
-            </nav>
-        );
+    const renderedTabNavigation = (
+        <nav>
+            <ul className={'pagination'}>
+                {tabs.map(({ tabTitle }, i) => (
+                    <li
+                        className={`page-item ${selectedTab === i ? 'active' : ''}`}
+                        key={i}
+                        onClick={() => setSelectedTab(i)}
+                        style={{ width: `${100 / tabs.length}%`}}
+                    >
+                        <a className={'page-link cursor-pointer'}>
+                            {tabTitle}
+                        </a>
+                    </li>
+                ))}
+            </ul>
+        </nav>
+    );
 
-        return (
+    return (
+        <React.Fragment>
+            <div className={'row pb-5'}>
+                <h1 className={'text-center mx-auto mt-5'}>
+                    {title}
+                </h1>
+            </div>
+
             <div className={'row pt-5'}>
                 <div className={'card mb-5 col-12'}>
                     <div className={'card-body'}>
@@ -153,18 +159,6 @@ function Show(props) {
                     </div>
                 </div>
             </div>
-        );
-    };
-
-    return (
-        <React.Fragment>
-            <div className={'row pb-5'}>
-                <h1 className={'text-center mx-auto mt-5'}>
-                    {title}
-                </h1>
-            </div>
-
-            {renderBody()}
         </React.Fragment>
     );
 }
