@@ -22,12 +22,12 @@ function Show(props) {
 
     async function fetchShowAndEpisodesList() {
         const episodeResults = await searchForShow(title);
-        setEpisodeResults(episodeResults);
         setShowsExpanded(
             Array
                 .from({ length: episodeResults.results.length })
                 .map(() => false)
         );
+        setEpisodeResults(episodeResults);
     }
 
     useEffect(() => {
