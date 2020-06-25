@@ -1,8 +1,8 @@
-import { getSearchUrl, kitsuTitleSearchUrl } from 'services/Urls';
+import { getKitsuTitleSearchUrl } from 'services/Urls';
 
 export async function fetchKitsuTitleSearch(searchText) {
     try {
-        const response = await fetch(getSearchUrl(kitsuTitleSearchUrl, searchText));
+        const response = await fetch(getKitsuTitleSearchUrl(searchText));
 
         return await response.json();
     } catch (e) {
