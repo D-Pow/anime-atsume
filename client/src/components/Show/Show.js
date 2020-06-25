@@ -45,8 +45,11 @@ function Show(props) {
             key={i}
             onClick={() => setSelectedShow(i)}
         >
-            <h4>
-                {showTitle} - {showEpisodes.length}
+            <h4 className={'d-flex justify-content-between align-items-center'}>
+                {showTitle}
+                <span className={`badge badge-pill badge-${selectedShow === i ? 'dark' : 'primary'}`}>
+                    {showEpisodes.length}
+                </span>
             </h4>
         </button>
     );
