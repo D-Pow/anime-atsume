@@ -22,6 +22,11 @@ function Show(props) {
 
     async function fetchShowAndEpisodesList() {
         const episodeResults = await searchForShow(title);
+
+        episodeResults.results.forEach(show => {
+            show.episodes.reverse();
+        });
+
         setSelectedShow(0);
         setEpisodeResults(episodeResults);
     }
