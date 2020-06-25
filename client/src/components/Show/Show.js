@@ -65,9 +65,7 @@ function Show(props) {
 
     if (!kitsuResult || !episodeResults) {
         return (
-            <div className={'full-screen-minus-scrollbar'}>
-                <Spinner className={'w-25 h-25 absolute-center'} show={true} />
-            </div>
+            <Spinner fullScreen={true} show={true} />
         );
     }
 
