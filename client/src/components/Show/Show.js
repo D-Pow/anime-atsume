@@ -6,6 +6,7 @@ import Spinner from 'components/ui/Spinner';
 function Show(props) {
     const title = decodeURIComponent(props.title);
 
+    const [ selectedTab, setSelectedTab ] = useState(0);
     const [ kitsuResult, setKitsuResult ] = useState(null);
 
     async function fetchKitsuInfo() {
@@ -37,6 +38,17 @@ function Show(props) {
             }
         } = kitsuResult.attributes;
 
+        const tabs = [
+            {
+                tabTitle: 'Overview',
+                content: synopsis
+            },
+            {
+                tabTitle: 'Episodes',
+                content: 'TODO episode list'
+            }
+        ];
+
         return (
             <div className={'row pt-5'}>
                 <div className={'card mb-5 col-12'}>
@@ -48,8 +60,20 @@ function Show(props) {
 
                             <div className={'col-sm-12 col-lg-8 d-inline-block'}>
                                 <div className={'card d-inline-block w-100'}>
+                                    <nav>
+                                        <ul className={'pagination'}>
+                                            {tabs.map(({ tabTitle }, i) => (
+                                                <li className={'page-item'} key={i} onClick={() => setSelectedTab(i)}>
+                                                    <a className={'page-link cursor-pointer'}>
+                                                        {tabTitle}
+                                                    </a>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </nav>
+
                                     <div className={'card-body'}>
-                                        {synopsis}
+                                        {tabs[selectedTab].content}
                                     </div>
                                 </div>
                             </div>
