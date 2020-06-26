@@ -124,7 +124,7 @@ function VideoModal(props) {
 
         return (
             <React.Fragment>
-                <video controls>
+                <video className={'w-100'} controls>
                     <source
                         type={'video/mp4'}
                         src={getVideoSrcPath(showName, episodeName, label, file)}
