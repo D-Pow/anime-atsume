@@ -29,7 +29,7 @@ import { EPISODE_HOST_SEARCH_URL } from 'services/Urls';
  * Searches for an episode host, bypassing captcha if required.
  *
  * @param {String} episodeUrl - Episode URL returned from {@link searchForShow.js}.
- * @param {CaptchaAttempt} captchaAnswers - List of answers used to attempt to bypass captcha.
+ * @param {CaptchaAttempt[]} captchaAnswers - List of answers used to attempt to bypass captcha.
  * @returns {Promise<(EpisodeHostResponse|NovelPlanetSource)>} - Data for either solving a captcha or the resolved video info.
  */
 export async function searchForEpisodeHost(episodeUrl, captchaAnswers = null) {
