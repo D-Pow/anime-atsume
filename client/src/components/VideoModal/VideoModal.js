@@ -17,6 +17,7 @@ function VideoModal(props) {
         setCaptchaPrompts([]);
         setCaptchaOptions([]);
         setCaptchaAnswers([]);
+        setVideoOptions([]);
 
         const res = await searchForEpisodeHost(episodeUrl, captchaAttempt);
         const { data, captchaContent } = res;
