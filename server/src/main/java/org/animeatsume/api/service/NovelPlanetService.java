@@ -24,6 +24,8 @@ import reactor.core.publisher.Mono;
 
 import java.io.*;
 import java.net.URI;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 @Service
@@ -79,5 +81,32 @@ public class NovelPlanetService {
         novelPlanetSource.setFile(mp4Url);
 
         return CompletableFuture.completedFuture(null);
+    }
+
+    public void removeLowQualityVideos(NovelPlanetSourceResponse sourceResponse) {
+        log.info("Removing lower quality MP4 sources from response");
+        List<NovelPlanetSourceResponse.NovelPlanetSource> videoSources = sourceResponse.getData();
+
+        NovelPlanetSourceResponse.NovelPlanetSource largestResSource = videoSources.stream()
+            .reduce(null, (previous, next) -> {
+                if (previous == null) {
+                    return next;
+                }
+
+                String prevResLabel = previous.getLabel();
+                int prevRes = Integer.parseInt(prevResLabel.replaceAll("[^\\d]", ""));
+                String nextResLabel = next.getLabel();
+                int nextRes = Integer.parseInt(nextResLabel.replaceAll("[^\\d]", ""));
+
+                if (nextRes > prevRes) {
+                    return next;
+                }
+
+                return previous;
+            });
+
+        log.info("Largest quality video extracted = {}", largestResSource);
+
+        sourceResponse.setData(Collections.singletonList(largestResSource));
     }
 }
