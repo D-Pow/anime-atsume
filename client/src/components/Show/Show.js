@@ -85,29 +85,36 @@ function Show(props) {
         {
             tabTitle: 'Overview',
             content: (
-                <div className={'text-center'}>
-                    <div className={'row mb-3'}>
-                        <div className={'col'}>
-                            <h5 className={'capitalize-first'}>
-                                {episodeCount === 1
-                                    ? showType
-                                    : episodeCount + ' episodes'
-                                }
-                            </h5>
-                        </div>
+                <div className={'row'}>
+                    <div className={'col-centered col-lg-4 my-3 d-flex'}>
+                        <img className={'my-auto flex-center'} src={small} alt={canonicalTitle} />
                     </div>
-                    <div className={'row mb-3'}>
-                        <div className={'col'}>
-                            <p>
-                                {synopsis}
-                            </p>
-                        </div>
-                    </div>
-                    <div className={'row mb-3'}>
-                        <div className={'col'}>
-                            <Anchor href={getMyAnimeListSearchUrl(title)}>
-                                <h5>View on MyAnimeList</h5>
-                            </Anchor>
+                    <div className={'col-sm-12 col-lg-8 d-flex'}>
+                        <div className={'text-center'}>
+                            <div className={'row mb-3'}>
+                                <div className={'col'}>
+                                    <h5 className={'capitalize-first'}>
+                                        {episodeCount === 1
+                                            ? showType
+                                            : episodeCount + ' episodes'
+                                        }
+                                    </h5>
+                                </div>
+                            </div>
+                            <div className={'row mb-3'}>
+                                <div className={'col'}>
+                                    <p>
+                                        {synopsis}
+                                    </p>
+                                </div>
+                            </div>
+                            <div className={'row mb-3'}>
+                                <div className={'col'}>
+                                    <Anchor href={getMyAnimeListSearchUrl(title)}>
+                                        <h5>View on MyAnimeList</h5>
+                                    </Anchor>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -162,22 +169,12 @@ function Show(props) {
             </div>
 
             <div className={'row pt-5'}>
-                <div className={'card mb-5 col-12'}>
-                    <div className={'card-body'}>
-                        <div className={'row'}>
-                            <div className={'col-centered col-lg-4 my-3 d-flex'}>
-                                <img className={'my-auto flex-center'} src={small} alt={canonicalTitle} />
-                            </div>
+                <div className={'col-12'}>
+                    <div className={'card mb-5'}>
+                        {renderedTabNavigation}
 
-                            <div className={'col-sm-12 col-lg-8 d-flex'}>
-                                <div className={'card d-inline-block w-100'}>
-                                    {renderedTabNavigation}
-
-                                    <div className={'card-body'}>
-                                        {tabs[selectedTab].content}
-                                    </div>
-                                </div>
-                            </div>
+                        <div className={'card-body'}>
+                            {tabs[selectedTab].content}
                         </div>
                     </div>
                 </div>
