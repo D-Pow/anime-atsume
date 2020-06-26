@@ -58,7 +58,7 @@ function Show(props) {
         >
             <h4 className={'d-flex justify-content-between align-items-center'}>
                 {showTitle}
-                <span className={`badge badge-pill badge-${selectedShow === i ? 'dark' : 'primary'}`}>
+                <span className={`d-xs-none badge badge-pill badge-${selectedShow === i ? 'dark' : 'primary'}`}>
                     {showEpisodes.length}
                 </span>
             </h4>
