@@ -87,7 +87,12 @@ function Show(props) {
             content: (
                 <div className={'row'}>
                     <div className={'col-centered col-lg-4 my-3 d-flex'}>
-                        <img className={'my-auto flex-center'} src={small} alt={canonicalTitle} />
+                        <img
+                            className={'my-auto flex-center'}
+                            src={small}
+                            alt={canonicalTitle}
+                            style={{ maxWidth: '95%' }}
+                        />
                     </div>
                     <div className={'col-sm-12 col-lg-8 d-flex'}>
                         <div className={'text-center'}>
