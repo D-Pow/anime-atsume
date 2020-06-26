@@ -12,6 +12,7 @@ import org.animeatsume.dao.model.CaptchaAnswer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.*;
@@ -29,6 +30,9 @@ import java.util.stream.Collectors;
 @Component
 public class KissanimeRuController {
     private static final Logger log = LoggerFactory.getLogger(KissanimeRuController.class);
+
+    @Value("#{new Boolean('${org.animeatsume.download-all-resolutions}')}")
+    private Boolean downloadAllResolutions;
 
     @Autowired
     KissanimeRuService kissanimeService;
@@ -75,6 +79,10 @@ public class KissanimeRuController {
 
         if (videoHostUrl != null && !videoHostUrl.isEmpty() && videoHostUrl.contains(NovelPlanetService.DOMAIN)) {
             NovelPlanetSourceResponse videoSources = getVideoSourcesForNovelPlanetHost(videoHostUrl);
+
+            if (!downloadAllResolutions) {
+                novelPlanetService.removeLowQualityVideos(videoSources);
+            }
 
             initiateEpisodeVideoDownloads(request.getEpisodeUrl(), videoSources);
 
