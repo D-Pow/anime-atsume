@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import Modal from 'components/ui/Modal';
+import Video from 'components/ui/Video';
 import Spinner from 'components/ui/Spinner';
 import { searchForEpisodeHost } from 'services/EpisodeHostSearchService';
 import { getImageSrcPath, getVideoSrcPath, getVideoNameDataFromUrl } from 'services/Urls';
@@ -124,14 +125,10 @@ function VideoModal(props) {
         const { label, file } = videoOptions[0];
 
         return (
-            <React.Fragment>
-                <video className={'w-100'} controls>
-                    <source
-                        type={'video/mp4'}
-                        src={getVideoSrcPath(showName, episodeName, label, file)}
-                    />
-                </video>
-            </React.Fragment>
+            <Video
+                className={'w-100'}
+                src={getVideoSrcPath(showName, episodeName, label, file)}
+            />
         );
     };
 
