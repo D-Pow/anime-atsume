@@ -125,7 +125,7 @@ function Show(props) {
                     </div>
                     <div className={'col-6 overflow-auto'} style={{ maxHeight: '400px' }}>
                         <h3 className={'mb-2'}>Episodes</h3>
-                        <div className={'text-left'}>
+                        <div className={'text-left list-group'}>
                             {episodeResults.results[selectedShow].episodes.map(renderEpisodesForSelectedShow)}
                         </div>
                     </div>
