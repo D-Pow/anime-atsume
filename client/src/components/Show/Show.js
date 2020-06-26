@@ -165,11 +165,11 @@ function Show(props) {
                 <div className={'card mb-5 col-12'}>
                     <div className={'card-body'}>
                         <div className={'row'}>
-                            <div className={'col-centered col-lg-4 my-3 d-inline-block'}>
+                            <div className={'col-centered col-lg-4 my-3 d-flex'}>
                                 <img className={'my-auto flex-center'} src={small} alt={canonicalTitle} />
                             </div>
 
-                            <div className={'col-sm-12 col-lg-8 d-inline-block'}>
+                            <div className={'col-sm-12 col-lg-8 d-flex'}>
                                 <div className={'card d-inline-block w-100'}>
                                     {renderedTabNavigation}
 
