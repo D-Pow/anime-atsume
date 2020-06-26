@@ -6,6 +6,7 @@ function Modal({
     title,
     children,
     footer,
+    escapeClosesModal,
     useGridForBody,
     useGridForFooter,
     preventDocumentScrolling,
@@ -16,7 +17,8 @@ function Modal({
     const [ hideMomentarily, setHideMomentarily ] = useState(false);
     const [ rootWasClosed, resetRootClosed ] = useRootClose(
         { attribute: 'class', value: 'modal-content' },
-        { attribute: 'class', value: 'modal fade' }
+        { attribute: 'class', value: 'modal fade' },
+        escapeClosesModal
     );
 
     const handleClose = () => {
@@ -103,6 +105,7 @@ Modal.propTypes = {
     title: PropTypes.node,
     children: PropTypes.node,
     footer: PropTypes.node,
+    escapeClosesModal: PropTypes.bool,
     useGridForBody: PropTypes.bool,
     useGridForFooter: PropTypes.bool,
     preventDocumentScrolling: PropTypes.bool,
@@ -115,6 +118,7 @@ Modal.defaultProps = {
     title: '',
     children: '',
     footer: '',
+    escapeClosesModal: true,
     useGridForBody: true,
     useGridForFooter: true,
     preventDocumentScrolling: true,
