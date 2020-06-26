@@ -121,7 +121,7 @@ function Show(props) {
             )
         },
         {
-            tabTitle: 'Possible Show/Episode Matches',
+            tabTitle: 'Watch',
             content: (
                 <div className={'row'}>
                     <div className={'col-6 overflow-auto'} style={{ maxHeight: '400px' }}>
