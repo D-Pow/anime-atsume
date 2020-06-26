@@ -93,13 +93,14 @@ export function useClickPath() {
  *
  * @param {ElementProps} acceptableElement - Element that marks the bounds of what is acceptable to click on
  * @param {ElementProps} closeElement - Element that marks the bounds of what should trigger the root close
+ * @param {boolean} [escapeClosesModal=true] - If pressing the Escape key should trigger a root-close event
  * @returns {[boolean, function]} - If the user triggered the root close and the function to reset the trigger
  */
-export function useRootClose(acceptableElement, closeElement) {
+export function useRootClose(acceptableElement, closeElement, escapeClosesModal = true) {
     const [ keyDown, setKeyDown ] = useKeyboardEvent();
     const [ clickPath, setClickPath ] = useClickPath();
 
-    const pressedEscape = keyDown === 'Escape';
+    const pressedEscape = escapeClosesModal && (keyDown === 'Escape');
     const clickedOnElementWithinBounds = elementIsInClickPath(acceptableElement, clickPath);
     const clickedOnElementOutsideBounds = elementIsInClickPath(closeElement, clickPath);
     const rootWasClosed = pressedEscape || (clickedOnElementOutsideBounds && !clickedOnElementWithinBounds);
