@@ -1,1 +1,1 @@
-web: cd server/ && ./gradlew bootRun
+web: ./gradlew bootRun
