@@ -4,7 +4,6 @@ plugins {
     // adding plugins here removes the need to declare them in buildscript {}
     id 'org.springframework.boot' version '2.3.0.RELEASE'
     id 'io.spring.dependency-management' version '1.0.9.RELEASE'
-    id 'org.openjfx.javafxplugin' version '0.0.8'
 }
 
 group 'org.animeatsume'
@@ -40,6 +39,19 @@ dependencies {
     implementation 'org.xerial:sqlite-jdbc:3.30.1'
     implementation 'com.github.gwenn:sqlite-dialect:0.1.0'
 
+    // https://mvnrepository.com/artifact/org.wildfly.swarm/javafx
+    implementation 'org.wildfly.swarm:javafx:2018.3.3'
+
+
+//    implementation 'org.openjfx:javafx:15-ea+6'
+//    implementation 'org.openjfx:javafx-base:15-ea+6'
+//    implementation 'org.openjfx:javafx-web:15-ea+6'
+//    implementation 'org.openjfx:javafx-fxml:15-ea+6'
+//    implementation 'org.openjfx:javafx-graphics:15-ea+6'
+//    implementation 'org.openjfx:javafx-controls:15-ea+6'
+
+
+
     annotationProcessor 'org.projectlombok:lombok'
 
     testImplementation('org.springframework.boot:spring-boot-starter-test') {
@@ -47,10 +59,6 @@ dependencies {
     }
 
     testImplementation 'io.projectreactor:reactor-test'
-}
-
-javafx {
-    version = '8.0.221'
 }
 
 // Creates a JAR that can run by itself instead of a WAR that requires running in a Tomcat container
