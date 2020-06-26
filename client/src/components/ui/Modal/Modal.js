@@ -65,8 +65,8 @@ function Modal({
                 height: sizeStyle
             }}
         >
-            <div className={'modal-dialog modal-dialog-centered'}>
-                <div className={'modal-content'}>
+            <div className={'modal-dialog modal-dialog-centered'} style={{ maxWidth: '90vw' }}>
+                <div className={'modal-content overflow-auto'} style={{ maxHeight: '90vh' }}>
 
                     <div className={'modal-header'}>
                         <div className={'modal-title'}>
