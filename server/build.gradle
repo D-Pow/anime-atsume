@@ -4,6 +4,7 @@ plugins {
     // adding plugins here removes the need to declare them in buildscript {}
     id 'org.springframework.boot' version '2.3.0.RELEASE'
     id 'io.spring.dependency-management' version '1.0.9.RELEASE'
+    id 'org.openjfx.javafxplugin' version '0.0.8'
 }
 
 group 'org.animeatsume'
@@ -46,6 +47,10 @@ dependencies {
     }
 
     testImplementation 'io.projectreactor:reactor-test'
+}
+
+javafx {
+    version = '8.0.221'
 }
 
 // Creates a JAR that can run by itself instead of a WAR that requires running in a Tomcat container
