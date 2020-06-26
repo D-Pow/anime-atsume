@@ -15,3 +15,12 @@ export const IMAGE_BASE_PATH = '/image';
 
 export const getVideoSrcPath = (showName, episodeName, quality, hostUrl) => `/video/${showName}/${episodeName}/${quality}?url=${hostUrl}`;
 export const getImageSrcPath = imageId => `/image/${imageId}`;
+
+export function getVideoNameDataFromUrl(kissanimeEpisodeUrl) {
+    const [ blank, unused, showName, episodeName ] = new URL(kissanimeEpisodeUrl).pathname.split('/');
+
+    return {
+        showName,
+        episodeName
+    };
+}
