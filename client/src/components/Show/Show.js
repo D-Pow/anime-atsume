@@ -129,15 +129,15 @@ function Show(props) {
             tabTitle: 'Watch',
             content: (
                 <div className={'row'}>
-                    <div className={'col-6 overflow-auto'} style={{ maxHeight: '400px' }}>
+                    <div className={'col-6'}>
                         <h3 className={'mb-2'}>Shows</h3>
-                        <div className={'text-left list-group'}>
+                        <div className={'text-left list-group overflow-auto'} style={{ maxHeight: '400px' }}>
                             {episodeResults.results.map(renderPossibleShowMatches)}
                         </div>
                     </div>
-                    <div className={'col-6 overflow-auto'} style={{ maxHeight: '400px' }}>
+                    <div className={'col-6'}>
                         <h3 className={'mb-2'}>Episodes</h3>
-                        <div className={'text-left list-group'}>
+                        <div className={'text-left list-group overflow-auto'} style={{ maxHeight: '400px' }}>
                             {episodeResults.results[selectedShow].episodes.map(renderEpisodesForSelectedShow)}
                         </div>
                     </div>
