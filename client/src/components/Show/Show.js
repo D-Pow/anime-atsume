@@ -50,20 +50,35 @@ function Show(props) {
         </a>
     );
 
-    const renderPossibleShowMatches = ({ title: showTitle, episodes: showEpisodes}, i) => (
-        <button
-            className={`list-group-item remove-focus-highlight ${selectedShow === i ? 'active' : ''}`}
-            key={i}
-            onClick={() => setSelectedShow(i)}
-        >
-            <h4 className={'d-flex justify-content-between align-items-center'}>
+    const renderPossibleShowMatches = ({ title: showTitle, episodes: showEpisodes}, i) => {
+        const renderedShowListItem = (
+            <React.Fragment>
                 {showTitle}
                 <span className={`d-xs-none badge badge-pill badge-${selectedShow === i ? 'dark' : 'primary'}`}>
                     {showEpisodes.length}
                 </span>
-            </h4>
-        </button>
-    );
+            </React.Fragment>
+        );
+
+        return (
+            <button
+                className={`list-group-item remove-focus-highlight ${selectedShow === i ? 'active' : ''}`}
+                key={i}
+                onClick={() => setSelectedShow(i)}
+            >
+                <div className={'d-sm-none d-xs-flex justify-content-between align-items-center'}>
+                    <h4 className={'mb-2'}>
+                        {renderedShowListItem}
+                    </h4>
+                </div>
+                <div className={'d-xs-none d-sm-flex justify-content-between align-items-center'}>
+                    <h3 className={'mb-2'}>
+                        {renderedShowListItem}
+                    </h3>
+                </div>
+            </button>
+        );
+    };
 
     if (!kitsuResult || !episodeResults) {
         return (
@@ -130,13 +145,23 @@ function Show(props) {
             content: (
                 <div className={'row'}>
                     <div className={'col-6'}>
-                        <h3 className={'mb-2'}>Shows</h3>
+                        <div className={'d-xs-block d-sm-none'}>
+                            <h4 className={'mb-2'}>Shows</h4>
+                        </div>
+                        <div className={'d-xs-none d-sm-block'}>
+                            <h3 className={'mb-2'}>Shows</h3>
+                        </div>
                         <div className={'text-left list-group overflow-auto'} style={{ maxHeight: '400px' }}>
                             {episodeResults.results.map(renderPossibleShowMatches)}
                         </div>
                     </div>
                     <div className={'col-6'}>
-                        <h3 className={'mb-2'}>Episodes</h3>
+                        <div className={'d-xs-block d-sm-none'}>
+                            <h4 className={'mb-2'}>Episodes</h4>
+                        </div>
+                        <div className={'d-xs-none d-sm-block'}>
+                            <h3 className={'mb-2'}>Episodes</h3>
+                        </div>
                         <div className={'text-left list-group overflow-auto'} style={{ maxHeight: '400px' }}>
                             {episodeResults.results[selectedShow].episodes.map(renderEpisodesForSelectedShow)}
                         </div>
