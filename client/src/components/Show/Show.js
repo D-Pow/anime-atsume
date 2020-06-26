@@ -155,7 +155,7 @@ function Show(props) {
 
     return (
         <React.Fragment>
-            <div className={'row pb-5'}>
+            <div className={'row pb-3'}>
                 <h1 className={'text-center mx-auto mt-5'}>
                     {title}
                 </h1>
