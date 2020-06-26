@@ -144,6 +144,7 @@ function VideoModal(props) {
 
     return (
         <Modal
+            escapeClosesModal={videoOptions.length === 0}
             show={props.show}
             title={renderedTitle}
             onClose={props.onClose}
