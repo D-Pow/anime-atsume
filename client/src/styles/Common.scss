@@ -44,7 +44,7 @@ $container-max-widths: (
 }
 
 .width-fit {
-  width: fit-content;
+  width: fit-content !important;
 }
 
 @for $int from 0 through 200 {
