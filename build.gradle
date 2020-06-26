@@ -13,6 +13,10 @@ task printVersion {
     println rootProject.artifacts
 }
 
+subprojects {
+  apply from: file("$rootProject.projectDir/gradle/heroku/stage.gradle")
+}
+
 wrapper {
     gradleVersion = '6.5'
     distributionType = Wrapper.DistributionType.ALL
