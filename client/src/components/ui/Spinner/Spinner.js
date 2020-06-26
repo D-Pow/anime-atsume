@@ -9,13 +9,13 @@ function Spinner(props) {
     let typeCls;
 
     switch(props.type) {
-    case Spinner.Type.CIRCLE:
-        typeCls = 'spinner-border spinner-border-sm';
-        break;
-    case Spinner.Type.DOTS:
-    default:
-        typeCls = 'fas fa-spinner';
-        break;
+        case Spinner.Type.CIRCLE:
+            typeCls = 'spinner-border spinner-border-sm';
+            break;
+        case Spinner.Type.DOTS:
+        default:
+            typeCls = 'fas fa-spinner';
+            break;
     }
 
     const fullScreenCls = props.fullScreen ? 'w-25 h-25 absolute-center' : '';
