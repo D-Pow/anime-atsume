@@ -1,1 +1,2 @@
+include 'server'
 rootProject.name = 'anime-atsume'

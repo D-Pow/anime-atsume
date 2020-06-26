@@ -1,0 +1,19 @@
+plugins {
+    id 'java'
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+dependencies {
+    compile(project(":server"))
+}
+
+task printVersion {
+    println rootProject.artifacts
+}
+
+wrapper {
+    gradleVersion = '6.5'
+    distributionType = Wrapper.DistributionType.ALL
+}
