@@ -49,14 +49,14 @@ $container-max-widths: (
 
 @for $int from 0 through 200 {
   .w-#{$int} {
-    width: $int + 0%;
+    width: $int + 0% !important;
   }
   .w-#{$int}px {
     width: $int + 0px;
   }
 
   .h-#{$int} {
-    height: $int + 0%;
+    height: $int + 0% !important;
   }
   .h-#{$int}px {
     height: $int + 0px;
