@@ -2,8 +2,10 @@ import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { fetchKitsuTitleSearch } from 'services/KitsuAnimeSearchService';
 import { searchForShow } from 'services/ShowSearchService';
+import { getMyAnimeListSearchUrl } from 'services/Urls';
 import Spinner from 'components/ui/Spinner';
 import VideoModal from 'components/VideoModal';
+import Anchor from 'components/ui/Anchor';
 
 function Show(props) {
     const title = decodeURIComponent(props.title);
@@ -83,17 +85,32 @@ function Show(props) {
         {
             tabTitle: 'Overview',
             content: (
-                <React.Fragment>
-                    <h5 className={'capitalize-first'}>
-                        {episodeCount === 1
-                            ? showType
-                            : episodeCount + ' episodes'
-                        }
-                    </h5>
-                    <p>
-                        {synopsis}
-                    </p>
-                </React.Fragment>
+                <div className={'text-center'}>
+                    <div className={'row mb-3'}>
+                        <div className={'col'}>
+                            <h5 className={'capitalize-first'}>
+                                {episodeCount === 1
+                                    ? showType
+                                    : episodeCount + ' episodes'
+                                }
+                            </h5>
+                        </div>
+                    </div>
+                    <div className={'row mb-3'}>
+                        <div className={'col'}>
+                            <p>
+                                {synopsis}
+                            </p>
+                        </div>
+                    </div>
+                    <div className={'row mb-3'}>
+                        <div className={'col'}>
+                            <Anchor href={getMyAnimeListSearchUrl(title)}>
+                                <h5>View on MyAnimeList</h5>
+                            </Anchor>
+                        </div>
+                    </div>
+                </div>
             )
         },
         {
