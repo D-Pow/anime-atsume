@@ -1,6 +1,7 @@
 plugins {
     id 'java'
     id 'idea'
+    id 'war'
     // adding plugins here removes the need to declare them in buildscript {}
     id 'org.springframework.boot' version '2.3.0.RELEASE'
     id 'io.spring.dependency-management' version '1.0.9.RELEASE'
@@ -51,6 +52,7 @@ dependencies {
 //    implementation 'org.openjfx:javafx-controls:15-ea+6'
 
 
+    providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
 
     annotationProcessor 'org.projectlombok:lombok'
 
@@ -61,11 +63,17 @@ dependencies {
     testImplementation 'io.projectreactor:reactor-test'
 }
 
-// Creates a JAR that can run by itself instead of a WAR that requires running in a Tomcat container
-bootJar {
-    archiveBaseName = project.name
-    archiveVersion = project.version
+// WAR is needed because JAR doesn't include resources/public/
+war {
+    baseName = 'anime-atsume'
+    version = '1.0.0'
 }
+
+// Creates a JAR that can run by itself instead of a WAR that requires running in a Tomcat container
+//bootJar {
+//    archiveBaseName = project.name
+//    archiveVersion = project.version
+//}
 
 sourceSets {
     main {
