@@ -40,9 +40,9 @@ dependencies {
     implementation 'com.github.gwenn:sqlite-dialect:0.1.0'
 
     // Heroku doesn't support JavaFX natively, so add it manually
-    implementation 'org.wildfly.swarm:javafx:2018.3.3'
-
-
+    // Single RedHat-made JavaFX package
+//    implementation 'org.wildfly.swarm:javafx:2018.3.3'
+    // OpenJFX which requires installing each piece separately
 //    implementation 'org.openjfx:javafx:15-ea+6'
 //    implementation 'org.openjfx:javafx-base:15-ea+6'
 //    implementation 'org.openjfx:javafx-web:15-ea+6'
