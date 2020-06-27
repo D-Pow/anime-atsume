@@ -15,3 +15,22 @@ Notes:
         * `heroku buildpacks:add -i 1 https://github.com/jkutner/heroku-buildpack-javafx` - add JavaFX to build path.
         * `heroku buildpacks:add heroku/gradle` - default gradle/Spring build process.
     * Alternatively (but possibly still mandatory), add JavaFX as a dependency in build.gradle.
+* For [deploying war file](https://devcenter.heroku.com/articles/war-deployment#deployment-with-the-heroku-cli):
+    * `heroku plugins:install java`
+    * `heroku war:deploy <path_to_war_file> --app <app_name>`
+
+### Deploying to gcloud
+* Only deploying .war file has worked so far.
+    * Requires app.yaml file to be present in the root dir of where you're deploying
+        * Will mean app.yaml needs to be in same dir as .war file:
+        ```
+        runtime: java
+        env: flex
+
+          handlers:
+          - url: /.*
+            script: this field is required, but ignored
+        ```
+    * Deploy (in server/build/libs/): `gcloud app deploy app.yaml`
+    * Logs: `gcloud app logs tail -s default`
+    * Open in browser: `gcloud app browse`
