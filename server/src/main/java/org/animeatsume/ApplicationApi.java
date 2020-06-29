@@ -26,8 +26,14 @@ public class ApplicationApi {
     NovelPlanetService novelPlanetService;
 
     @CrossOrigin
-    @RequestMapping(value = "/corsProxy", method = { RequestMethod.GET, RequestMethod.POST })
-    public ResponseEntity<?> doCorsRequest(
+    @GetMapping("/corsProxy")
+    public ResponseEntity<?> getCorsRequest(@RequestParam("url") URI url, ServerHttpRequest request) {
+        return postCorsRequest(null, url, request);
+    }
+
+    @CrossOrigin
+    @PostMapping("/corsProxy")
+    public ResponseEntity<?> postCorsRequest(
         @RequestBody(required = false) Object body,
         @RequestParam("url") URI url,
         ServerHttpRequest request
