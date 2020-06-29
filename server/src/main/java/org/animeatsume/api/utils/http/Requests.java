@@ -21,6 +21,16 @@ import java.util.stream.Stream;
 public class Requests {
     private static final Logger log = LoggerFactory.getLogger(Requests.class);
 
+    public static HttpHeaders copyHttpHeaders(HttpHeaders headers) {
+        HttpHeaders copiedHeaders = new HttpHeaders();
+
+        if (headers != null) {
+            copiedHeaders.putAll(headers);
+        }
+
+        return copiedHeaders;
+    }
+
     public static <T> HttpEntity<T> getHttpEntityWithHeaders(T body, Map<String, String> headers) {
         HttpHeaders httpHeaders = new HttpHeaders();
 
