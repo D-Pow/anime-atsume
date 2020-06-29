@@ -40,7 +40,7 @@ public class NovelPlanetService {
         String origin = UriParser.getOrigin(uri);
         String cookie = Cookies.getCookieFromWebsite(url);
 
-        return CorsProxy.getCorsEntityWithCookie(body, origin, url, cookie);
+        return CorsProxy.getCorsEntity(body, origin, url, cookie);
     }
 
     public String getApiUrlForHost(URI websiteHost) {
