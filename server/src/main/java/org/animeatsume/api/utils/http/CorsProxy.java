@@ -14,7 +14,7 @@ import java.util.Map;
 public class CorsProxy {
     public static ResponseEntity<?> doCorsRequest(HttpMethod method, URI url, Object body, HttpHeaders headers) {
         String origin = UriParser.getOrigin(url);
-        HttpEntity<Object> corsEntity = getCorsEntity(body, origin, origin, null, headers);
+        HttpEntity<Object> corsEntity = getCorsEntity(body, origin, origin, null, headers, true);
         List<String> acceptHeaders = corsEntity.getHeaders().get(HttpHeaders.ACCEPT);
 
         if (acceptHeaders == null || acceptHeaders.size() == 0) {
@@ -50,7 +50,7 @@ public class CorsProxy {
     }
 
     public static <T> HttpEntity<T> getCorsEntity(T body, String origin, String referer, String cookie) {
-        return getCorsEntity(body, origin, referer, cookie, (HttpHeaders) null);
+        return getCorsEntity(body, origin, referer, cookie, (HttpHeaders) null, false);
     }
 
     public static <T> HttpEntity<T> getCorsEntity(
@@ -72,7 +72,7 @@ public class CorsProxy {
             });
         }
 
-        return getCorsEntity(body, origin, referer, cookie, httpHeaders);
+        return getCorsEntity(body, origin, referer, cookie, httpHeaders, false);
     }
 
     public static <T> HttpEntity<T> getCorsEntity(
@@ -80,7 +80,8 @@ public class CorsProxy {
         String origin,
         String referer,
         String cookie,
-        HttpHeaders headers
+        HttpHeaders headers,
+        boolean preventGzipResponses
     ) {
         HttpHeaders corsHeaders = new HttpHeaders();
 
@@ -95,9 +96,11 @@ public class CorsProxy {
             corsHeaders.set("Cookie", cookie);
         }
 
-        // Prevent getting gzip responses by removing the
-        // header that defines what is supported
-        corsHeaders.remove(HttpHeaders.ACCEPT_ENCODING);
+        if (preventGzipResponses) {
+            // Prevent getting gzip responses by removing the 'Accept-Encoding'
+            // header which defines what algorithms are supported
+            corsHeaders.remove(HttpHeaders.ACCEPT_ENCODING);
+        }
 
         return new HttpEntity<>(body, corsHeaders);
     }
