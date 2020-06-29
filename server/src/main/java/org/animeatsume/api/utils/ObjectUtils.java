@@ -1,8 +1,11 @@
 package org.animeatsume.api.utils;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
+import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -72,6 +75,25 @@ public class ObjectUtils {
             return new BigInteger(1, imageHash).toString(16);
         } catch (IOException | NoSuchAlgorithmException e) {
             log.error("Could not hash Resource ({}). Error cause ({}), message = {}", resource, e.getCause(), e.getMessage());
+        }
+
+        return null;
+    }
+
+    public static <T> T sanitizeAndParseJsonToClass(String json, Class<T> parseToClass) {
+        ObjectMapper objectMapper = Jackson2ObjectMapperBuilder.json().build();
+
+        String nonAsciiCharactersRegex = "[^\\x00-\\x7F]";
+        String asciiControlCharactersRegex = "[\\p{Cntrl}&&[^\r\n\t]]";
+        String nonPrintableCharactersRegex = "\\p{C}";
+
+        String sanitizeRegex = String.format("(%s)|(%s)|(%s)", nonAsciiCharactersRegex, asciiControlCharactersRegex, nonPrintableCharactersRegex);
+        String sanitizedJson = json.replaceAll(sanitizeRegex, "");
+
+        try {
+            return objectMapper.readValue(sanitizedJson, parseToClass);
+        } catch (JsonProcessingException e) {
+            log.error("Could not parse json to class ({}). Error = {}", parseToClass, e.getMessage());
         }
 
         return null;
