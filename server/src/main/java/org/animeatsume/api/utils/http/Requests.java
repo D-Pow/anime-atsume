@@ -1,5 +1,6 @@
 package org.animeatsume.api.utils.http;
 
+import org.animeatsume.api.utils.ObjectUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
@@ -14,6 +15,7 @@ import org.springframework.web.client.RestTemplate;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -65,6 +67,48 @@ public class Requests {
         MappingJackson2HttpMessageConverter httpMediaTypeConverter = new MappingJackson2HttpMessageConverter();
         httpMediaTypeConverter.setSupportedMediaTypes(Arrays.asList(mediaTypes));
         restTemplate.getMessageConverters().add(httpMediaTypeConverter);
+    }
+
+    public static ResponseEntity<?> doRequestWithStringFallback(
+        RestTemplate restTemplate,
+        URI url,
+        HttpMethod method,
+        HttpEntity<?> requestEntity,
+        Class<?> responseType
+    ) {
+        ResponseEntity<?> response;
+        Object body;
+
+        try {
+            response = restTemplate.exchange(
+                url,
+                method,
+                requestEntity,
+                responseType
+            );
+            body = response.getBody();
+        } catch (Exception e) {
+            log.info("Failed to parse response to type ({}), proceeding with getting plain text. Error cause = {}", responseType, e.getMessage());
+
+            response = restTemplate.exchange(
+                url,
+                method,
+                requestEntity,
+                String.class
+            );
+            body = response.getBody();
+
+            if (responseType != String.class) {
+                Object parsedObject = ObjectUtils.sanitizeAndParseJsonToClass((String) body, responseType);
+
+                if (parsedObject != null) {
+                    log.info("String from response body successfully parsed to ({})", responseType);
+                    body = parsedObject;
+                }
+            }
+        }
+
+        return new ResponseEntity(body, response.getHeaders(), response.getStatusCode());
     }
 
     /**
