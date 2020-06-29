@@ -3,6 +3,7 @@ package org.animeatsume;
 import org.animeatsume.api.controller.KissanimeRuController;
 import org.animeatsume.api.service.NovelPlanetService;
 import org.animeatsume.api.model.*;
+import org.animeatsume.api.utils.http.CorsProxy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,8 @@ import org.springframework.http.*;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.web.bind.annotation.*;
+
+import java.net.URI;
 
 @RestController
 public class ApplicationApi {
@@ -21,6 +24,20 @@ public class ApplicationApi {
 
     @Autowired
     NovelPlanetService novelPlanetService;
+
+    @CrossOrigin
+    @RequestMapping(value = "/corsProxy", method = { RequestMethod.GET, RequestMethod.POST })
+    public ResponseEntity<?> doCorsRequest(
+        @RequestBody(required = false) Object body,
+        @RequestParam("url") URI url,
+        ServerHttpRequest request
+    ) {
+        HttpMethod method = request.getMethod();
+
+        log.info("Executing {} CORS request to URL ({}) with body ({})", method, url, body);
+
+        return CorsProxy.doCorsRequest(method, url, body, request.getHeaders());
+    }
 
     @CrossOrigin
     @PostMapping(value = "/searchKissanime", consumes = MediaType.APPLICATION_JSON_VALUE)
