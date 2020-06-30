@@ -54,7 +54,7 @@ function Show(props) {
         const renderedShowListItem = (
             <React.Fragment>
                 {showTitle}
-                <span className={`d-xs-none badge badge-pill badge-${selectedShow === i ? 'dark' : 'primary'}`}>
+                <span className={`ml-1 d-xs-none badge badge-pill badge-${selectedShow === i ? 'dark' : 'primary'}`}>
                     {showEpisodes.length}
                 </span>
             </React.Fragment>
