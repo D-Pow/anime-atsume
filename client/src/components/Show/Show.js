@@ -149,7 +149,8 @@ function Show(props) {
                             <h4 className={'mb-2'}>Shows</h4>
                         </div>
                         <div className={'d-xs-none d-sm-block'}>
-                            <h3 className={'mb-2'}>Shows</h3>
+                            <h3 className={'mb-2 d-inline-block'}>Shows</h3>
+                            <h4 className={'d-inline-block ml-1'}>(# episodes)</h4>
                         </div>
                         <div className={'text-left list-group overflow-auto'} style={{ maxHeight: '400px' }}>
                             {episodeResults.results.map(renderPossibleShowMatches)}
