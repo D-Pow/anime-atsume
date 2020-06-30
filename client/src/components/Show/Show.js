@@ -65,9 +65,9 @@ function Show(props) {
                 onClick={() => setSelectedShow(i)}
             >
                 <div className={'d-sm-none d-xs-flex justify-content-between align-items-center'}>
-                    <h4 className={'mb-2'}>
+                    <h5 className={'mb-2'}>
                         {showTitle}
-                    </h4>
+                    </h5>
                     {renderedEpisodeCountBadge}
                 </div>
                 <div className={'d-xs-none d-sm-flex justify-content-between align-items-center'}>
