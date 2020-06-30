@@ -51,13 +51,12 @@ function Show(props) {
     );
 
     const renderPossibleShowMatches = ({ title: showTitle, episodes: showEpisodes}, i) => {
-        const renderedShowListItem = (
-            <React.Fragment>
-                {showTitle}
+        const renderedEpisodeCountBadge = (
+            <h4>
                 <span className={`ml-1 d-xs-none badge badge-pill badge-${selectedShow === i ? 'dark' : 'primary'}`}>
                     {showEpisodes.length}
                 </span>
-            </React.Fragment>
+            </h4>
         );
 
         return (
@@ -68,13 +67,15 @@ function Show(props) {
             >
                 <div className={'d-sm-none d-xs-flex justify-content-between align-items-center'}>
                     <h4 className={'mb-2'}>
-                        {renderedShowListItem}
+                        {showTitle}
                     </h4>
+                    {renderedEpisodeCountBadge}
                 </div>
                 <div className={'d-xs-none d-sm-flex justify-content-between align-items-center'}>
                     <h3 className={'mb-2'}>
-                        {renderedShowListItem}
+                        {showTitle}
                     </h3>
+                    {renderedEpisodeCountBadge}
                 </div>
             </button>
         );
