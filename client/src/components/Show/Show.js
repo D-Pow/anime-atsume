@@ -31,7 +31,6 @@ function Show(props) {
             show.episodes.reverse();
         });
 
-        setSelectedShow(0);
         setEpisodeResults(episodeResults);
     }
 
@@ -164,7 +163,7 @@ function Show(props) {
                             <h3 className={'mb-2'}>Episodes</h3>
                         </div>
                         <div className={'text-left list-group overflow-auto'} style={{ maxHeight: '400px' }}>
-                            {episodeResults.results[selectedShow].episodes.map(renderEpisodesForSelectedShow)}
+                            {selectedShow != null && episodeResults.results[selectedShow].episodes.map(renderEpisodesForSelectedShow)}
                         </div>
                     </div>
                 </div>
