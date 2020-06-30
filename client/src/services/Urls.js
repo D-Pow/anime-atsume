@@ -12,7 +12,9 @@ export const SHOW_SEARCH_URL = '/searchKissanime';
 export const EPISODE_HOST_SEARCH_URL = '/getVideosForEpisode';
 export const VIDEO_BASE_PATH = '/video';
 export const IMAGE_BASE_PATH = '/image';
+export const CORS_PROXY_URL = '/corsProxy?url=';
 
+export const getCorsProxyUrl = url => getSearchUrl(CORS_PROXY_URL, url);
 export const getVideoSrcPath = (showName, episodeName, quality, hostUrl) => `${VIDEO_BASE_PATH}/${showName}/${episodeName}/${quality}?url=${hostUrl}`;
 export const getImageSrcPath = imageId => `${IMAGE_BASE_PATH}/${imageId}`;
 
