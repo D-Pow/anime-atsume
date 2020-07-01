@@ -63,24 +63,77 @@ dependencies {
     testImplementation 'io.projectreactor:reactor-test'
 }
 
-def getJavaFxJarPath() {
-    /*
-     * Alternatively, try an automated (not hard-coded) search using the
-     * method found [here](http://dl.bintray.com/content/shemnon/javafx-gradle/8.1.1/javafx.plugin)
-     *
-     * Note that the system env for JAVA_HOME is used here instead of
-     * the gradle property `System.properties['java.home']` because
-     * gradle's java.home outputs `JAVA_HOME/jre`
-     *
-     * Note that this doesn't include the ANT JavaFX .jar packager tools.
-     * Those help make a .jar file double-click-able, digitally sign apps,
-     * and other random things that aren't likely needed for this app.
-     */
-    String JAVA_HOME = System.getenv("JAVA_HOME");
-    String javaFxRelativePath = "/jre/lib/jfxrt.jar";
-    String javaFxAbsolutePath = file(JAVA_HOME + javaFxRelativePath).absolutePath
+if (System.properties['jfxrtDir'] == null) { // if not in root-level gradle.properties
+    System.properties['jfxrtDir'] = '.'
+}
 
-    return javaFxAbsolutePath;
+def searchFile(Map<String, Closure> places, List<String> searchPaths, String searchID) {
+    File result = null;
+    places.each { k, v ->
+        if (result != null) return;
+        project.logger.debug("Looking for $searchID in $k")
+        def dir = v()
+        if (dir == null) {
+            project.logger.debug("$k not set")
+        } else {
+            project.logger.debug("$k is $dir")
+            searchPaths.each { s ->
+                if (result != null) return;
+                File f = new File(dir, s);
+                project.logger.debug("Trying $f.path")
+                if (f.exists() && f.file) {
+                    project.logger.debug("found $searchID as $result")
+                    result = f;
+                }
+            }
+        }
+    }
+    if (!result?.file) {
+        throw new GradleException("Could not find $searchID, please set one of ${places.keySet()}");
+    } else {
+        project.logger.info("$searchID: ${result}")
+        return result
+    }
+}
+
+def findJavaFxJar() {
+    return searchFile(
+        [
+            'jfxrtDir in Gradle Properties': { System.properties['jfxrtDir'] },
+            'JFXRT_HOME in System Environment': { System.getenv('JFXRT_HOME') },
+            'JAVA_HOME in System Environment': { System.getenv('JAVA_HOME') },
+            'java.home in JVM properties': { System.properties['java.home'] }
+        ],
+        [
+            'jfxrt.jar',
+            'lib/jfxrt.jar',
+            'lib/ext/jfxrt.jar',
+            'jre/lib/jfxrt.jar',
+            'jre/lib/ext/jfxrt.jar'
+        ],
+        'JavaFX Runtime Jar'
+    )
+}
+
+def findAntJavaFxJar() {
+    return searchFile(
+        [
+            'jfxrtDir in Gradle Properties': { System.properties['jfxrtDir'] },
+            'JFXRT_HOME in System Environment': { System.getenv('JFXRT_HOME') },
+            'JAVA_HOME in System Environment': { System.getenv('JAVA_HOME') },
+            'java.home in JVM properties': { System.properties['java.home'] }
+        ],
+        [
+            'ant-javafx.jar',
+            'lib/ant-javafx.jar',
+            '../lib/ant-javafx.jar'
+        ],
+        'JavaFX Packager Tools'
+    )
+}
+
+def getJavaFxJarPath() {
+    return file(findJavaFxJar()).absolutePath
 }
 
 def copyDbToBuildDir() {
