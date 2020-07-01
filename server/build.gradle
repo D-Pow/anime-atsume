@@ -101,6 +101,7 @@ bootWar {
      */
     def javaFxAbsolutePath = getJavaFxJarPath()
     classpath(javaFxAbsolutePath)
+    println("Injected JavaFX .jar file to dependencies from ${javaFxAbsolutePath}")
 }
 
 // Creates a JAR that can run by itself instead of a WAR that requires running in a Tomcat container
