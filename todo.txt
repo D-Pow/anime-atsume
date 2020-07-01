@@ -1,0 +1,6 @@
+Front-end
+    - Local storage to hold where users left off
+        - https://usehooks.com/useLocalStorage/
+
+Back-end
+    - Cron job to delete videos/ dir
