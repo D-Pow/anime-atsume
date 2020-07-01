@@ -42,7 +42,7 @@ dependencies {
 
     // Heroku doesn't support JavaFX natively, so add it manually
     // Single RedHat-made JavaFX package
-//    implementation 'org.wildfly.swarm:javafx:2018.3.3'
+//   implementation 'org.wildfly.swarm:javafx:2018.5.0'
     // OpenJFX which requires installing each piece separately
 //    implementation 'org.openjfx:javafx:15-ea+6'
 //    implementation 'org.openjfx:javafx-base:15-ea+6'
