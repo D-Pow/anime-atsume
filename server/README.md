@@ -4,6 +4,11 @@ Simple search engine for anime that includes links for watching episodes
 
 Notes:
 
+### General
+* To run on specific port, `server.port` option is necessary, either in application.properties or via command line
+    * CMD: `java -jar anime-atsume.war --server.port=80`
+    * Port 80 for HTTP, 443 for HTTPS
+
 ### Deploying to Heroku
 * Heroku doesn't know how to handle nested folders.
     * Since the front-end is built to the back-end's resources/ directory,
