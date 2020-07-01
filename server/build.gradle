@@ -83,6 +83,18 @@ def getJavaFxJarPath() {
     return javaFxAbsolutePath;
 }
 
+def copyDbToBuildDir() {
+    def warOutputDir = "${project.buildDir}/${project.libsDirName}"
+    def dbName = 'anime_atsume.db'
+
+    copy {
+        from dbName
+        into warOutputDir
+    }
+
+    println("Copied ${dbName} to ${warOutputDir}")
+}
+
 // WAR is needed because JAR doesn't include resources/public/
 // Spring disables `war` task and replaces it with `bootWar`
 bootWar {
@@ -102,6 +114,10 @@ bootWar {
     def javaFxAbsolutePath = getJavaFxJarPath()
     classpath(javaFxAbsolutePath)
     println("Injected JavaFX .jar file to dependencies from ${javaFxAbsolutePath}")
+
+    doLast {
+        copyDbToBuildDir()
+    }
 }
 
 // Creates a JAR that can run by itself instead of a WAR that requires running in a Tomcat container
