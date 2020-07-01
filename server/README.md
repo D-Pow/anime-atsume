@@ -8,6 +8,9 @@ Notes:
 * To run on specific port, `server.port` option is necessary, either in application.properties or via command line
     * CMD: `java -jar anime-atsume.war --server.port=80`
     * Port 80 for HTTP, 443 for HTTPS
+    * Usually, running on ports 80 or 443 will require `sudo`
+* If running in a hosted VM, use the `nohup` command to allow the process to run even after your SSH session has ended. **Make sure to run in background**
+    * e.g. `nohup java -jar anime-atsume.war --server.port=80 &`
 
 ### Deploying to Heroku
 * Heroku doesn't know how to handle nested folders.
