@@ -17,6 +17,7 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
 
 import java.io.File;
 import java.net.URI;
@@ -28,6 +29,9 @@ import java.util.stream.Collectors;
 @Component
 public class KissanimeRuController {
     private static final Logger log = LoggerFactory.getLogger(KissanimeRuController.class);
+
+    @Value("#{new Boolean('${org.animeatsume.download-videos}')}")
+    private Boolean downloadVideos;
 
     @Value("#{new Boolean('${org.animeatsume.download-all-resolutions}')}")
     private Boolean downloadAllResolutions;
@@ -82,7 +86,9 @@ public class KissanimeRuController {
                 novelPlanetService.removeLowQualityVideos(videoSources);
             }
 
-            initiateEpisodeVideoDownloads(request.getEpisodeUrl(), videoSources);
+            if (downloadVideos) {
+                initiateEpisodeVideoDownloads(request.getEpisodeUrl(), videoSources);
+            }
 
             body = videoSources;
         }
@@ -254,6 +260,24 @@ public class KissanimeRuController {
             videoQuality,
             novelPlanetSourceUrl
         );
+
+        if (!downloadVideos) {
+            // Proxy video bytes from URL since the videos aren't being downloaded.
+            // Buffer videos with default buffer defined in {@code getContentRangeStartAndEndAndLength()}.
+            List<Long> ranges = Requests.getContentRangeStartAndEndAndLength(novelPlanetSourceUrl, requestHeaders, false);
+
+            HttpHeaders proxyHeaders = new HttpHeaders();
+            proxyHeaders.set(HttpHeaders.ACCEPT_RANGES, "bytes");
+            proxyHeaders.set(HttpHeaders.RANGE, String.format("bytes=%d-%d", ranges.get(0), ranges.get(1)));
+
+            return new RestTemplate().exchange(
+                novelPlanetSourceUrl,
+                HttpMethod.GET,
+                new HttpEntity<>(null, proxyHeaders),
+                Resource.class
+            );
+        }
+
         File videoFile = videoFileService.getVideoFile(showName, episodeName, videoQuality);
 
         if (videoFile == null) {
