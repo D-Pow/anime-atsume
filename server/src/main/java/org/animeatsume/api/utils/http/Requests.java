@@ -17,6 +17,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
@@ -153,6 +154,41 @@ public class Requests {
     private static final long CHUNK_SIZE_MED = BYTE_LENGTH * 1024;
     private static final long CHUNK_SIZE_HIGH = BYTE_LENGTH * 2048;
     private static final long CHUNK_SIZE_VERY_HIGH = CHUNK_SIZE_HIGH * 2;
+
+    public static List<Long> getContentRangeStartAndEndAndLength(String url, HttpHeaders headers, boolean endRangeIsContentLengthIfStartIsZero) {
+        long chunkSize = CHUNK_SIZE_VERY_HIGH; // TODO choose which chunk size to use from above
+
+        try {
+            UrlResource urlResource = new UrlResource(url);
+            long contentLength = urlResource.contentLength();
+            HttpRange range = headers.getRange().isEmpty() ? null : headers.getRange().get(0);
+
+            long headerRangeStart = 0;
+
+            if (range != null) {
+                headerRangeStart = range.getRangeStart(contentLength);
+            }
+
+            if (headerRangeStart == 0L) {
+                long rangeEnd = endRangeIsContentLengthIfStartIsZero
+                    ? contentLength-1
+                    : chunkSize;
+
+                return Arrays.asList(0L, rangeEnd, contentLength);
+            }
+
+            long resourceLengthLeftToServe = contentLength - headerRangeStart + 1;
+            long rangeLength = Math.min(chunkSize, resourceLengthLeftToServe);
+            long rangeEnd = headerRangeStart + rangeLength;
+
+            return Arrays.asList(headerRangeStart, rangeEnd, contentLength);
+        } catch (IOException e) {
+            log.error("Could not get UrlResource or ResourceRegion for URL ({})", url);
+            e.printStackTrace();
+        }
+
+        return Arrays.asList(0L, chunkSize, 0L);
+    }
 
     public static ResourceRegion getUrlResourceRegion(String url, HttpHeaders headers) {
         long chunkSize = CHUNK_SIZE_MED; // TODO choose which chunk size to use from above
