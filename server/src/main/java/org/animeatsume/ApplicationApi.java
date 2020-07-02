@@ -9,10 +9,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.*;
-import org.springframework.http.server.reactive.ServerHttpRequest;
-import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.net.URI;
 
 @RestController
@@ -27,8 +26,12 @@ public class ApplicationApi {
 
     @CrossOrigin
     @GetMapping("/corsProxy")
-    public ResponseEntity<?> getCorsRequest(@RequestParam("url") URI url, ServerHttpRequest request) {
-        return postCorsRequest(null, url, request);
+    public ResponseEntity<?> getCorsRequest(
+        @RequestParam("url") URI url,
+        @RequestHeader HttpHeaders requestHeaders,
+        HttpServletRequest request
+    ) {
+        return postCorsRequest(null, url, requestHeaders, request);
     }
 
     @CrossOrigin
@@ -36,13 +39,14 @@ public class ApplicationApi {
     public ResponseEntity<?> postCorsRequest(
         @RequestBody(required = false) Object body,
         @RequestParam("url") URI url,
-        ServerHttpRequest request
+        @RequestHeader HttpHeaders requestHeaders,
+        HttpServletRequest request
     ) {
-        HttpMethod method = request.getMethod();
+        HttpMethod method = HttpMethod.resolve(request.getMethod());
 
         log.info("Executing {} CORS request to URL ({}) with body ({})", method, url, body);
 
-        return CorsProxy.doCorsRequest(method, url, body, request.getHeaders());
+        return CorsProxy.doCorsRequest(method, url, body, requestHeaders);
     }
 
     @CrossOrigin
@@ -70,7 +74,7 @@ public class ApplicationApi {
         @PathVariable("episode") String episodeName,
         @PathVariable("quality") String videoQuality,
         @RequestParam("url") String novelPlanetUrl,
-        ServerHttpRequest request
+        @RequestHeader HttpHeaders requestHeaders
     ) {
         String validCharactersRegex = "^[a-zA-Z0-9-]+$"; // alphanumeric and '-'
         boolean paramsAreValid = (
@@ -96,7 +100,7 @@ public class ApplicationApi {
             episodeName,
             videoQuality,
             novelPlanetUrl,
-            request
+            requestHeaders
         );
     }
 

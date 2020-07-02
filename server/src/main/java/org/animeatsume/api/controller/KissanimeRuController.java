@@ -16,8 +16,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.*;
-import org.springframework.http.server.reactive.ServerHttpRequest;
-import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
@@ -248,7 +246,7 @@ public class KissanimeRuController {
         String episodeName,
         String videoQuality,
         String novelPlanetSourceUrl,
-        ServerHttpRequest request
+        HttpHeaders requestHeaders
     ) {
         log.info("Serving video stream: show name ({}), episode name ({}), video quality ({}), source URL ({})",
             showName,
@@ -263,7 +261,7 @@ public class KissanimeRuController {
             return Requests.getUrlResourceStreamResponse(novelPlanetSourceUrl);
         }
 
-        String rangeHeader = request.getHeaders().getFirst("Range");
+        String rangeHeader = requestHeaders.getFirst("Range");
 
         if (rangeHeader == null) {
             rangeHeader = "";
