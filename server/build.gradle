@@ -165,6 +165,7 @@ bootWar {
      * the dependencies that *should* already be on the host's system.
      */
     def javaFxAbsolutePath = getJavaFxJarPath()
+    // TODO add configurable option in settings.gradle
     classpath(javaFxAbsolutePath)
     println("Injected JavaFX .jar file to dependencies from ${javaFxAbsolutePath}")
 
