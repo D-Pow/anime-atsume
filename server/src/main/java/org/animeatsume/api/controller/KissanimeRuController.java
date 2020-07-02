@@ -72,8 +72,8 @@ public class KissanimeRuController {
         return kissanimeSearchResponse;
     }
 
-    public ResponseEntity<Object> getVideosForKissanimeEpisode(KissanimeVideoHostRequest request, ServerHttpResponse response) {
-        KissanimeVideoHostResponse videoHost = getVideoHostUrlForKissanimeEpisode(request, response);
+    public ResponseEntity<Object> getVideosForKissanimeEpisode(KissanimeVideoHostRequest request) {
+        KissanimeVideoHostResponse videoHost = getVideoHostUrlForKissanimeEpisode(request);
         String videoHostUrl = videoHost.getVideoHostUrl();
         Object body = videoHost;
 
@@ -94,7 +94,7 @@ public class KissanimeRuController {
             .body(body);
     }
 
-    private KissanimeVideoHostResponse getVideoHostUrlForKissanimeEpisode(KissanimeVideoHostRequest request, ServerHttpResponse response) {
+    private KissanimeVideoHostResponse getVideoHostUrlForKissanimeEpisode(KissanimeVideoHostRequest request) {
         log.info("KissanimeVideoHostRequest = {}", request);
 
         String kissanimeEpisodeUrl = request.getEpisodeUrl();
