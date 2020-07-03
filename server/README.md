@@ -54,6 +54,8 @@ Notes:
         * JavaFX: `sudo apt install openjfx=8u161-b12-1ubuntu2 libopenjfx-jni=8u161-b12-1ubuntu2 libopenjfx-java=8u161-b12-1ubuntu2`
             * Didn't find the solution to run with monocle.platform=Headless until after installing openjfx
             * Gotten from [stackoverflow](https://stackoverflow.com/questions/56166267/how-do-i-get-java-fx-running-with-openjdk-8-on-ubuntu-18-04-2-lts)
+            * Make sure to prevent them from updating:
+            `sudo apt-mark hold openjfx libopenjfx-jni libopenjfx-java`
         * `sudo apt install xvfb`
         * `sudo apt install xorg libgtk2.0-0`
     * Run with headless mode:
