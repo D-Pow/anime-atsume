@@ -58,3 +58,5 @@ Notes:
         * `sudo apt install xorg libgtk2.0-0`
     * Run with headless mode:
         * `java -Dglass.platform=Monocle -Dmonocle.platform=Headless -jar anime-atsume-1.0.war`
+    * Final command to run with headless mode, port 80, and as background process:
+        * `sudo nohup java -Dglass.platform=Monocle -Dmonocle.platform=Headless -jar anime-atsume-1.0.war --server.port=80 &`
