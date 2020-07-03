@@ -154,20 +154,21 @@ bootWar {
     archiveBaseName = project.name
     archiveVersion = project.version
 
-    /*
-     * Add JavaFX's .jar file to classpath to bundle it with the app.
-     *
-     * Allows website hosting systems that don't support JavaFX to
-     * run this webapp.
-     *
-     * Could also be done in dependencies: `implementation project.files(javaFxAbsolutePath)`
-     * but was put here instead to keep the actual app's dependencies separated from
-     * the dependencies that *should* already be on the host's system.
-     */
-    def javaFxAbsolutePath = getJavaFxJarPath()
-    // TODO add configurable option in settings.gradle
-    classpath(javaFxAbsolutePath)
-    println("Injected JavaFX .jar file to dependencies from ${javaFxAbsolutePath}")
+    if (injectJavaFxJar.toBoolean()) {
+        /*
+         * Add JavaFX's .jar file to classpath to bundle it with the app.
+         *
+         * Allows website hosting systems that don't support JavaFX to
+         * run this webapp.
+         *
+         * Could also be done in dependencies: `implementation project.files(javaFxAbsolutePath)`
+         * but was put here instead to keep the actual app's dependencies separated from
+         * the dependencies that *should* already be on the host's system.
+         */
+        def javaFxAbsolutePath = getJavaFxJarPath()
+        classpath(javaFxAbsolutePath)
+        println("Injected JavaFX .jar file to dependencies from ${javaFxAbsolutePath}")
+    }
 
     doLast {
         copyDbToBuildDir()
