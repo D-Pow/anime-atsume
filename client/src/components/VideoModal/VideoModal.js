@@ -13,6 +13,8 @@ function VideoModal(props) {
     const [ captchaAnswers, setCaptchaAnswers ] = useState([]);
     const [ videoOptions, setVideoOptions ] = useState([]);
 
+    const isDisplayingVideo = videoOptions.length > 0;
+
     const resetState = () => {
         setCaptchaPrompts([]);
         setCaptchaOptions([]);
@@ -131,7 +133,7 @@ function VideoModal(props) {
     );
 
     const renderVideo = () => {
-        if (!videoOptions.length) {
+        if (!isDisplayingVideo) {
             return;
         }
 
@@ -156,7 +158,7 @@ function VideoModal(props) {
 
     return (
         <Modal
-            escapeClosesModal={videoOptions.length === 0}
+            escapeClosesModal={!isDisplayingVideo}
             show={props.show}
             title={renderedTitle}
             onClose={handleClose}
