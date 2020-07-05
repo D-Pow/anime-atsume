@@ -101,7 +101,12 @@ function VideoModal(props) {
         ? (
             <div className={'text-center'}>
                 <h4>Please solve this captcha</h4>
-                <h5>{captchaPrompts[currentPromptIndex]}</h5>
+                <h5 className={'d-inline'}>
+                    ({currentPromptIndex+1}/{captchaPrompts.length})
+                </h5>
+                <h5 className={'text-danger d-inline ml-1'}>
+                    {captchaPrompts[currentPromptIndex]}
+                </h5>
             </div>
         ) : props.episodeTitle;
 
