@@ -13,12 +13,21 @@ function VideoModal(props) {
     const [ captchaAnswers, setCaptchaAnswers ] = useState([]);
     const [ videoOptions, setVideoOptions ] = useState([]);
 
-    async function fetchEpisodeHost(episodeUrl, captchaAttempt) {
-        setShowSpinner(true);
+    const resetState = () => {
         setCaptchaPrompts([]);
         setCaptchaOptions([]);
         setCaptchaAnswers([]);
         setVideoOptions([]);
+    };
+
+    const handleClose = () => {
+        resetState();
+        props.onClose();
+    };
+
+    async function fetchEpisodeHost(episodeUrl, captchaAttempt) {
+        setShowSpinner(true);
+        resetState();
 
         const res = await searchForEpisodeHost(episodeUrl, captchaAttempt);
         const { data, captchaContent } = res;
@@ -145,7 +154,7 @@ function VideoModal(props) {
             escapeClosesModal={videoOptions.length === 0}
             show={props.show}
             title={renderedTitle}
-            onClose={props.onClose}
+            onClose={handleClose}
         >
             <div className={'overflow-auto'} style={{ minHeight: '200px' }}>
                 {renderedBody}
