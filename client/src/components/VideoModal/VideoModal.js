@@ -97,6 +97,12 @@ function VideoModal(props) {
         }
     }, [ props.show, props.episodeUrl, captchaAnswers.length, captchaPrompts.length ]);
 
+    useEffect(() => {
+        if (isDisplayingVideo) {
+            props.onVideoLoad();
+        }
+    }, [ isDisplayingVideo ]);
+
     const currentPromptIndex = captchaAnswers.length;
 
     const renderedTitle = captchaPrompts.length
@@ -174,14 +180,16 @@ VideoModal.propTypes = {
     episodeTitle: PropTypes.string,
     episodeUrl: PropTypes.string,
     show: PropTypes.bool,
-    onClose: PropTypes.func
+    onClose: PropTypes.func,
+    onVideoLoad: PropTypes.func
 };
 
 VideoModal.defaultProps = {
     episodeTitle: '',
     episodeUrl: null,
     show: false,
-    onClose: () => {}
+    onClose: () => {},
+    onVideoLoad: () => {}
 };
 
 export default VideoModal;
