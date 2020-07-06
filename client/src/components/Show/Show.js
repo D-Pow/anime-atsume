@@ -55,15 +55,19 @@ function Show(props) {
         });
     }
 
-    const renderEpisodesForSelectedShow = ({ title: episodeTitle, url: episodeUrl }, i) => (
-        <a
-            className={'list-group-item text-primary cursor-pointer'}
-            key={i}
-            onClick={() => setSelectedEpisode({ episodeTitle, episodeUrl })}
-        >
-            {episodeTitle}
-        </a>
-    );
+    const renderEpisodesForSelectedShow = ({ title: episodeTitle, url: episodeUrl }, i) => {
+        const isLastEpisodeWatched = showsProgress[getShowTitle()] === episodeTitle;
+
+        return (
+            <a
+                className={`list-group-item cursor-pointer ${isLastEpisodeWatched ? 'active' : 'text-primary'}`}
+                key={i}
+                onClick={() => setSelectedEpisode({ episodeTitle, episodeUrl })}
+            >
+                {episodeTitle}
+            </a>
+        );
+    };
 
     const renderPossibleShowMatches = ({ title: showTitle, episodes: showEpisodes}, i) => {
         const renderedEpisodeCountBadge = (
