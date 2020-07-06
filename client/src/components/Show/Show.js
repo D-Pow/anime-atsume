@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { fetchKitsuTitleSearch } from 'services/KitsuAnimeSearchService';
 import { searchForShow } from 'services/ShowSearchService';
 import { getMyAnimeListSearchUrl } from 'services/Urls';
+import { useStorage } from 'utils/Hooks';
 import Spinner from 'components/ui/Spinner';
 import VideoModal from 'components/VideoModal';
 import Anchor from 'components/ui/Anchor';
@@ -15,6 +16,7 @@ function Show(props) {
     const [ selectedTab, setSelectedTab ] = useState(0);
     const [ selectedShow, setSelectedShow ] = useState(null);
     const [ selectedEpisode, setSelectedEpisode ] = useState(null);
+    const [ showsProgress, setShowsProgress ] = useStorage('showsProgress', { initialValue: {} });
 
     async function fetchKitsuInfo() {
         const response = await fetchKitsuTitleSearch(title.toLowerCase());
@@ -38,6 +40,18 @@ function Show(props) {
         fetchKitsuInfo();
         fetchShowAndEpisodesList();
     }, []);
+
+    function handleVideoLoad() {
+        // update show progress in window storage
+        const showTitle = episodeResults.results[selectedShow].title;
+        const { episodeTitle } = selectedEpisode;
+
+        setShowsProgress(prevState => {
+            const prevProgress = {...prevState};
+            prevProgress[showTitle] = episodeTitle;
+            return prevProgress;
+        });
+    }
 
     const renderEpisodesForSelectedShow = ({ title: episodeTitle, url: episodeUrl }, i) => (
         <a
@@ -85,6 +99,26 @@ function Show(props) {
             <Spinner fullScreen={true} show={true} />
         );
     }
+
+    const renderLastWatchedEpisodeText = () => {
+        if (!episodeResults || selectedShow == null) {
+            return null;
+        }
+
+        const showTitle = episodeResults.results[selectedShow].title;
+        const lastWatchedEpisode = showsProgress[showTitle];
+
+        if (lastWatchedEpisode) {
+            return (
+                <div className={'row mb-3'}>
+                    <div className={'col-12'}>
+                        <h5 className={'mb-1'}>Last watched: </h5>
+                        <h5 className={'underline'}>{lastWatchedEpisode}</h5>
+                    </div>
+                </div>
+            );
+        }
+    };
 
     const {
         canonicalTitle,
@@ -163,6 +197,7 @@ function Show(props) {
                         <div className={'d-xs-none d-sm-block'}>
                             <h3 className={'mb-2'}>Episodes</h3>
                         </div>
+                        {renderLastWatchedEpisodeText()}
                         <div className={'text-left list-group overflow-auto'} style={{ maxHeight: '400px' }}>
                             {selectedShow != null && episodeResults.results[selectedShow].episodes.map(renderEpisodesForSelectedShow)}
                         </div>
@@ -215,6 +250,7 @@ function Show(props) {
                 {...selectedEpisode}
                 show={selectedEpisode != null}
                 onClose={() => setSelectedEpisode(null)}
+                onVideoLoad={handleVideoLoad}
             />
         </React.Fragment>
     );
