@@ -41,9 +41,11 @@ function Show(props) {
         fetchShowAndEpisodesList();
     }, []);
 
+    const getShowTitle = () => episodeResults.results[selectedShow].title;
+
     function handleVideoLoad() {
         // update show progress in window storage
-        const showTitle = episodeResults.results[selectedShow].title;
+        const showTitle = getShowTitle();
         const { episodeTitle } = selectedEpisode;
 
         setShowsProgress(prevState => {
@@ -105,7 +107,7 @@ function Show(props) {
             return null;
         }
 
-        const showTitle = episodeResults.results[selectedShow].title;
+        const showTitle = getShowTitle();
         const lastWatchedEpisode = showsProgress[showTitle];
 
         if (lastWatchedEpisode) {
