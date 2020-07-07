@@ -12,6 +12,25 @@ Notes:
 * If running in a hosted VM, use the `nohup` command to allow the process to run even after your SSH session has ended. **Make sure to run in background**
     * e.g. `nohup java -jar anime-atsume.war --server.port=80 &`
 
+### Docker
+* Build image: `docker build -t app .`
+    * Builds new image named "app" using the Dockerfile at root dir "."
+    * Needs to be run in same directory where the Dockerfile is (in this case, server/).
+* Run app in image: `docker run -p 8080:8080 app`
+    * Runs the newly built image, "app"
+    * `-p host_port:container_port`
+* Run bash in image: `docker run -it app /bin/bash`
+* Notes on Dockerfile:
+    * It renames the .war file to `anime-atsume.war` so version number isn't needed (and CMD can just be this renamed filename).
+    * Since ports are mapped in `docker run`, there's no need to force `--server-port=80`.
+    * SQLite3 was added as an installation dependency (since it's not guaranteed that the docker image will support it out of the box).
+    * Allow DB to be writeable via `chmod`.
+* Other docker commands:
+    * List images or running containers: `docker [container|image] ls`
+    * List running containers: `docker ps`
+    * New bash terminal on running container: `docker exec -it <id_from_ps> /bin/bash`
+    * Delete image: `docker rmi <image_id>`
+
 ### Deploying to Heroku
 * Heroku doesn't know how to handle nested folders.
     * Since the front-end is built to the back-end's resources/ directory,
