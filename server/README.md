@@ -45,17 +45,17 @@ Notes:
     * Open in browser: `gcloud app browse`
 * Cloud Compute (VM instance)
     * Needed:
-        * `sudo apt install openjdk-8-jre`
-        * Alternatively, try full JDK+JFX packages:
-            * [Zulu "JDK FX"](https://www.azul.com/downloads/zulu-community/?architecture=x86-64-bit)
-            * [Liberica "Full JDK"](https://bell-sw.com/pages/downloads/)
-            * [Other options](https://stackoverflow.com/questions/61783369/install-openjdkopenjfx-8-on-ubuntu-20)
-    * Not sure which of the following are needed, if any at all:
+        * Java 8: `sudo apt install openjdk-8-jre`
         * JavaFX: `sudo apt install openjfx=8u161-b12-1ubuntu2 libopenjfx-jni=8u161-b12-1ubuntu2 libopenjfx-java=8u161-b12-1ubuntu2`
             * Didn't find the solution to run with monocle.platform=Headless until after installing openjfx
             * Gotten from [stackoverflow](https://stackoverflow.com/questions/56166267/how-do-i-get-java-fx-running-with-openjdk-8-on-ubuntu-18-04-2-lts)
             * Make sure to prevent them from updating:
             `sudo apt-mark hold openjfx libopenjfx-jni libopenjfx-java`
+        * Alternatively, try full JDK+JFX packages:
+            * [Zulu "JDK FX"](https://www.azul.com/downloads/zulu-community/?architecture=x86-64-bit)
+            * [Liberica "Full JDK"](https://bell-sw.com/pages/downloads/)
+            * [Other options](https://stackoverflow.com/questions/61783369/install-openjdkopenjfx-8-on-ubuntu-20)
+    * Not sure which of the following are needed, if any at all:
         * `sudo apt install xvfb`
         * `sudo apt install xorg libgtk2.0-0`
     * Run with headless mode:
