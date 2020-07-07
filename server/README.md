@@ -45,6 +45,14 @@ Notes:
 * For [deploying war file](https://devcenter.heroku.com/articles/war-deployment#deployment-with-the-heroku-cli):
     * `heroku plugins:install java`
     * `heroku war:deploy <path_to_war_file> --app <app_name>`
+* For [deploying with Dockerfile](https://medium.com/@urbanswati/deploying-spring-boot-restapi-using-docker-maven-heroku-and-accessing-it-using-your-custom-aa04798c0112)
+    * Luckily, Heroku doesn't need you to build the image, nor to push the subtree, nor do anything else to deploy the container. It will build the image using any required files from your filesystem (e.g. .war, .db) and push it to its own container registry.
+        * Note: You might need `server.port=${PORT}` in application.properties so Heroku's PORT var will overwrite Spring's port.
+        * Likely not needed since Spring and Heroku both default to port 8080.
+    * Make sure you're in the server/ directory. Then run:
+        * `heroku container:login`
+        * `heroku container:push web`
+        * `heroku container:release web`
 
 ### Deploying to gcloud
 * If all else fails, rewrite code with Selenium and allow it via [this method](https://medium.com/@CapitalTerefe/selenium-grid-in-docker-using-serenity-in-google-cloud-47b57deab5d)
