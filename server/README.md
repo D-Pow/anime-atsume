@@ -22,7 +22,7 @@ Notes:
 * Run bash in image: `docker run -it app /bin/bash`
 * Notes on Dockerfile:
     * It renames the .war file to `anime-atsume.war` so version number isn't needed (and CMD can just be this renamed filename).
-    * Since ports are mapped in `docker run`, there's no need to force `--server-port=80`.
+    * Since ports are mapped in `docker run`, there's no need to force `--server.port=80`.
     * SQLite3 was added as an installation dependency (since it's not guaranteed that the docker image will support it out of the box).
     * Allow DB to be writeable via `chmod`.
 * Other docker commands:
@@ -43,8 +43,9 @@ Notes:
         * `heroku buildpacks:add heroku/gradle` - default gradle/Spring build process.
     * Alternatively (but possibly still mandatory), add JavaFX as a dependency in build.gradle.
 * For [deploying war file](https://devcenter.heroku.com/articles/war-deployment#deployment-with-the-heroku-cli):
+    * Make sure to include the .db file with `--includes anime_atsume.db`
     * `heroku plugins:install java`
-    * `heroku war:deploy <path_to_war_file> --app <app_name>`
+    * `heroku war:deploy <path_to_war_file> --app <app_name> --includes anime_atsume.db`
 * For [deploying with Dockerfile](https://medium.com/@urbanswati/deploying-spring-boot-restapi-using-docker-maven-heroku-and-accessing-it-using-your-custom-aa04798c0112)
     * Luckily, Heroku doesn't need you to build the image, nor to push the subtree, nor do anything else to deploy the container. It will build the image using any required files from your filesystem (e.g. .war, .db) and push it to its own container registry.
         * Note: You might need `server.port=${PORT}` in application.properties so Heroku's PORT var will overwrite Spring's port.
