@@ -54,6 +54,9 @@ Notes:
         * `heroku container:login`
         * `heroku container:push web`
         * `heroku container:release web`
+    * Heroku's "free" and "hobby" tiers only allow a maximum of 512 MB.
+        * Force JVM to not exceed this cap by adding `-Xmx512m` to `CMD`.
+        * `-Xmx` is to set maximum memory usage, `m` specifies megabytes.
 
 ### Deploying to gcloud
 * If all else fails, rewrite code with Selenium and allow it via [this method](https://medium.com/@CapitalTerefe/selenium-grid-in-docker-using-serenity-in-google-cloud-47b57deab5d)
