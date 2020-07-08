@@ -32,6 +32,10 @@ function Show(props) {
         try {
             const episodeResults = await searchForShow(title);
 
+            if (episodeResults.status && episodeResults.status > 299) {
+                throw `Got HTTP status code ${episodeResults.status} from server. Error: ${episodeResults.error}.`;
+            }
+
             episodeResults.results.forEach(show => {
                 show.episodes.reverse();
             });

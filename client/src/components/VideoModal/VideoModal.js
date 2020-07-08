@@ -35,6 +35,11 @@ function VideoModal(props) {
 
         try {
             const res = await searchForEpisodeHost(episodeUrl, captchaAttempt);
+
+            if (res.status && res.status > 299) {
+                throw `Got HTTP status code ${res.status} from server. Error: ${res.error}.`;
+            }
+
             const { data, captchaContent } = res;
 
             if (captchaContent) {
