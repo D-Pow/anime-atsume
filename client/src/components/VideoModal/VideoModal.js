@@ -156,7 +156,7 @@ function VideoModal(props) {
 
     const renderedBody = (props.show && props.episodeUrl)
         ? showSpinner
-            ? <Spinner className={'w-15 h-15 flex-center'} show={true} />
+            ? <Spinner className={'w-40 h-40'} show={true} />
             : captchaPrompts.length
                 ? renderCaptchaImages()
                 : renderVideo()
@@ -169,7 +169,10 @@ function VideoModal(props) {
             title={renderedTitle}
             onClose={handleClose}
         >
-            <div className={'overflow-auto'} style={{ minHeight: '200px' }}>
+            <div
+                className={`overflow-auto ${showSpinner ? 'd-flex justify-content-center align-items-center' : ''}`}
+                style={{ minHeight: '200px' }}
+            >
                 {renderedBody}
             </div>
         </Modal>
