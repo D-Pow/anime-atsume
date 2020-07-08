@@ -39,7 +39,7 @@ dependencies {
      * Using v3.0.0 because it ironically has more features than 4.0.0
      * (see https://github.com/webfolderio/ui4j/tree/3.0.0)
      */
-    implementation 'io.webfolder:ui4j-webkit:3.0.0'
+//    implementation 'io.webfolder:ui4j-webkit:3.0.0'
 
     providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
 
