@@ -57,6 +57,7 @@ Notes:
     * Heroku's "free" and "hobby" tiers only allow a maximum of 512 MB.
         * Force JVM to not exceed this cap by adding `-Xmx512m` to `CMD`.
         * `-Xmx` is to set maximum memory usage, `m` specifies megabytes.
+        * If restricting memory like this, it might be helpful to also decrease the number of threads Spring uses. Try `core-size=1`, `max-size=5`.
 
 ### Deploying to gcloud
 * If all else fails, rewrite code with Selenium and allow it via [this method](https://medium.com/@CapitalTerefe/selenium-grid-in-docker-using-serenity-in-google-cloud-47b57deab5d)
