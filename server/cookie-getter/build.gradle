@@ -1,0 +1,61 @@
+plugins {
+    id 'java'
+    id 'idea'
+    id 'war'
+    // adding plugins here removes the need to declare them in buildscript {}
+    id 'org.springframework.boot' version '2.3.0.RELEASE'
+    id 'io.spring.dependency-management' version '1.0.9.RELEASE'
+}
+
+group 'org.animeatsume'
+version '1.0'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+task printVersion {
+    println rootProject.artifacts
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'io.webfolder:ui4j-webkit:3.0.0'
+}
+
+// WAR is needed because JAR doesn't include resources/public/
+// Spring disables `war` task and replaces it with `bootWar`
+war {
+    archiveBaseName = project.name
+    archiveVersion = project.version
+}
+
+// Creates a JAR that can run by itself instead of a WAR that requires running in a Tomcat container
+//bootJar {
+//    archiveBaseName = project.name
+//    archiveVersion = project.version
+//}
+
+sourceSets {
+    main {
+        java {
+            srcDir 'src/main/java'
+        }
+        resources {
+            srcDir 'src/main/resources'
+        }
+    }
+    test {
+        java {
+            srcDir 'src/test/java'
+        }
+    }
+}
+
+wrapper {
+    gradleVersion = '6.5'
+    distributionType = Wrapper.DistributionType.ALL
+}
