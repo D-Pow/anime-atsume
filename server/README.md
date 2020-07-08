@@ -22,7 +22,7 @@ Notes:
 * Run bash in image: `docker run -it app /bin/bash`
 * Notes on Dockerfile:
     * It renames the .war file to `anime-atsume.war` so version number isn't needed (and CMD can just be this renamed filename).
-    * Since ports are mapped in `docker run`, there's no need to force `--server-port=80`.
+    * Since ports are mapped in `docker run`, there's no need to force `--server.port=80`.
     * SQLite3 was added as an installation dependency (since it's not guaranteed that the docker image will support it out of the box).
     * Allow DB to be writeable via `chmod`.
 * Other docker commands:
