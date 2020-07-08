@@ -3,10 +3,12 @@ import PropTypes from 'prop-types';
 import Modal from 'components/ui/Modal';
 import Video from 'components/ui/Video';
 import Spinner from 'components/ui/Spinner';
+import ErrorDisplay from 'components/ui/ErrorDisplay';
 import { searchForEpisodeHost } from 'services/EpisodeHostSearchService';
 import { getImageSrcPath, getVideoSrcPath, getVideoNameDataFromUrl } from 'services/Urls';
 
 function VideoModal(props) {
+    const [ hasError, setHasError ] = useState(false);
     const [ showSpinner, setShowSpinner ] = useState(false);
     const [ captchaPrompts, setCaptchaPrompts ] = useState([]);
     const [ captchaOptions, setCaptchaOptions ] = useState([]);
@@ -31,19 +33,24 @@ function VideoModal(props) {
         setShowSpinner(true);
         resetState();
 
-        const res = await searchForEpisodeHost(episodeUrl, captchaAttempt);
-        const { data, captchaContent } = res;
+        try {
+            const res = await searchForEpisodeHost(episodeUrl, captchaAttempt);
+            const { data, captchaContent } = res;
 
-        if (captchaContent) {
-            setCaptchaPrompts(captchaContent.promptTexts);
-            setCaptchaOptions(captchaContent.imgIdsAndSrcs);
+            if (captchaContent) {
+                setCaptchaPrompts(captchaContent.promptTexts);
+                setCaptchaOptions(captchaContent.imgIdsAndSrcs);
+            }
+
+            if (data) {
+                setVideoOptions(data);
+            }
+
+            setShowSpinner(false);
+        } catch (e) {
+            console.error('Error fetching for episodes:', e);
+            setHasError(true);
         }
-
-        if (data) {
-            setVideoOptions(data);
-        }
-
-        setShowSpinner(false);
     }
 
     useEffect(() => {
@@ -155,11 +162,13 @@ function VideoModal(props) {
     };
 
     const renderedBody = (props.show && props.episodeUrl)
-        ? showSpinner
-            ? <Spinner className={'w-40 h-40'} show={true} />
-            : captchaPrompts.length
-                ? renderCaptchaImages()
-                : renderVideo()
+        ? hasError
+            ? <ErrorDisplay suggestion={'Try closing and re-opening the modal.'} show={hasError} />
+            : showSpinner
+                ? <Spinner className={'w-40 h-40'} show={true} />
+                : captchaPrompts.length
+                    ? renderCaptchaImages()
+                    : renderVideo()
         : '';
 
     return (

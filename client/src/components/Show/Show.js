@@ -7,10 +7,12 @@ import { useStorage } from 'utils/Hooks';
 import Spinner from 'components/ui/Spinner';
 import VideoModal from 'components/VideoModal';
 import Anchor from 'components/ui/Anchor';
+import ErrorDisplay from 'components/ui/ErrorDisplay';
 
 function Show(props) {
     const title = decodeURIComponent(props.title);
 
+    const [ hasError, setHasError ] = useState(false);
     const [ kitsuResult, setKitsuResult ] = useState(null);
     const [ episodeResults, setEpisodeResults ] = useState(null);
     const [ selectedTab, setSelectedTab ] = useState(0);
@@ -27,13 +29,18 @@ function Show(props) {
     }
 
     async function fetchShowAndEpisodesList() {
-        const episodeResults = await searchForShow(title);
+        try {
+            const episodeResults = await searchForShow(title);
 
-        episodeResults.results.forEach(show => {
-            show.episodes.reverse();
-        });
+            episodeResults.results.forEach(show => {
+                show.episodes.reverse();
+            });
 
-        setEpisodeResults(episodeResults);
+            setEpisodeResults(episodeResults);
+        } catch (e) {
+            console.error('Error fetching for show matches:', e);
+            setHasError(true);
+        }
     }
 
     useEffect(() => {
@@ -231,6 +238,10 @@ function Show(props) {
             </ul>
         </nav>
     );
+
+    if (hasError) {
+        return <ErrorDisplay fullScreen={true} show={hasError} />;
+    }
 
     return (
         <React.Fragment>
