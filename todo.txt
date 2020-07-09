@@ -1,5 +1,4 @@
 Front-end
-    - Local storage to hold where users left off
 
 Back-end
     - Cron job to delete videos/ dir
