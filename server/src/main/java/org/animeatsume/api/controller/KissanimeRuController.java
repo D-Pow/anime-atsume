@@ -48,8 +48,8 @@ public class KissanimeRuController {
     @Autowired
     AnimeAtsumeDao dao;
 
-    public KissanimeSearchResponse searchKissanimeTitles(KissanimeSearchRequest kissanimeSearchRequest) {
-        KissanimeSearchResponse kissanimeSearchResponse = kissanimeService.searchKissanimeTitles(kissanimeSearchRequest);
+    public KissanimeSearchResponse searchKissanimeTitles(TitleSearchRequest titleSearchRequest) {
+        KissanimeSearchResponse kissanimeSearchResponse = kissanimeService.searchKissanimeTitles(titleSearchRequest);
         List<KissanimeSearchResponse.SearchResults> titleSearchResults = kissanimeSearchResponse.getResults();
 
         if (titleSearchResults != null) {

@@ -65,8 +65,8 @@ public class ApplicationApi {
 
     @CrossOrigin
     @PostMapping(value = "/searchKissanime", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public KissanimeSearchResponse searchKissanime(@RequestBody KissanimeSearchRequest kissanimeSearchRequest) {
-        return kissanimeRuController.searchKissanimeTitles(kissanimeSearchRequest);
+    public KissanimeSearchResponse searchKissanime(@RequestBody TitleSearchRequest titleSearchRequest) {
+        return kissanimeRuController.searchKissanimeTitles(titleSearchRequest);
     }
 
     @CrossOrigin

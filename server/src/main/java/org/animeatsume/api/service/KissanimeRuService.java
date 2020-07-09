@@ -147,9 +147,9 @@ public class KissanimeRuService {
         return headers;
     }
 
-    public KissanimeSearchResponse searchKissanimeTitles(KissanimeSearchRequest kissanimeSearchRequest) {
+    public KissanimeSearchResponse searchKissanimeTitles(TitleSearchRequest titleSearchRequest) {
         waitForCloudflareToAllowAccessToKissanime();
-        String requestSearchTitle = kissanimeSearchRequest.getTitle();
+        String requestSearchTitle = titleSearchRequest.getTitle();
 
         log.info("Searching Kissanime for title ({}) ...", requestSearchTitle);
 
