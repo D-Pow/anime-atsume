@@ -57,6 +57,7 @@ Notes:
     * Heroku's "free" and "hobby" tiers only allow a maximum of 512 MB.
         * Force JVM to not exceed this cap by adding `-Xmx512m` to `CMD`.
         * `-Xmx` is to set maximum memory usage, `m` specifies megabytes.
+        * Since Heroku's memory cap is a soft limit (will only kill the app if you go too much above the limit), `-Xmx640m` will likely work, giving the app more memory without triggering Heroku's kill switch.
         * If restricting memory like this, it might be helpful to also decrease the number of threads Spring uses. Try `core-size=1`, `max-size=5`.
 
 ### Deploying to gcloud
