@@ -147,80 +147,84 @@ function Show(props) {
         }
     } = kitsuResult.attributes;
 
+    const renderOverviewTab = () => (
+        <div className={'row'}>
+            <div className={'col-centered col-lg-4 my-3 d-flex'}>
+                <img
+                    className={'my-auto flex-center'}
+                    src={small}
+                    alt={canonicalTitle}
+                    style={{ maxWidth: '95%' }}
+                />
+            </div>
+            <div className={'col-sm-12 col-lg-8 d-flex'}>
+                <div className={'text-center'}>
+                    <div className={'row mb-3'}>
+                        <div className={'col'}>
+                            <h5 className={'capitalize-first'}>
+                                {episodeCount === 1
+                                    ? showType
+                                    : episodeCount + ' episodes'
+                                }
+                            </h5>
+                        </div>
+                    </div>
+                    <div className={'row mb-3'}>
+                        <div className={'col'}>
+                            <p>
+                                {synopsis}
+                            </p>
+                        </div>
+                    </div>
+                    <div className={'row mb-3'}>
+                        <div className={'col'}>
+                            <Anchor href={getMyAnimeListSearchUrl(title)}>
+                                <h5>View on MyAnimeList</h5>
+                            </Anchor>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+
+    const renderWatchTab = () => (
+        <div className={'row'}>
+            <div className={'col-6'}>
+                <div className={'d-xs-block d-sm-none'}>
+                    <h4 className={'mb-2'}>Shows</h4>
+                </div>
+                <div className={'d-xs-none d-sm-block'}>
+                    <h3 className={'mb-2 d-inline-block'}>Shows</h3>
+                    <h4 className={'d-inline-block ml-1'}>(# episodes)</h4>
+                </div>
+                <div className={'text-left list-group overflow-auto'} style={{ maxHeight: '400px' }}>
+                    {episodeResults.results.map(renderPossibleShowMatches)}
+                </div>
+            </div>
+            <div className={'col-6'}>
+                <div className={'d-xs-block d-sm-none'}>
+                    <h4 className={'mb-2'}>Episodes</h4>
+                </div>
+                <div className={'d-xs-none d-sm-block'}>
+                    <h3 className={'mb-2'}>Episodes</h3>
+                </div>
+                {renderLastWatchedEpisodeText()}
+                <div className={'text-left list-group overflow-auto'} style={{ maxHeight: '400px' }}>
+                    {selectedShow != null && episodeResults.results[selectedShow].episodes.map(renderEpisodesForSelectedShow)}
+                </div>
+            </div>
+        </div>
+    );
+
     const tabs = [
         {
             tabTitle: 'Overview',
-            content: (
-                <div className={'row'}>
-                    <div className={'col-centered col-lg-4 my-3 d-flex'}>
-                        <img
-                            className={'my-auto flex-center'}
-                            src={small}
-                            alt={canonicalTitle}
-                            style={{ maxWidth: '95%' }}
-                        />
-                    </div>
-                    <div className={'col-sm-12 col-lg-8 d-flex'}>
-                        <div className={'text-center'}>
-                            <div className={'row mb-3'}>
-                                <div className={'col'}>
-                                    <h5 className={'capitalize-first'}>
-                                        {episodeCount === 1
-                                            ? showType
-                                            : episodeCount + ' episodes'
-                                        }
-                                    </h5>
-                                </div>
-                            </div>
-                            <div className={'row mb-3'}>
-                                <div className={'col'}>
-                                    <p>
-                                        {synopsis}
-                                    </p>
-                                </div>
-                            </div>
-                            <div className={'row mb-3'}>
-                                <div className={'col'}>
-                                    <Anchor href={getMyAnimeListSearchUrl(title)}>
-                                        <h5>View on MyAnimeList</h5>
-                                    </Anchor>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )
+            content: renderOverviewTab()
         },
         {
             tabTitle: 'Watch',
-            content: (
-                <div className={'row'}>
-                    <div className={'col-6'}>
-                        <div className={'d-xs-block d-sm-none'}>
-                            <h4 className={'mb-2'}>Shows</h4>
-                        </div>
-                        <div className={'d-xs-none d-sm-block'}>
-                            <h3 className={'mb-2 d-inline-block'}>Shows</h3>
-                            <h4 className={'d-inline-block ml-1'}>(# episodes)</h4>
-                        </div>
-                        <div className={'text-left list-group overflow-auto'} style={{ maxHeight: '400px' }}>
-                            {episodeResults.results.map(renderPossibleShowMatches)}
-                        </div>
-                    </div>
-                    <div className={'col-6'}>
-                        <div className={'d-xs-block d-sm-none'}>
-                            <h4 className={'mb-2'}>Episodes</h4>
-                        </div>
-                        <div className={'d-xs-none d-sm-block'}>
-                            <h3 className={'mb-2'}>Episodes</h3>
-                        </div>
-                        {renderLastWatchedEpisodeText()}
-                        <div className={'text-left list-group overflow-auto'} style={{ maxHeight: '400px' }}>
-                            {selectedShow != null && episodeResults.results[selectedShow].episodes.map(renderEpisodesForSelectedShow)}
-                        </div>
-                    </div>
-                </div>
-            )
+            content: renderWatchTab()
         }
     ];
 
