@@ -36,9 +36,11 @@ function Show(props) {
                 throw `Got HTTP status code ${episodeResults.status} from server. Error: ${episodeResults.error}.`;
             }
 
-            episodeResults.results.forEach(show => {
-                show.episodes.reverse();
-            });
+            if (episodeResults.results != null && episodeResults.results.length >= 0) {
+                episodeResults.results.forEach(show => {
+                    show.episodes.reverse();
+                });
+            }
 
             setEpisodeResults(episodeResults);
         } catch (e) {
@@ -188,34 +190,44 @@ function Show(props) {
         </div>
     );
 
-    const renderWatchTab = () => (
-        <div className={'row'}>
-            <div className={'col-6'}>
-                <div className={'d-xs-block d-sm-none'}>
-                    <h4 className={'mb-2'}>Shows</h4>
+    const renderWatchTab = () => {
+        if (episodeResults.results == null || episodeResults.results.length === 0) {
+            return (
+                <div className={'row d-flex justify-content-center'}>
+                    <h4>Sorry, no episodes were found for this show.</h4>
                 </div>
-                <div className={'d-xs-none d-sm-block'}>
-                    <h3 className={'mb-2 d-inline-block'}>Shows</h3>
-                    <h4 className={'d-inline-block ml-1'}>(# episodes)</h4>
+            );
+        }
+
+        return (
+            <div className={'row'}>
+                <div className={'col-6'}>
+                    <div className={'d-xs-block d-sm-none'}>
+                        <h4 className={'mb-2'}>Shows</h4>
+                    </div>
+                    <div className={'d-xs-none d-sm-block'}>
+                        <h3 className={'mb-2 d-inline-block'}>Shows</h3>
+                        <h4 className={'d-inline-block ml-1'}>(# episodes)</h4>
+                    </div>
+                    <div className={'text-left list-group overflow-auto'} style={{ maxHeight: '400px' }}>
+                        {episodeResults.results.map(renderPossibleShowMatches)}
+                    </div>
                 </div>
-                <div className={'text-left list-group overflow-auto'} style={{ maxHeight: '400px' }}>
-                    {episodeResults.results.map(renderPossibleShowMatches)}
+                <div className={'col-6'}>
+                    <div className={'d-xs-block d-sm-none'}>
+                        <h4 className={'mb-2'}>Episodes</h4>
+                    </div>
+                    <div className={'d-xs-none d-sm-block'}>
+                        <h3 className={'mb-2'}>Episodes</h3>
+                    </div>
+                    {renderLastWatchedEpisodeText()}
+                    <div className={'text-left list-group overflow-auto'} style={{ maxHeight: '400px' }}>
+                        {selectedShow != null && episodeResults.results[selectedShow].episodes.map(renderEpisodesForSelectedShow)}
+                    </div>
                 </div>
             </div>
-            <div className={'col-6'}>
-                <div className={'d-xs-block d-sm-none'}>
-                    <h4 className={'mb-2'}>Episodes</h4>
-                </div>
-                <div className={'d-xs-none d-sm-block'}>
-                    <h3 className={'mb-2'}>Episodes</h3>
-                </div>
-                {renderLastWatchedEpisodeText()}
-                <div className={'text-left list-group overflow-auto'} style={{ maxHeight: '400px' }}>
-                    {selectedShow != null && episodeResults.results[selectedShow].episodes.map(renderEpisodesForSelectedShow)}
-                </div>
-            </div>
-        </div>
-    );
+        );
+    };
 
     const tabs = [
         {
