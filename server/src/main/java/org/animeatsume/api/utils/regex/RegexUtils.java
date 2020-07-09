@@ -83,4 +83,8 @@ public class RegexUtils {
     public static String strip(String str) {
         return str.replaceAll("^\\s+", "").replaceAll("\\s+$", "");
     }
+
+    public static String removeNonAlphanumericChars(String str) {
+        return str.replaceAll("[^a-zA-Z0-9 -]", "");
+    }
 }
