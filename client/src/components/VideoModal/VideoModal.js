@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import Modal from 'components/ui/Modal';
 import Video from 'components/ui/Video';
@@ -14,6 +14,7 @@ function VideoModal(props) {
     const [ captchaOptions, setCaptchaOptions ] = useState([]);
     const [ captchaAnswers, setCaptchaAnswers ] = useState([]);
     const [ videoOptions, setVideoOptions ] = useState([]);
+    const modalRef = useRef(null);
 
     const isDisplayingVideo = videoOptions.length > 0;
 
@@ -97,6 +98,8 @@ function VideoModal(props) {
         } else {
             setCaptchaAnswers([]);
         }
+
+        modalRef.current.scrollTo(0, 0);
     };
 
     useEffect(() => {
@@ -178,10 +181,12 @@ function VideoModal(props) {
 
     return (
         <Modal
+            className={'scroll-smooth'}
             escapeClosesModal={!isDisplayingVideo}
             show={props.show}
             title={renderedTitle}
             onClose={handleClose}
+            forwardRef={modalRef}
         >
             <div
                 className={`overflow-auto ${showSpinner ? 'd-flex justify-content-center align-items-center' : ''}`}
