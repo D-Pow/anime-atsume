@@ -473,8 +473,7 @@ public class KissanimeRuService {
 
         String episodePageHtml = response.getBody();
 
-        String videoIframeSrcRegex = "(<iframe[^>]+my_video_1[^>]+src=[\"'])([^\"']+)";
-        String videoHostUrl = RegexUtils.getFirstMatchGroups(videoIframeSrcRegex, episodePageHtml, Pattern.CASE_INSENSITIVE).get(2);
+        String videoHostUrl = HtmlParser.getIframeSrc(episodePageHtml);
 
         return new KissanimeVideoHostResponse(videoHostUrl, null);
     }
