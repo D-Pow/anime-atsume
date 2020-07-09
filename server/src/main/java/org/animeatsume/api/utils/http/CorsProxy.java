@@ -1,10 +1,7 @@
 package org.animeatsume.api.utils.http;
 
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
+import org.springframework.http.converter.FormHttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
@@ -31,6 +28,10 @@ public class CorsProxy {
 
         Class<?> responseClass = responseIsText ? String.class : Object.class;
         RestTemplate restTemplate = Requests.getNoFollowRedirectsRestTemplate();
+
+        // Add support for form-data requests and Map<String,String> responses
+        Requests.addAcceptableMediaTypes(restTemplate, MediaType.APPLICATION_FORM_URLENCODED);
+        restTemplate.getMessageConverters().add(new FormHttpMessageConverter());
 
         ResponseEntity<?> response = Requests.doRequestWithStringFallback(restTemplate, url, method, corsEntity, responseClass);
         Object responseBody = response.getBody();

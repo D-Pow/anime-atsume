@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.net.URI;
+import java.util.Map;
 
 @RestController
 public class ApplicationApi {
@@ -25,13 +26,26 @@ public class ApplicationApi {
     NovelPlanetService novelPlanetService;
 
     @CrossOrigin
-    @GetMapping("/corsProxy")
+    @GetMapping(value = "/corsProxy", consumes = MediaType.ALL_VALUE)
     public ResponseEntity<?> getCorsRequest(
         @RequestParam("url") URI url,
         @RequestHeader HttpHeaders requestHeaders,
         HttpServletRequest request
     ) {
         return postCorsRequest(null, url, requestHeaders, request);
+    }
+
+    @CrossOrigin
+    @PostMapping(value = "/corsProxy", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    public ResponseEntity<?> postCorsRequestWithFormData(
+        @RequestParam Map<String, String> body,
+        @RequestParam("url") URI url,
+        @RequestHeader HttpHeaders requestHeaders,
+        HttpServletRequest request
+    ) {
+        body.remove("url");
+
+        return postCorsRequest(body, url, requestHeaders, request);
     }
 
     @CrossOrigin
