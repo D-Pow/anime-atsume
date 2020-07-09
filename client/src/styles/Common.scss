@@ -189,6 +189,10 @@ input.text-white::placeholder, textarea.text-white::placeholder {
   border-color: inherit !important;
 }
 
+.scroll-smooth {
+  scroll-behavior: smooth;
+}
+
 @import "~bootstrap/scss/bootstrap";
 
 :export {
