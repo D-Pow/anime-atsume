@@ -159,7 +159,7 @@ function Show(props) {
                     style={{ maxWidth: '95%' }}
                 />
             </div>
-            <div className={'col-sm-12 col-lg-8 d-flex'}>
+            <div className={'col-sm-12 col-lg-8 d-flex justify-content-center'}>
                 <div className={'text-center'}>
                     <div className={'row mb-3'}>
                         <div className={'col'}>
