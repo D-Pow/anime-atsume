@@ -1,6 +1,8 @@
 package org.animeatsume;
 
+import org.animeatsume.api.controller.HiMoviesController;
 import org.animeatsume.api.controller.KissanimeRuController;
+import org.animeatsume.api.model.himovies.HiMoviesSearchResponse;
 import org.animeatsume.api.service.NovelPlanetService;
 import org.animeatsume.api.model.*;
 import org.animeatsume.api.utils.http.CorsProxy;
@@ -23,7 +25,7 @@ public class ApplicationApi {
     KissanimeRuController kissanimeRuController;
 
     @Autowired
-    NovelPlanetService novelPlanetService;
+    HiMoviesController hiMoviesController;
 
     @CrossOrigin
     @GetMapping(value = "/corsProxy", consumes = MediaType.ALL_VALUE)
@@ -122,5 +124,11 @@ public class ApplicationApi {
     @GetMapping(value = "/image/{id}", produces = { MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_PNG_VALUE })
     public ResponseEntity<Resource> getKissanimeCaptchaImage(@PathVariable("id") String imageId) {
         return kissanimeRuController.getProxiedKissanimeCaptchaImage(imageId);
+    }
+
+    @CrossOrigin
+    @PostMapping("/searchHiMovies")
+    public ResponseEntity<HiMoviesSearchResponse> searchHiMovies(@RequestBody TitleSearchRequest titleSearchRequest) {
+        return hiMoviesController.searchHiMovies(titleSearchRequest);
     }
 }
