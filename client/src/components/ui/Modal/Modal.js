@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { useRootClose, useBlockDocumentScrolling } from 'utils/Hooks';
 
 function Modal({
+    className,
     title,
     children,
     footer,
@@ -12,7 +13,8 @@ function Modal({
     preventDocumentScrolling,
     show,
     showCloseButton,
-    onClose
+    onClose,
+    forwardRef
 }) {
     const [ hideMomentarily, setHideMomentarily ] = useState(false);
     const [ rootWasClosed, resetRootClosed ] = useRootClose(
@@ -68,7 +70,7 @@ function Modal({
             }}
         >
             <div className={'modal-dialog modal-dialog-centered width-fit'} style={{ maxWidth: '90vw' }}>
-                <div className={'modal-content overflow-auto'} style={{ maxHeight: '90vh' }}>
+                <div className={'modal-content overflow-auto ' + className} style={{ maxHeight: '90vh' }} ref={forwardRef}>
 
                     <div className={'modal-header'}>
                         <div className={'modal-title'}>
@@ -102,6 +104,7 @@ function Modal({
 }
 
 Modal.propTypes = {
+    className: PropTypes.string,
     title: PropTypes.node,
     children: PropTypes.node,
     footer: PropTypes.node,
@@ -111,10 +114,12 @@ Modal.propTypes = {
     preventDocumentScrolling: PropTypes.bool,
     show: PropTypes.bool,
     showCloseButton: PropTypes.bool,
-    onClose: PropTypes.func
+    onClose: PropTypes.func,
+    forwardRef: PropTypes.object
 };
 
 Modal.defaultProps = {
+    className: '',
     title: '',
     children: '',
     footer: '',
