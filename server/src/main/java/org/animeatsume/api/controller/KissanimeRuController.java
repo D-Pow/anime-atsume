@@ -79,18 +79,22 @@ public class KissanimeRuController {
         String videoHostUrl = videoHost.getVideoHostUrl();
         Object body = videoHost;
 
-        if (videoHostUrl != null && !videoHostUrl.isEmpty() && videoHostUrl.contains(NovelPlanetService.DOMAIN)) {
-            NovelPlanetSourceResponse videoSources = getVideoSourcesForNovelPlanetHost(videoHostUrl);
+        if (videoHostUrl != null && !videoHostUrl.isEmpty()) {
+            if (videoHostUrl.contains(NovelPlanetService.DOMAIN)) {
+                NovelPlanetSourceResponse videoSources = getVideoSourcesForNovelPlanetHost(videoHostUrl);
 
-            if (!downloadAllResolutions) {
-                novelPlanetService.removeLowQualityVideos(videoSources);
+                if (!downloadAllResolutions) {
+                    novelPlanetService.removeLowQualityVideos(videoSources);
+                }
+
+                if (downloadVideos) {
+                    initiateEpisodeVideoDownloads(request.getEpisodeUrl(), videoSources);
+                }
+
+                body = videoSources;
+            } else {
+                // TODO return iframe URL and inform user the scraper for said host hasn't been made yet
             }
-
-            if (downloadVideos) {
-                initiateEpisodeVideoDownloads(request.getEpisodeUrl(), videoSources);
-            }
-
-            body = videoSources;
         }
 
         return ResponseEntity
