@@ -20,6 +20,8 @@ public class HiMoviesController {
     public ResponseEntity<HiMoviesSearchResponse> searchHiMovies(TitleSearchRequest request) {
         request.setTitle(RegexUtils.removeNonAlphanumericChars(request.getTitle()));
 
+        hiMoviesService.getMp4FileFromUrl("https://www2.himovies.to/watch-movie/how-to-train-your-dragon-19703.2618738");
+
         return hiMoviesService.searchHiMovies(request.getTitle());
     }
 }
