@@ -1,5 +1,5 @@
 {
-  "short_name": "anime-atsume",
+  "short_name": "ア集",
   "name": "Anime Atsume",
   "icons": [
     {
@@ -19,8 +19,8 @@
     }
   ],
   "start_url": "/",
-  "scope": "../",
+  "scope": "/",
   "display": "standalone",
-  "theme_color": "#3800FF",
-  "background_color": "#3800FF"
+  "theme_color": "#007bff",
+  "background_color": "#007bff"
 }
