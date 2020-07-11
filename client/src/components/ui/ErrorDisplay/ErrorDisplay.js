@@ -9,7 +9,7 @@ function ErrorDisplay(props) {
     return (
         <div className={`${props.className} ${props.fullScreen ? 'full-screen-minus-scrollbar' : ''}`}>
             <div className={props.fullScreen ? 'absolute-center' : ''}>
-                <h3 className={'mr-1'}>Sorry something went wrong.</h3>
+                <h3 className={'mr-1'}>Sorry, something went wrong.</h3>
                 <h3>{props.suggestion}</h3>
             </div>
         </div>
