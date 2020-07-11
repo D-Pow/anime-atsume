@@ -14,6 +14,7 @@ function VideoModal(props) {
     const [ captchaOptions, setCaptchaOptions ] = useState([]);
     const [ captchaAnswers, setCaptchaAnswers ] = useState([]);
     const [ videoOptions, setVideoOptions ] = useState([]);
+    const [ captchaImagesLoaded, setCaptchaImagesLoaded ] = useState(0);
     const modalRef = useRef(null);
 
     const isDisplayingVideo = videoOptions.length > 0;
@@ -23,6 +24,7 @@ function VideoModal(props) {
         setCaptchaOptions([]);
         setCaptchaAnswers([]);
         setVideoOptions([]);
+        setCaptchaImagesLoaded(0);
     };
 
     const handleClose = () => {
@@ -102,6 +104,10 @@ function VideoModal(props) {
         modalRef.current.scrollTo(0, 0);
     };
 
+    const incrementCaptchaImagesLoaded = () => {
+        setCaptchaImagesLoaded(prevNumLoaded => prevNumLoaded + 1);
+    };
+
     useEffect(() => {
         if (props.show
             && props.episodeUrl
@@ -145,9 +151,11 @@ function VideoModal(props) {
                         }
                         src={getImageSrcPath(imageId)}
                         onClick={() => handleImageSelection(formId)}
+                        onLoad={incrementCaptchaImagesLoaded}
                         alt={'failed to load. sorry'}
                     />
                     {i % 2 === 0 ? '' : (<React.Fragment><br/><br/></React.Fragment>)}
+                    <Spinner show={captchaImagesLoaded !== captchaOptions.length} />
                 </React.Fragment>
             ))}
         </React.Fragment>
