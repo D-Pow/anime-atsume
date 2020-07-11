@@ -8,24 +8,34 @@ import { searchForEpisodeHost } from 'services/EpisodeHostSearchService';
 import { getImageSrcPath, getVideoSrcPath, getVideoNameDataFromUrl } from 'services/Urls';
 
 function VideoModal(props) {
-    const [ hasError, setHasError ] = useState(false);
-    const [ showSpinner, setShowSpinner ] = useState(false);
-    const [ captchaPrompts, setCaptchaPrompts ] = useState([]);
-    const [ captchaOptions, setCaptchaOptions ] = useState([]);
-    const [ captchaAnswers, setCaptchaAnswers ] = useState([]);
-    const [ videoOptions, setVideoOptions ] = useState([]);
-    const [ captchaImagesLoaded, setCaptchaImagesLoaded ] = useState(0);
+    const defaultStateValues = {
+        hasError: false,
+        showSpinner: false,
+        captchaPrompts: [],
+        captchaOptions: [],
+        captchaAnswers: [],
+        videoOptions: [],
+        captchaImagesLoaded: 0
+    };
+
+    const [ hasError, setHasError ] = useState(defaultStateValues.hasError);
+    const [ showSpinner, setShowSpinner ] = useState(defaultStateValues.showSpinner);
+    const [ captchaPrompts, setCaptchaPrompts ] = useState(defaultStateValues.captchaPrompts);
+    const [ captchaOptions, setCaptchaOptions ] = useState(defaultStateValues.captchaOptions);
+    const [ captchaAnswers, setCaptchaAnswers ] = useState(defaultStateValues.captchaAnswers);
+    const [ videoOptions, setVideoOptions ] = useState(defaultStateValues.videoOptions);
+    const [ captchaImagesLoaded, setCaptchaImagesLoaded ] = useState(defaultStateValues.captchaImagesLoaded);
     const modalRef = useRef(null);
 
     const isDisplayingVideo = videoOptions.length > 0;
 
     const resetState = () => {
-        setHasError(false);
-        setCaptchaPrompts([]);
-        setCaptchaOptions([]);
-        setCaptchaAnswers([]);
-        setVideoOptions([]);
-        setCaptchaImagesLoaded(0);
+        setHasError(defaultStateValues.hasError);
+        setCaptchaPrompts(defaultStateValues.captchaPrompts);
+        setCaptchaOptions(defaultStateValues.captchaOptions);
+        setCaptchaAnswers(defaultStateValues.captchaAnswers);
+        setVideoOptions(defaultStateValues.videoOptions);
+        setCaptchaImagesLoaded(defaultStateValues.captchaImagesLoaded);
     };
 
     const handleClose = () => {
