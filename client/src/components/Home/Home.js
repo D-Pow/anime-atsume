@@ -14,10 +14,10 @@ function Home() {
     const [ kitsuResults, setKitsuResults ] = useState(null);
     const [ showSpinner, setShowSpinner ] = useState(false);
 
-    const handleSubmit = async selectedDropdownText => {
+    const handleSubmit = async () => {
         setShowSpinner(true);
-        const searchQuery = selectedDropdownText || typedText;
-        const response = await fetchKitsuTitleSearch(searchQuery.toLowerCase());
+        const searchQuery = typedText.toLowerCase();
+        const response = await fetchKitsuTitleSearch(searchQuery);
         setKitsuResults(response);
         setShowSpinner(false);
     };
