@@ -120,6 +120,10 @@ function VideoModal(props) {
     };
 
     useEffect(() => {
+        // useEffect is necessary instead of calling submitAnswers() in handleImageSelection()
+        // because state updates are async and not guaranteed to take effect as soon as setState()
+        // is called, and because the useState() hook doesn't have a callback function like
+        // class components' setState() does
         if (props.show
             && props.episodeUrl
             && (captchaAnswers.length > 0)
