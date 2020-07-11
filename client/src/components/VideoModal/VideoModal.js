@@ -15,7 +15,7 @@ function VideoModal(props) {
         captchaOptions: [],
         captchaAnswers: [],
         videoOptions: [],
-        captchaImagesLoaded: 0
+        captchaImagesLoaded: new Set()
     };
 
     const [ hasError, setHasError ] = useState(defaultStateValues.hasError);
@@ -115,8 +115,12 @@ function VideoModal(props) {
         modalRef.current.scrollTo(0, 0);
     };
 
-    const incrementCaptchaImagesLoaded = () => {
-        setCaptchaImagesLoaded(prevNumLoaded => prevNumLoaded + 1);
+    const handleCaptchaImageLoaded = imageIndex => {
+        setCaptchaImagesLoaded(prevImagesLoaded => {
+            const imagesLoaded = new Set(prevImagesLoaded);
+            imagesLoaded.add(imageIndex);
+            return imagesLoaded;
+        });
     };
 
     useEffect(() => {
@@ -160,11 +164,11 @@ function VideoModal(props) {
                         }
                         src={getImageSrcPath(imageId)}
                         onClick={() => handleImageSelection(formId)}
-                        onLoad={incrementCaptchaImagesLoaded}
+                        onLoad={() => handleCaptchaImageLoaded(i)}
                         alt={'failed to load. sorry'}
                     />
                     {i % 2 === 0 ? '' : (<React.Fragment><br/><br/></React.Fragment>)}
-                    <Spinner show={captchaImagesLoaded !== captchaOptions.length} />
+                    <Spinner show={!captchaImagesLoaded.has(i)} />
                 </React.Fragment>
             ))}
         </React.Fragment>
