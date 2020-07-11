@@ -92,8 +92,6 @@ public class KissanimeRuController {
                 }
 
                 body = videoSources;
-            } else {
-                body = new Anchor(videoHostUrl, null);
             }
         }
 

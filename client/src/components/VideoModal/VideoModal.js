@@ -58,7 +58,7 @@ function VideoModal(props) {
                 throw `Got HTTP status code ${res.status} from server. Error: ${res.error}.`;
             }
 
-            const { data, captchaContent, url } = res;
+            const { data, captchaContent, videoHostUrl } = res;
 
             if (captchaContent) {
                 setCaptchaPrompts(captchaContent.promptTexts);
@@ -69,8 +69,8 @@ function VideoModal(props) {
                 setVideoOptions(data);
             }
 
-            if (url) {
-                setVideoHostUrl(url);
+            if (videoHostUrl) {
+                setVideoHostUrl(videoHostUrl);
             }
 
             setShowSpinner(false);
