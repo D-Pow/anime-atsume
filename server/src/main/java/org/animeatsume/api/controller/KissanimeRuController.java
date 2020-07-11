@@ -93,7 +93,7 @@ public class KissanimeRuController {
 
                 body = videoSources;
             } else {
-                // TODO return iframe URL and inform user the scraper for said host hasn't been made yet
+                body = new Anchor(videoHostUrl, null);
             }
         }
 
