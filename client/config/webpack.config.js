@@ -19,7 +19,7 @@ const indexHtmlTitle = 'Anime Atsume';
 const indexHtmlMetaTagData = {
     description: packageJson.description,
     keywords: packageJson.keywords.join(', '),
-    'theme-color': '#3800FF'
+    'theme-color': '#007bff'
 };
 
 // output path for webpack build on machine, not relative paths for index.html
