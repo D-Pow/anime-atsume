@@ -148,7 +148,7 @@ public class KissanimeRuController {
     private KissanimeVideoHostResponse getCaptchaContentWithImageHash(String kissanimeEpisodeUrl) {
         KissanimeVideoHostResponse response = kissanimeService.getBypassAreYouHumanPromptContent(kissanimeEpisodeUrl);
         List<CompletableFuture<String>> imageHashes = response.getCaptchaContent().getImgIdsAndSrcs().stream()
-            .map(captchaAttempt -> kissanimeService.getCaptchaImageHash(captchaAttempt))
+            .map(captchaAttempt -> kissanimeService.setCaptchaImageHash(captchaAttempt))
             .collect(Collectors.toList());
 
         ObjectUtils.getAllCompletableFutureResults(imageHashes);

@@ -323,7 +323,7 @@ public class KissanimeRuService {
     }
 
     @Async
-    public CompletableFuture<String> getCaptchaImageHash(CaptchaAttempt captchaAttempt) {
+    public CompletableFuture<String> setCaptchaImageHash(CaptchaAttempt captchaAttempt) {
         String imageId = captchaAttempt.getImageId();
         ResponseEntity<Resource> kissanimeCaptchaImage = getKissanimeCaptchaImage(imageId);
         Resource imageResource = kissanimeCaptchaImage.getBody();
