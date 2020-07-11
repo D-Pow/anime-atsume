@@ -20,7 +20,7 @@ ErrorDisplay.propTypes = {
     className: PropTypes.string,
     fullScreen: PropTypes.bool,
     show: PropTypes.bool,
-    suggestion: PropTypes.string
+    suggestion: PropTypes.node
 };
 
 ErrorDisplay.defaultProps = {
