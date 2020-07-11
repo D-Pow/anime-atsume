@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 
 function Spinner(props) {
     if (!props.show) {
-        return;
+        return '';
     }
 
     let typeCls;
