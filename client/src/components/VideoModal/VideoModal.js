@@ -191,15 +191,19 @@ function VideoModal(props) {
         );
     };
 
-    const renderedBody = (props.show && props.episodeUrl)
-        ? hasError
-            ? <ErrorDisplay suggestion={'Try closing and re-opening the modal.'} show={hasError} />
-            : showSpinner
-                ? <Spinner className={'w-40 h-40'} show={true} />
-                : captchaPrompts.length
-                    ? renderCaptchaImages()
-                    : renderVideo()
-        : '';
+    let renderedBody = '';
+
+    if (props.show && props.episodeUrl) {
+        if (hasError) {
+            renderedBody = <ErrorDisplay suggestion={'Try closing and re-opening the modal.'} show={hasError} />;
+        } else if (showSpinner) {
+            renderedBody = <Spinner className={'w-40 h-40'} show={true} />;
+        } else if (captchaPrompts.length) {
+            renderedBody = renderCaptchaImages();
+        } else if (isDisplayingVideo) {
+            renderedBody = renderVideo();
+        }
+    }
 
     return (
         <Modal
