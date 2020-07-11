@@ -287,7 +287,7 @@ function Show(props) {
                 {...selectedEpisode}
                 show={selectedEpisode != null}
                 onClose={() => setSelectedEpisode(null)}
-                onVideoLoad={handleVideoLoad}
+                videoElementProps={{ onLoadStart: handleVideoLoad }}
             />
         </React.Fragment>
     );
