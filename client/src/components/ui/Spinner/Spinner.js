@@ -18,18 +18,18 @@ function Spinner(props) {
             break;
     }
 
-    const fullScreenCls = props.fullScreen ? 'w-25 h-25 absolute-center' : '';
+    const fullScreenCls = props.fullScreen ? 'w-50 h-50' : '';
     const spinnerCls = `spin-infinite duration-12 ${typeCls} ${props.className} ${fullScreenCls}`;
 
     const renderedSpinner = (
-        <span>
+        <span className={'text-center'}>
             <div className={spinnerCls} />
         </span>
     );
 
     if (props.fullScreen) {
         return (
-            <div className={'full-screen-minus-scrollbar'}>
+            <div className={'w-100 d-flex justify-content-center align-items-center'} style={{ height: '100vh' }}>
                 {renderedSpinner}
             </div>
         );

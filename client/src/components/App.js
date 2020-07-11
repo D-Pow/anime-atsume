@@ -42,7 +42,7 @@ const routes = [
 function App() {
     return (
         <React.Suspense
-            fallback={<Spinner className={'w-25 h-25 absolute-center'} show={true} />}
+            fallback={<Spinner fullScreen={true} show={true} />}
         >
             <div className={'app container-fluid text-center'}>
                 <div className={'col-12'}>
