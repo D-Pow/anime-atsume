@@ -1,5 +1,0 @@
-Front-end
-
-Back-end
-    - Cron job to delete videos/ dir
-    - Way to download video files
