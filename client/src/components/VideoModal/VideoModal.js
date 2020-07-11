@@ -20,6 +20,7 @@ function VideoModal(props) {
     const isDisplayingVideo = videoOptions.length > 0;
 
     const resetState = () => {
+        setHasError(false);
         setCaptchaPrompts([]);
         setCaptchaOptions([]);
         setCaptchaAnswers([]);
