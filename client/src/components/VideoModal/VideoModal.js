@@ -94,10 +94,10 @@ function VideoModal(props) {
     };
 
     const addCaptchaAnswer = formId => {
-        setCaptchaAnswers(prevState => {
-            const previousAnswers = [...prevState];
-            previousAnswers.push(formId);
-            return previousAnswers;
+        setCaptchaAnswers(prevCaptchaAnswers => {
+            const newCapchaAnswers = [...prevCaptchaAnswers];
+            newCapchaAnswers.push(formId);
+            return newCapchaAnswers;
         });
     };
 
