@@ -4,6 +4,7 @@ import Modal from 'components/ui/Modal';
 import Video from 'components/ui/Video';
 import Spinner from 'components/ui/Spinner';
 import ErrorDisplay from 'components/ui/ErrorDisplay';
+import Anchor from 'components/ui/Anchor';
 import { searchForEpisodeHost } from 'services/EpisodeHostSearchService';
 import { getImageSrcPath, getVideoSrcPath, getVideoNameDataFromUrl } from 'services/Urls';
 
@@ -15,7 +16,8 @@ function VideoModal(props) {
         captchaOptions: [],
         captchaAnswers: [],
         videoOptions: [],
-        captchaImagesLoaded: new Set()
+        captchaImagesLoaded: new Set(),
+        videoHostUrl: null
     };
 
     const [ hasError, setHasError ] = useState(defaultStateValues.hasError);
@@ -25,6 +27,7 @@ function VideoModal(props) {
     const [ captchaAnswers, setCaptchaAnswers ] = useState(defaultStateValues.captchaAnswers);
     const [ videoOptions, setVideoOptions ] = useState(defaultStateValues.videoOptions);
     const [ captchaImagesLoaded, setCaptchaImagesLoaded ] = useState(defaultStateValues.captchaImagesLoaded);
+    const [ videoHostUrl, setVideoHostUrl ] = useState(defaultStateValues.videoHostUrl);
     const modalRef = useRef(null);
 
     const isDisplayingVideo = videoOptions.length > 0;
@@ -36,6 +39,7 @@ function VideoModal(props) {
         setCaptchaAnswers(defaultStateValues.captchaAnswers);
         setVideoOptions(defaultStateValues.videoOptions);
         setCaptchaImagesLoaded(defaultStateValues.captchaImagesLoaded);
+        setVideoHostUrl(defaultStateValues.videoHostUrl);
     };
 
     const handleClose = () => {
@@ -54,7 +58,7 @@ function VideoModal(props) {
                 throw `Got HTTP status code ${res.status} from server. Error: ${res.error}.`;
             }
 
-            const { data, captchaContent } = res;
+            const { data, captchaContent, url } = res;
 
             if (captchaContent) {
                 setCaptchaPrompts(captchaContent.promptTexts);
@@ -63,6 +67,10 @@ function VideoModal(props) {
 
             if (data) {
                 setVideoOptions(data);
+            }
+
+            if (url) {
+                setVideoHostUrl(url);
             }
 
             setShowSpinner(false);
@@ -202,6 +210,19 @@ function VideoModal(props) {
             renderedBody = renderCaptchaImages();
         } else if (isDisplayingVideo) {
             renderedBody = renderVideo();
+        } else if (videoHostUrl != null) {
+            renderedBody = (
+                <ErrorDisplay
+                    suggestion={(
+                        <React.Fragment>
+                            <div>The scraper for this host has not been made yet.</div>
+                            <div>You may watch the video at:</div>
+                            <Anchor className={'d-block'} href={videoHostUrl}>{videoHostUrl}</Anchor>
+                        </React.Fragment>
+                    )}
+                    show={videoHostUrl != null}
+                />
+            );
         }
     }
 
