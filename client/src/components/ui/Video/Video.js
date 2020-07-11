@@ -88,7 +88,7 @@ function Video(props) {
     }, [ videoRef ]);
 
     return (
-        <video className={props.className} controls autoPlay ref={videoRef}>
+        <video className={props.className} controls autoPlay ref={videoRef} {...props.videoElementProps}>
             <source src={props.src} type={props.type} />
         </video>
     );
@@ -97,13 +97,15 @@ function Video(props) {
 Video.propTypes = {
     className: PropTypes.string,
     src: PropTypes.string,
-    type: PropTypes.string
+    type: PropTypes.string,
+    videoElementProps: PropTypes.object
 };
 
 Video.defaultProps = {
     className: '',
     src: '',
-    type: 'video/mp4'
+    type: 'video/mp4',
+    videoElementProps: {}
 };
 
 export default Video;
