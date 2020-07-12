@@ -32,6 +32,8 @@ Notes:
     * Delete image: `docker rmi <image_id>`
 
 ### Deploying to Heroku
+* General
+    * If you want heroku to log your process' memory usage stats, run `heroku labs:enable log-runtime-metrics` and re-deploy. Disable with `labs:disable`.
 * Heroku doesn't know how to handle nested folders.
     * Since the front-end is built to the back-end's resources/ directory,
       we need only deploy the server/ folder.
