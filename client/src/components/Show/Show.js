@@ -171,6 +171,10 @@ function Show(props) {
         });
     };
 
+    if (hasError) {
+        return <ErrorDisplay fullScreen={true} show={hasError} />;
+    }
+
     if (!kitsuResult || !episodeResults) {
         return (
             <Spinner fullScreen={true} show={true} />
@@ -332,10 +336,6 @@ function Show(props) {
             </ul>
         </nav>
     );
-
-    if (hasError) {
-        return <ErrorDisplay fullScreen={true} show={hasError} />;
-    }
 
     return (
         <React.Fragment>
