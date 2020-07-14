@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useRootClose, useBlockDocumentScrolling } from 'utils/Hooks';
+import { isSafariBrowser } from 'utils/BrowserIdentification';
 
 function Modal({
     className,
@@ -72,7 +73,7 @@ function Modal({
             <div className={'modal-dialog modal-dialog-centered width-fit'} style={{ maxWidth: '90vw' }}>
                 <div className={'modal-content overflow-auto ' + className} style={{ maxHeight: '90vh' }} ref={forwardRef}>
 
-                    <div className={'modal-header'}>
+                    <div className={'modal-header'} style={isSafariBrowser() ? { display: '-webkit-box' } : {}}>
                         <div className={'modal-title'}>
                             {renderedTitle}
                         </div>

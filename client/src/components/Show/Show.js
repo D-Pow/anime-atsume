@@ -5,6 +5,7 @@ import { searchForShow } from 'services/ShowSearchService';
 import { getMyAnimeListSearchUrl } from 'services/Urls';
 import { useStorage } from 'utils/Hooks';
 import { debounce } from 'utils/Events';
+import { isSafariBrowser } from 'utils/BrowserIdentification';
 import Spinner from 'components/ui/Spinner';
 import VideoModal from 'components/VideoModal';
 import Anchor from 'components/ui/Anchor';
@@ -146,10 +147,11 @@ function Show(props) {
                     </span>
                 </h4>
             );
+            const Button = isSafariBrowser() ? 'div' : 'button';
 
             return (
-                <button
-                    className={`list-group-item remove-focus-highlight ${selectedShow === i ? 'active' : ''}`}
+                <Button
+                    className={`btn list-group-item remove-focus-highlight ${selectedShow === i ? 'active' : ''}`}
                     id={getIdForSelectableElement(i, showTitle)}
                     key={i}
                     onClick={() => setSelectedShow(i)}
@@ -166,7 +168,7 @@ function Show(props) {
                         </h3>
                         {renderedEpisodeCountBadge}
                     </div>
-                </button>
+                </Button>
             );
         });
     };
