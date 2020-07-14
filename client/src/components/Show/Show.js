@@ -94,9 +94,26 @@ function Show(props) {
         element.scrollIntoView({ block: 'center', inline: 'center' });
     }, 500);
 
+    const scrollShowIntoView = debounce(elementId => {
+        /*
+         * Chrome cannot handle multiple scrollIntoView() calls at once
+         * and will cancel the previous calls when a new call is made.
+         * Thus, manually set the scroll amount to immediately scroll
+         * to the show, and give the smooth scroll animation to the
+         * episode scroll function.
+         * Requires `scroll-behavior: auto`.
+         */
+        const element = document.getElementById(elementId);
+        element.parentElement.scrollTop = element.offsetTop - element.offsetHeight
+    }, 500);
+
     function handleLastWatchedEpisodeClick(showIndex, episodeTitle) {
+        const showElementId = getIdForSelectableElement(showIndex, getShowTitle(showIndex));
+        const episodeElementId = getIdForSelectableElement(showIndex, episodeTitle);
+
         setSelectedShow(showIndex);
-        scrollEpisodeIntoView(getIdForSelectableElement(showIndex, episodeTitle));
+        scrollShowIntoView(showElementId);
+        scrollEpisodeIntoView(episodeElementId);
     }
 
     const renderEpisodesForSelectedShow = () => {
@@ -133,6 +150,7 @@ function Show(props) {
             return (
                 <button
                     className={`list-group-item remove-focus-highlight ${selectedShow === i ? 'active' : ''}`}
+                    id={getIdForSelectableElement(i, showTitle)}
                     key={i}
                     onClick={() => setSelectedShow(i)}
                 >
@@ -266,7 +284,7 @@ function Show(props) {
                         <h3 className={'mb-2 d-inline-block'}>Shows</h3>
                         <h4 className={'d-inline-block ml-1'}>(# episodes)</h4>
                     </div>
-                    <div className={'text-left list-group overflow-auto'} style={{ maxHeight: watchSectionScrollListsMaxHeight }}>
+                    <div className={'text-left list-group overflow-auto scroll-auto'} style={{ maxHeight: watchSectionScrollListsMaxHeight }}>
                         {renderPossibleShowMatches()}
                     </div>
                 </div>
