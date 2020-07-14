@@ -228,6 +228,7 @@ function VideoModal(props) {
 
     return (
         <Modal
+            className={showSpinner ? 'overflow-hidden' : ''}
             escapeClosesModal={!isDisplayingVideo}
             show={props.show}
             title={renderedTitle}
@@ -235,7 +236,7 @@ function VideoModal(props) {
             forwardRef={modalRef}
         >
             <div
-                className={`overflow-auto ${showSpinner ? 'd-flex justify-content-center align-items-center' : ''}`}
+                className={showSpinner ? 'd-flex justify-content-center align-items-center' : 'overflow-auto'}
                 style={{ minHeight: '200px' }}
             >
                 {renderedBody}
