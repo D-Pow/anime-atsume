@@ -187,6 +187,10 @@ input.text-white::placeholder, textarea.text-white::placeholder {
   scroll-behavior: smooth;
 }
 
+.scroll-auto {
+  scroll-behavior: auto;
+}
+
 @import "~bootstrap/scss/bootstrap";
 
 :export {
