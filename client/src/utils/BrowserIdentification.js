@@ -53,3 +53,7 @@ export function isMicrosoftBrowser(includeEdge = true) {
 
     return Boolean(navigator.userAgent.toLowerCase().match(new RegExp(browserRegex)));
 }
+
+export function isFirefoxBrowser() {
+    return navigator.userAgent.toLowerCase().includes('firefox');
+}
