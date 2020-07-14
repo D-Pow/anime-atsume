@@ -3,6 +3,10 @@
 @import "Fonts";
 @import "Grid";
 
+* {
+  @extend .scroll-smooth;
+}
+
 html, body, #root {
 
 }

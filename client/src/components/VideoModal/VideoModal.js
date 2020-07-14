@@ -228,7 +228,6 @@ function VideoModal(props) {
 
     return (
         <Modal
-            className={'scroll-smooth'}
             escapeClosesModal={!isDisplayingVideo}
             show={props.show}
             title={renderedTitle}
