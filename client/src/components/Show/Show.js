@@ -11,6 +11,7 @@ import ErrorDisplay from 'components/ui/ErrorDisplay';
 
 function Show(props) {
     const title = decodeURIComponent(props.title);
+    const watchSectionScrollListsMaxHeight = '400px';
 
     const [ hasError, setHasError ] = useState(false);
     const [ kitsuResult, setKitsuResult ] = useState(null);
@@ -209,7 +210,7 @@ function Show(props) {
                         <h3 className={'mb-2 d-inline-block'}>Shows</h3>
                         <h4 className={'d-inline-block ml-1'}>(# episodes)</h4>
                     </div>
-                    <div className={'text-left list-group overflow-auto'} style={{ maxHeight: '400px' }}>
+                    <div className={'text-left list-group overflow-auto'} style={{ maxHeight: watchSectionScrollListsMaxHeight }}>
                         {episodeResults.results.map(renderPossibleShowMatches)}
                     </div>
                 </div>
@@ -221,7 +222,7 @@ function Show(props) {
                         <h3 className={'mb-2'}>Episodes</h3>
                     </div>
                     {renderLastWatchedEpisodeText()}
-                    <div className={'text-left list-group overflow-auto'} style={{ maxHeight: '400px' }}>
+                    <div className={'text-left list-group overflow-auto'} style={{ maxHeight: watchSectionScrollListsMaxHeight }}>
                         {selectedShow != null && episodeResults.results[selectedShow].episodes.map(renderEpisodesForSelectedShow)}
                     </div>
                 </div>
