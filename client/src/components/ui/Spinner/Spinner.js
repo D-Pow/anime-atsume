@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { isFirefoxBrowser } from 'utils/BrowserIdentification';
 
 function Spinner(props) {
     if (!props.show) {
@@ -18,7 +19,11 @@ function Spinner(props) {
             break;
     }
 
-    const fullScreenCls = props.fullScreen ? 'w-50 h-50' : '';
+    const fullScreenCls = props.fullScreen
+        ? isFirefoxBrowser()
+            ? 'w-25 h-25'
+            : 'w-50 h-50'
+        : '';
     const spinnerCls = `spin-infinite duration-12 ${typeCls} ${props.className} ${fullScreenCls}`;
 
     const renderedSpinner = (
