@@ -56,6 +56,17 @@ function Show(props) {
     }, []);
 
     const getShowTitle = () => episodeResults.results[selectedShow].title;
+    const getAllShowsProgressForShowMatches = () => (
+        episodeResults.results
+            ? episodeResults.results
+                .map(({ title }, i) => ({
+                    episodeTitle: showsProgress[title],
+                    showTitle: title,
+                    showIndex: i
+                }))
+                .filter(showProgress => showProgress.episodeTitle != null)
+            : []
+    );
 
     function handleVideoLoad() {
         // update show progress in window storage
@@ -125,22 +136,18 @@ function Show(props) {
             return null;
         }
 
-        const renderedLastWatchedEpisodes = episodeResults.results
-            .map(({ title }, i) => {
-                const lastWatchedEpisodeForShow = showsProgress[title];
-
-                if (lastWatchedEpisodeForShow) {
-                    return (
-                        <div className={'row mb-1'} key={i}>
-                            <div className={'col-12'}>
-                                <span className={'h5 underline'}>{title}</span>
-                                <span className={'h5'}>: {lastWatchedEpisodeForShow}</span>
-                            </div>
-                        </div>
-                    );
-                }
-            })
-            .filter(exists => exists);
+        const renderedLastWatchedEpisodes = getAllShowsProgressForShowMatches()
+            .map(({ showTitle, showIndex, episodeTitle }) => (
+                <div className={'row mb-1'} key={showIndex}>
+                    <div className={'col-12'}>
+                        <span className={'h5'}>
+                            <span className={'underline'}>{showTitle}</span>
+                            :
+                        </span>
+                        <span className={'h5 ml-1'}>{episodeTitle}</span>
+                    </div>
+                </div>
+            ));
 
         if (renderedLastWatchedEpisodes.length) {
             return (
