@@ -80,49 +80,57 @@ function Show(props) {
         });
     }
 
-    const renderEpisodesForSelectedShow = ({ title: episodeTitle, url: episodeUrl }, i) => {
-        const isLastEpisodeWatched = showsProgress[getShowTitle()] === episodeTitle;
+    const renderEpisodesForSelectedShow = () => {
+        if (selectedShow == null) {
+            return;
+        }
 
-        return (
-            <a
-                className={`list-group-item cursor-pointer ${isLastEpisodeWatched ? 'active' : 'text-primary'}`}
-                key={i}
-                onClick={() => setSelectedEpisode({ episodeTitle, episodeUrl })}
-            >
-                {episodeTitle}
-            </a>
-        );
+        return episodeResults.results[selectedShow].episodes.map(({ title: episodeTitle, url: episodeUrl }, i) => {
+            const isLastEpisodeWatched = showsProgress[getShowTitle()] === episodeTitle;
+
+            return (
+                <a
+                    className={`list-group-item cursor-pointer ${isLastEpisodeWatched ? 'active' : 'text-primary'}`}
+                    key={i}
+                    onClick={() => setSelectedEpisode({ episodeTitle, episodeUrl })}
+                >
+                    {episodeTitle}
+                </a>
+            );
+        });
     };
 
-    const renderPossibleShowMatches = ({ title: showTitle, episodes: showEpisodes}, i) => {
-        const renderedEpisodeCountBadge = (
-            <h4>
-                <span className={`ml-1 d-none d-sm-block badge badge-pill badge-${selectedShow === i ? 'dark' : 'primary'}`}>
-                    {showEpisodes.length}
-                </span>
-            </h4>
-        );
+    const renderPossibleShowMatches = () => {
+        return episodeResults.results.map(({ title: showTitle, episodes: showEpisodes}, i) => {
+            const renderedEpisodeCountBadge = (
+                <h4>
+                    <span className={`ml-1 d-none d-sm-block badge badge-pill badge-${selectedShow === i ? 'dark' : 'primary'}`}>
+                        {showEpisodes.length}
+                    </span>
+                </h4>
+            );
 
-        return (
-            <button
-                className={`list-group-item remove-focus-highlight ${selectedShow === i ? 'active' : ''}`}
-                key={i}
-                onClick={() => setSelectedShow(i)}
-            >
-                <div className={'d-flex d-sm-none justify-content-between align-items-center'}>
-                    <h5 className={'mb-2'}>
-                        {showTitle}
-                    </h5>
-                    {renderedEpisodeCountBadge}
-                </div>
-                <div className={'d-none d-sm-flex justify-content-between align-items-center'}>
-                    <h3 className={'mb-2'}>
-                        {showTitle}
-                    </h3>
-                    {renderedEpisodeCountBadge}
-                </div>
-            </button>
-        );
+            return (
+                <button
+                    className={`list-group-item remove-focus-highlight ${selectedShow === i ? 'active' : ''}`}
+                    key={i}
+                    onClick={() => setSelectedShow(i)}
+                >
+                    <div className={'d-flex d-sm-none justify-content-between align-items-center'}>
+                        <h5 className={'mb-2'}>
+                            {showTitle}
+                        </h5>
+                        {renderedEpisodeCountBadge}
+                    </div>
+                    <div className={'d-none d-sm-flex justify-content-between align-items-center'}>
+                        <h3 className={'mb-2'}>
+                            {showTitle}
+                        </h3>
+                        {renderedEpisodeCountBadge}
+                    </div>
+                </button>
+            );
+        });
     };
 
     if (!kitsuResult || !episodeResults) {
@@ -234,7 +242,7 @@ function Show(props) {
                         <h4 className={'d-inline-block ml-1'}>(# episodes)</h4>
                     </div>
                     <div className={'text-left list-group overflow-auto'} style={{ maxHeight: watchSectionScrollListsMaxHeight }}>
-                        {episodeResults.results.map(renderPossibleShowMatches)}
+                        {renderPossibleShowMatches()}
                     </div>
                 </div>
                 <div className={'col-6'}>
@@ -245,7 +253,7 @@ function Show(props) {
                         <h3 className={'mb-2'}>Episodes</h3>
                     </div>
                     <div className={'text-left list-group overflow-auto'} style={{ maxHeight: watchSectionScrollListsMaxHeight }}>
-                        {selectedShow != null && episodeResults.results[selectedShow].episodes.map(renderEpisodesForSelectedShow)}
+                        {renderEpisodesForSelectedShow()}
                     </div>
                 </div>
             </div>
