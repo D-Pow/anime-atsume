@@ -68,7 +68,7 @@ function Show(props) {
                 .filter(showProgress => showProgress.episodeTitle != null)
             : []
     );
-    const getEpisodeAnchorId = (showIndex, episodeTitle) => `${showIndex}-${episodeTitle}`;
+    const getIdForSelectableElement = (showIndex, title) => `${showIndex}-${title}`;
 
     function handleVideoLoad() {
         // update show progress in window storage
@@ -96,7 +96,7 @@ function Show(props) {
 
     function handleLastWatchedEpisodeClick(showIndex, episodeTitle) {
         setSelectedShow(showIndex);
-        scrollEpisodeIntoView(getEpisodeAnchorId(showIndex, episodeTitle));
+        scrollEpisodeIntoView(getIdForSelectableElement(showIndex, episodeTitle));
     }
 
     const renderEpisodesForSelectedShow = () => {
@@ -110,7 +110,7 @@ function Show(props) {
             return (
                 <a
                     className={`list-group-item cursor-pointer ${isLastEpisodeWatched ? 'active' : 'text-primary'}`}
-                    id={getEpisodeAnchorId(selectedShow, episodeTitle)}
+                    id={getIdForSelectableElement(selectedShow, episodeTitle)}
                     key={i}
                     onClick={() => setSelectedEpisode({ episodeTitle, episodeUrl })}
                 >
