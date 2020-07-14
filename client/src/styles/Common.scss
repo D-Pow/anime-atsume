@@ -191,6 +191,17 @@ input.text-white::placeholder, textarea.text-white::placeholder {
   scroll-behavior: auto;
 }
 
+.fix-strange-z-index-scrollbars {
+  /*
+   * Fixes strange cases where scrollbars from elements
+   * underneath `position: absolute` elements still show
+   * their scrollbars through the absolute element on top
+   * of it.
+   * See: https://stackoverflow.com/a/60449150
+   */
+  transform: translate3d(0,0,0);
+}
+
 @import "~bootstrap/scss/bootstrap";
 
 :export {
