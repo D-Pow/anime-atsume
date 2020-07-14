@@ -4,6 +4,7 @@ import { fetchKitsuTitleSearch } from 'services/KitsuAnimeSearchService';
 import { searchForShow } from 'services/ShowSearchService';
 import { getMyAnimeListSearchUrl } from 'services/Urls';
 import { useStorage } from 'utils/Hooks';
+import { debounce } from 'utils/Events';
 import Spinner from 'components/ui/Spinner';
 import VideoModal from 'components/VideoModal';
 import Anchor from 'components/ui/Anchor';
@@ -67,6 +68,7 @@ function Show(props) {
                 .filter(showProgress => showProgress.episodeTitle != null)
             : []
     );
+    const getEpisodeAnchorId = (showIndex, episodeTitle) => `${showIndex}-${episodeTitle}`;
 
     function handleVideoLoad() {
         // update show progress in window storage
@@ -80,6 +82,23 @@ function Show(props) {
         });
     }
 
+    const scrollEpisodeIntoView = debounce(elementId => {
+        /*
+         * Cannot use React refs here because the list of episode
+         * links are dynamically updated and it's possible the show
+         * hasn't been selected yet. As such, it's possible the anchor
+         * element that the ref should be attached to hasn't been
+         * mounted yet and will be null.
+         */
+        const element = document.getElementById(elementId);
+        element.scrollIntoView({ block: 'center', inline: 'center' });
+    }, 500);
+
+    function handleLastWatchedEpisodeClick(showIndex, episodeTitle) {
+        setSelectedShow(showIndex);
+        scrollEpisodeIntoView(getEpisodeAnchorId(showIndex, episodeTitle));
+    }
+
     const renderEpisodesForSelectedShow = () => {
         if (selectedShow == null) {
             return;
@@ -91,6 +110,7 @@ function Show(props) {
             return (
                 <a
                     className={`list-group-item cursor-pointer ${isLastEpisodeWatched ? 'active' : 'text-primary'}`}
+                    id={getEpisodeAnchorId(selectedShow, episodeTitle)}
                     key={i}
                     onClick={() => setSelectedEpisode({ episodeTitle, episodeUrl })}
                 >
@@ -152,7 +172,12 @@ function Show(props) {
                             <span className={'underline'}>{showTitle}</span>
                             :
                         </span>
-                        <span className={'h5 ml-1'}>{episodeTitle}</span>
+                        <button
+                            className={'btn btn-link remove-focus-highlight border-0'}
+                            onClick={() => handleLastWatchedEpisodeClick(showIndex, episodeTitle)}
+                        >
+                            <h5 className={'m-0'}>{episodeTitle}</h5>
+                        </button>
                     </div>
                 </div>
             ));
