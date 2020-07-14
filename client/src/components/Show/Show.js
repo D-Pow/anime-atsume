@@ -120,20 +120,36 @@ function Show(props) {
         );
     }
 
-    const renderLastWatchedEpisodeText = () => {
-        if (!episodeResults || selectedShow == null) {
+    const renderLastWatchedEpisodes = () => {
+        if (!episodeResults || selectedTab !== 1) {
             return null;
         }
 
-        const showTitle = getShowTitle();
-        const lastWatchedEpisode = showsProgress[showTitle];
+        const renderedLastWatchedEpisodes = episodeResults.results
+            .map(({ title }, i) => {
+                const lastWatchedEpisodeForShow = showsProgress[title];
 
-        if (lastWatchedEpisode) {
+                if (lastWatchedEpisodeForShow) {
+                    return (
+                        <div className={'row mb-1'} key={i}>
+                            <div className={'col-12'}>
+                                <span className={'h5 underline'}>{title}</span>
+                                <span className={'h5'}>: {lastWatchedEpisodeForShow}</span>
+                            </div>
+                        </div>
+                    );
+                }
+            })
+            .filter(exists => exists);
+
+        if (renderedLastWatchedEpisodes.length) {
             return (
-                <div className={'row mb-3'}>
+                <div className={'row pb-2'}>
                     <div className={'col-12'}>
-                        <h5 className={'mb-1'}>Last watched: </h5>
-                        <h5 className={'underline'}>{lastWatchedEpisode}</h5>
+                        <h4 className={'mb-2'}>
+                            Last watched episodes:
+                        </h4>
+                        {renderedLastWatchedEpisodes}
                     </div>
                 </div>
             );
@@ -221,7 +237,6 @@ function Show(props) {
                     <div className={'d-none d-sm-block'}>
                         <h3 className={'mb-2'}>Episodes</h3>
                     </div>
-                    {renderLastWatchedEpisodeText()}
                     <div className={'text-left list-group overflow-auto'} style={{ maxHeight: watchSectionScrollListsMaxHeight }}>
                         {selectedShow != null && episodeResults.results[selectedShow].episodes.map(renderEpisodesForSelectedShow)}
                     </div>
@@ -266,11 +281,13 @@ function Show(props) {
 
     return (
         <React.Fragment>
-            <div className={'row pb-3'}>
+            <div className={'row pb-4'}>
                 <h1 className={'text-center mx-auto mt-5'}>
                     {title}
                 </h1>
             </div>
+
+            {renderLastWatchedEpisodes()}
 
             <div className={'row pt-5'}>
                 <div className={'col-12'}>
