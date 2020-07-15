@@ -70,7 +70,7 @@ function Modal({
                 height: sizeStyle
             }}
         >
-            <div className={'modal-dialog modal-dialog-centered width-fit'} style={{ maxWidth: '90vw' }}>
+            <div className={'modal-dialog modal-dialog-centered width-fit m-auto'} style={{ maxWidth: '90vw' }}>
                 <div className={'modal-content overflow-auto ' + className} style={{ maxHeight: '90vh' }} ref={forwardRef}>
 
                     <div className={'modal-header'} style={isSafariBrowser() ? { display: '-webkit-box' } : {}}>
