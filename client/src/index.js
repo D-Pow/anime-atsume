@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import App from 'components/App';
+import { LOCATION_PROTOCOL_HTTPS } from 'utils/Constants';
 import AppContext from 'utils/AppContext';
 import registerServiceWorker from './registerServiceWorker';
 import '@fortawesome/fontawesome-free/js/fontawesome';
@@ -21,6 +22,12 @@ ReactDOM.render(
 );
 
 // registerServiceWorker();
+
+if (process.env.NODE_ENV === 'production') {
+    if (window.location.protocol !== LOCATION_PROTOCOL_HTTPS) {
+        window.location.protocol = LOCATION_PROTOCOL_HTTPS;
+    }
+}
 
 // hot reloading
 if (process.env.NODE_ENV !== 'production' && module.hot) {

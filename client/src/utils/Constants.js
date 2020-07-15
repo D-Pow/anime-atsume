@@ -1,3 +1,5 @@
+export const LOCATION_PROTOCOL_HTTPS = 'https:';
+
 export const COLORS = [
     'red',
     'blue',
