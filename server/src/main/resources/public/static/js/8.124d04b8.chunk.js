@@ -1,0 +1,1 @@
+(window.webpackJsonp=window.webpackJsonp||[]).push([[8],{612:function(n,p,o){n.exports=o.p+"favicon.png"}}]);
