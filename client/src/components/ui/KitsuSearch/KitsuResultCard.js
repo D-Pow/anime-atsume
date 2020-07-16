@@ -26,9 +26,11 @@ function KitsuResultCard({
 
     return (
         <React.Fragment>
-            <Anchor className={'m-auto'} target={anchorImageTarget} href={anchorImageFunc(canonicalTitle)}>
-                <img className={'align-self-center img-thumbnail'} src={small} alt={canonicalTitle} />
-            </Anchor>
+            <div className={'col-sm-12 col-md-6'}>
+                <Anchor className={'m-auto'} target={anchorImageTarget} href={anchorImageFunc(canonicalTitle)}>
+                    <img className={'align-self-center img-thumbnail'} src={small} alt={canonicalTitle} />
+                </Anchor>
+            </div>
             <div className={'media-body align-self-center ml-2 mt-2'}>
                 <h5>
                     <Anchor target={anchorTitleTarget} href={anchorTitleFunc(canonicalTitle)}>
