@@ -142,7 +142,7 @@ function Show(props) {
         return episodeResults.results.map(({ title: showTitle, episodes: showEpisodes}, i) => {
             const renderedEpisodeCountBadge = (
                 <h4>
-                    <span className={`ml-1 d-none d-sm-block badge badge-pill badge-${selectedShow === i ? 'dark' : 'primary'}`}>
+                    <span className={`ml-1 badge badge-pill badge-${selectedShow === i ? 'dark' : 'primary'}`}>
                         {showEpisodes.length}
                     </span>
                 </h4>
@@ -156,14 +156,11 @@ function Show(props) {
                     key={i}
                     onClick={() => setSelectedShow(i)}
                 >
-                    <div className={'d-flex d-sm-none justify-content-between align-items-center'}>
-                        <h5 className={'mb-2'}>
+                    <div className={'d-flex justify-content-between align-items-center'}>
+                        <h5 className={'mb-2 d-flex d-sm-none'}>
                             {showTitle}
                         </h5>
-                        {renderedEpisodeCountBadge}
-                    </div>
-                    <div className={'d-none d-sm-flex justify-content-between align-items-center'}>
-                        <h3 className={'mb-2'}>
+                        <h3 className={'mb-2 d-none d-sm-flex'}>
                             {showTitle}
                         </h3>
                         {renderedEpisodeCountBadge}
@@ -282,12 +279,10 @@ function Show(props) {
 
         return (
             <div className={'row'}>
-                <div className={'col-6'}>
-                    <div className={'d-block d-sm-none'}>
-                        <h4 className={'mb-2'}>Shows</h4>
-                    </div>
-                    <div className={'d-none d-sm-block'}>
-                        <h3 className={'mb-2 d-inline-block'}>Shows</h3>
+                <div className={'col-sm-12 col-md-6 mb-5'}>
+                    <div>
+                        <h3 className={'mb-2 d-none d-sm-inline-block'}>Shows</h3>
+                        <h4 className={'mb-2 d-inline-block d-sm-none'}>Shows</h4>
                         <h4 className={'d-inline-block ml-1'}>(# episodes)</h4>
                     </div>
                     <div
@@ -297,12 +292,10 @@ function Show(props) {
                         {renderPossibleShowMatches()}
                     </div>
                 </div>
-                <div className={'col-6'}>
-                    <div className={'d-block d-sm-none'}>
-                        <h4 className={'mb-2'}>Episodes</h4>
-                    </div>
-                    <div className={'d-none d-sm-block'}>
-                        <h3 className={'mb-2'}>Episodes</h3>
+                <div className={'col-sm-12 col-md-6'}>
+                    <div>
+                        <h3 className={'mb-2 d-none d-sm-block'}>Episodes</h3>
+                        <h4 className={'mb-2 d-block d-sm-none'}>Episodes</h4>
                     </div>
                     <div
                         className={'text-left list-group overflow-auto fix-strange-z-index-scrollbars'}
