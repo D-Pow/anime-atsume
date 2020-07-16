@@ -13,7 +13,10 @@ function KitsuSearchResults({ kitsuResults, ...resultCardProps }) {
                 <ul className={'list-unstyled'}>
                     {kitsuResults.data.map(kitsuResult => {
                         return (
-                            <li className={'media row w-75 mb-5 mx-auto'} key={kitsuResult.id}>
+                            <li
+                                className={'media row w-75 mb-5 mx-auto d-flex align-items-center justify-content-center'}
+                                key={kitsuResult.id}
+                            >
                                 <KitsuResultCard
                                     {...resultCardProps}
                                     kitsuResult={kitsuResult}
