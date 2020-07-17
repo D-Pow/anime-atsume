@@ -277,6 +277,14 @@ function Show(props) {
             );
         }
 
+        const scrollDivBorderCls = 'border-top border-bottom';
+
+        const renderedShowMatches = renderPossibleShowMatches();
+        const renderedEpisodeMatches = renderEpisodesForSelectedShow();
+
+        const showBorderCls = (renderedShowMatches && renderedShowMatches.length) ? scrollDivBorderCls : '';
+        const episodeBorderCls = (renderedEpisodeMatches && renderedEpisodeMatches.length) ? scrollDivBorderCls : '';
+
         return (
             <div className={'row'}>
                 <div className={'col-sm-12 col-md-6 mb-5'}>
@@ -286,10 +294,10 @@ function Show(props) {
                         <h4 className={'d-inline-block ml-1'}>(# episodes)</h4>
                     </div>
                     <div
-                        className={'text-left list-group overflow-auto border-top border-bottom fix-strange-z-index-scrollbars scroll-auto'}
+                        className={`text-left list-group overflow-auto ${showBorderCls} fix-strange-z-index-scrollbars scroll-auto`}
                         style={{ maxHeight: watchSectionScrollListsMaxHeight }}
                     >
-                        {renderPossibleShowMatches()}
+                        {renderedShowMatches}
                     </div>
                 </div>
                 <div className={'col-sm-12 col-md-6'}>
@@ -298,10 +306,10 @@ function Show(props) {
                         <h4 className={'mb-2 d-block d-sm-none'}>Episodes</h4>
                     </div>
                     <div
-                        className={'text-left list-group overflow-auto border-top border-bottom fix-strange-z-index-scrollbars'}
+                        className={`text-left list-group overflow-auto ${episodeBorderCls} fix-strange-z-index-scrollbars`}
                         style={{ maxHeight: watchSectionScrollListsMaxHeight }}
                     >
-                        {renderEpisodesForSelectedShow()}
+                        {renderedEpisodeMatches}
                     </div>
                 </div>
             </div>
