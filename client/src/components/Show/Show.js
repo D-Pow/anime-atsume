@@ -286,7 +286,7 @@ function Show(props) {
                         <h4 className={'d-inline-block ml-1'}>(# episodes)</h4>
                     </div>
                     <div
-                        className={'text-left list-group overflow-auto fix-strange-z-index-scrollbars scroll-auto'}
+                        className={'text-left list-group overflow-auto border-top border-bottom fix-strange-z-index-scrollbars scroll-auto'}
                         style={{ maxHeight: watchSectionScrollListsMaxHeight }}
                     >
                         {renderPossibleShowMatches()}
@@ -298,7 +298,7 @@ function Show(props) {
                         <h4 className={'mb-2 d-block d-sm-none'}>Episodes</h4>
                     </div>
                     <div
-                        className={'text-left list-group overflow-auto fix-strange-z-index-scrollbars'}
+                        className={'text-left list-group overflow-auto border-top border-bottom fix-strange-z-index-scrollbars'}
                         style={{ maxHeight: watchSectionScrollListsMaxHeight }}
                     >
                         {renderEpisodesForSelectedShow()}
