@@ -18,6 +18,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 
 import java.net.*;
@@ -160,12 +161,24 @@ public class KissanimeRuService {
         formDataBody.add("type", "Anime");
         formDataBody.add("keyword", requestSearchTitle);
 
-        ResponseEntity<String> searchResponse = new RestTemplate().exchange(
-            TITLE_SEARCH_URL,
-            HttpMethod.POST,
-            new HttpEntity<>(formDataBody, headers),
-            String.class
-        );
+        ResponseEntity<String> searchResponse;
+
+        try {
+            searchResponse = new RestTemplate().exchange(
+                TITLE_SEARCH_URL,
+                HttpMethod.POST,
+                new HttpEntity<>(formDataBody, headers),
+                String.class
+            );
+        } catch (HttpStatusCodeException e) {
+            log.error("Error searching for Kissanime title: status code ({}), response body ({}), error = {}",
+                e.getStatusCode(),
+                e.getResponseBodyAsString(),
+                e.getMessage()
+            );
+
+            throw e;
+        }
 
         String searchResults = searchResponse.getBody();
 
