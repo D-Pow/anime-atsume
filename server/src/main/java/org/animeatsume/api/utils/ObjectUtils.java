@@ -66,13 +66,14 @@ public class ObjectUtils {
             return null;
         }
 
-        try (InputStream imageInputStream = resource.getInputStream()) {
+        try (InputStream inputStream = resource.getInputStream()) {
             byte[] imageBytes = new byte[(int) resource.contentLength()];
-            imageInputStream.read(imageBytes);
+            inputStream.read(imageBytes);
 
             MessageDigest hash = MessageDigest.getInstance("SHA-256");
-            byte[] imageHash = hash.digest(imageBytes);
-            return new BigInteger(1, imageHash).toString(16);
+            byte[] resourceHash = hash.digest(imageBytes);
+
+            return new BigInteger(1, resourceHash).toString(16);
         } catch (IOException | NoSuchAlgorithmException e) {
             log.error("Could not hash Resource ({}). Error cause ({}), message = {}", resource, e.getCause(), e.getMessage());
         }
