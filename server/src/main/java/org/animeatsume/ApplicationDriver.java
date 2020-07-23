@@ -4,7 +4,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.scheduling.annotation.EnableAsync;
 
 /**
  * SpringBootApplication is a combo of the following:
@@ -21,7 +20,6 @@ import org.springframework.scheduling.annotation.EnableAsync;
 
 // TODO Replace blocking/synchronous RestTemplate usage with webflux's non-blocking/async WebClient
 @SpringBootApplication
-@EnableAsync
 public class ApplicationDriver {
     private static final Logger log = LoggerFactory.getLogger(ApplicationDriver.class);
 
