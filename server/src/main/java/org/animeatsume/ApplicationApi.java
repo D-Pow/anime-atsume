@@ -16,6 +16,7 @@ import java.net.URI;
 import java.util.Map;
 
 @RestController
+@CrossOrigin
 public class ApplicationApi {
     private static final Logger log = LoggerFactory.getLogger(ApplicationApi.class);
 
@@ -25,7 +26,6 @@ public class ApplicationApi {
     @Autowired
     NovelPlanetService novelPlanetService;
 
-    @CrossOrigin
     @GetMapping(value = "/corsProxy", consumes = MediaType.ALL_VALUE)
     public ResponseEntity<?> getCorsRequest(
         @RequestParam("url") URI url,
@@ -35,7 +35,6 @@ public class ApplicationApi {
         return postCorsRequest(null, url, requestHeaders, request);
     }
 
-    @CrossOrigin
     @PostMapping(value = "/corsProxy", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     public ResponseEntity<?> postCorsRequestWithFormData(
         @RequestParam Map<String, String> body,
@@ -48,7 +47,6 @@ public class ApplicationApi {
         return postCorsRequest(body, url, requestHeaders, request);
     }
 
-    @CrossOrigin
     @PostMapping("/corsProxy")
     public ResponseEntity<?> postCorsRequest(
         @RequestBody(required = false) Object body,
@@ -63,25 +61,21 @@ public class ApplicationApi {
         return CorsProxy.doCorsRequest(method, url, body, requestHeaders);
     }
 
-    @CrossOrigin
     @PostMapping(value = "/searchKissanime", consumes = MediaType.APPLICATION_JSON_VALUE)
     public KissanimeSearchResponse searchKissanime(@RequestBody KissanimeSearchRequest kissanimeSearchRequest) {
         return kissanimeRuController.searchKissanimeTitles(kissanimeSearchRequest);
     }
 
-    @CrossOrigin
     @PostMapping(value = "/getVideosForEpisode")
     public ResponseEntity<Object> getVideoHostUrlForKissanimeEpisode(@RequestBody KissanimeVideoHostRequest kissanimeEpisodeRequest) {
         return kissanimeRuController.getVideosForKissanimeEpisode(kissanimeEpisodeRequest);
     }
 
-    @CrossOrigin
     @PostMapping(value = "/getNovelPlanetSources", consumes = MediaType.APPLICATION_JSON_VALUE)
     public NovelPlanetSourceResponse getNovelPlanetSources(@RequestBody NovelPlanetUrlRequest novelPlanetRequest) {
         return kissanimeRuController.getVideoSourcesForNovelPlanetHost(novelPlanetRequest.getNovelPlanetUrl().toString());
     }
 
-    @CrossOrigin
     @GetMapping(value = "/video/{show}/{episode}/{quality}", produces = { "video/mp4", MediaType.APPLICATION_OCTET_STREAM_VALUE })
     public ResponseEntity<Resource> getNovelPlanetVideoStream(
         @PathVariable("show") String showName,
@@ -118,7 +112,6 @@ public class ApplicationApi {
         );
     }
 
-    @CrossOrigin
     @GetMapping(value = "/image/{id}", produces = { MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_PNG_VALUE })
     public ResponseEntity<Resource> getKissanimeCaptchaImage(@PathVariable("id") String imageId) {
         return kissanimeRuController.getProxiedKissanimeCaptchaImage(imageId);
