@@ -7,6 +7,7 @@ import org.animeatsume.api.utils.http.CorsProxy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.io.Resource;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
@@ -61,6 +62,7 @@ public class ApplicationApi {
         return CorsProxy.doCorsRequest(method, url, body, requestHeaders);
     }
 
+    @Cacheable(ApplicationConfig.KISSANIME_TITLE_SEARCH_CACHE_NAME)
     @PostMapping(value = "/searchKissanime", consumes = MediaType.APPLICATION_JSON_VALUE)
     public KissanimeSearchResponse searchKissanime(@RequestBody KissanimeSearchRequest kissanimeSearchRequest) {
         return kissanimeRuController.searchKissanimeTitles(kissanimeSearchRequest);

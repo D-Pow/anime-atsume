@@ -3,15 +3,22 @@ package org.animeatsume;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
+import java.util.Arrays;
 import java.util.concurrent.Executor;
 
 @Configuration
+@EnableCaching
 public class ApplicationConfig {
     private static final Logger log = LoggerFactory.getLogger(ApplicationConfig.class);
+
+    public static final String KISSANIME_TITLE_SEARCH_CACHE_NAME = "kissanimeTitleSearch";
 
     @Bean
     public Executor taskExecutor(
@@ -29,5 +36,12 @@ public class ApplicationConfig {
         executor.initialize();
 
         return executor;
+    }
+
+    @Bean
+    public CacheManager cacheManager(@Value("${org.animeatsume.cache.cache-names}") String[] cacheNames) {
+        log.info("Caching activated for cache names: {}", Arrays.asList(cacheNames));
+
+        return new ConcurrentMapCacheManager(cacheNames);
     }
 }
