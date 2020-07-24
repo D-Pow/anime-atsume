@@ -181,6 +181,19 @@ public class KissanimeRuService {
                 e.getMessage()
             );
 
+            String errorHtmlBodyTitle = HtmlParser.getTitleTextFromHtml(e.getResponseBodyAsString());
+
+            /*
+             * Occasionally, Kissanime will throw a 503 (Service Temporarily Unavailable)
+             * error even if the cookie is still valid.
+             * In this case, force the Cloudflare bypass to re-run and then attempt to
+             * search Kissanime again.
+             */
+            if (errorHtmlBodyTitle != null && errorHtmlBodyTitle.contains(CLOUDFLARE_TITLE)) {
+                waitForCloudflareToAllowAccessToKissanime(true);
+                return searchKissanimeTitles(kissanimeSearchRequest);
+            }
+
             throw e;
         }
 
