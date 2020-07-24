@@ -1,29 +1,45 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { fetchKitsuTitleSearch } from 'services/KitsuAnimeSearchService';
 import SearchBar from 'components/ui/SearchBar';
 import KitsuSearchResults from 'components/ui/KitsuSearch/KitsuSearchResults';
 import Spinner from 'components/ui/Spinner';
+import { useQueryParams } from 'utils/Hooks';
 
 function Home() {
     const pageText = {
         title: 'Anime Atsume',
         description: 'Search aggregator for many anime shows.'
     };
+    const searchQueryParam = 'search';
 
     const [ typedText, setTypedText ] = useState('');
     const [ kitsuResults, setKitsuResults ] = useState(null);
     const [ showSpinner, setShowSpinner ] = useState(false);
+    const [ queryParams, setQueryParam ] = useQueryParams();
 
     const handleSubmit = async textToSearch => {
         const query = textToSearch ? textToSearch : typedText;
         const searchQuery = query.toLowerCase();
 
         setShowSpinner(true);
+        setQueryParam(searchQueryParam, query);
 
         const response = await fetchKitsuTitleSearch(searchQuery);
         setKitsuResults(response);
         setShowSpinner(false);
     };
+
+    useEffect(() => {
+        const previousSearchedQuery = queryParams[searchQueryParam];
+
+        if (previousSearchedQuery) {
+            // React hooks' setState() function is not guaranteed to
+            // update the state immediately, so pass the previousSearchedQuery
+            // as an argument to handleSubmit()
+            setTypedText(previousSearchedQuery);
+            handleSubmit(previousSearchedQuery);
+        }
+    }, []); // Add no dependencies so useEffect() only runs on first page load
 
     const anchorHrefFunction = title => `#/show/${encodeURIComponent(title)}`;
 
