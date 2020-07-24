@@ -14,9 +14,12 @@ function Home() {
     const [ kitsuResults, setKitsuResults ] = useState(null);
     const [ showSpinner, setShowSpinner ] = useState(false);
 
-    const handleSubmit = async () => {
+    const handleSubmit = async textToSearch => {
+        const query = textToSearch ? textToSearch : typedText;
+        const searchQuery = query.toLowerCase();
+
         setShowSpinner(true);
-        const searchQuery = typedText.toLowerCase();
+
         const response = await fetchKitsuTitleSearch(searchQuery);
         setKitsuResults(response);
         setShowSpinner(false);
