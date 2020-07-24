@@ -2,6 +2,12 @@ import React, { useState, useEffect, useRef } from 'react';
 import { elementIsInClickPath, getClickPath } from 'utils/Events';
 
 /**
+ * Valid JSON primitive types.
+ *
+ * @typedef {(String|Number|Object|Array|boolean|null)} JsonPrimitive
+ */
+
+/**
  * @callback hookedChildRenderer
  * @param {(*|Array<*>)} hookReturnVal - Value returned from useMyHook()
  * @returns {React.Component} - Children to render using hookReturnVal
@@ -27,7 +33,7 @@ export function Hooked({ hook, hookArgs, children }) {
  * @param {Object} options - Options for storage handling.
  * @param {(String|Number|Object|Array|boolean|null)} [options.initialValue=null] - Initial value to use if storage lacks the passed key.
  * @param {String} [options.type="local"] - Type of window storage to use ('local' or 'session').
- * @returns {[(String|Number|Object|Array|boolean|null), function]} - Parsed state value and setState function.
+ * @returns {[ JsonPrimitive, function ]} - Parsed state value and setState function.
  */
 export function useStorage(key, { initialValue = null, type = 'local' } = {}) {
     const storage = window[`${type}Storage`];
