@@ -119,12 +119,16 @@ public class KissanimeRuService {
         return authCookie;
     }
 
+    void waitForCloudflareToAllowAccessToKissanime() {
+        waitForCloudflareToAllowAccessToKissanime(false);
+    }
+
     /*
      * User-Agent header and cf_clearance cookie matter.
      * Origin, etc. doesn't
      */
-    void waitForCloudflareToAllowAccessToKissanime() {
-        if (getAuthCookie().hasExpired()) {
+    void waitForCloudflareToAllowAccessToKissanime(boolean forceRefresh) {
+        if (getAuthCookie().hasExpired() || forceRefresh) {
             log.info("Cookie has expired. Refreshing now...");
 
             try {
