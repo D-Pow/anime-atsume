@@ -43,6 +43,8 @@ public class KissanimeRuService {
     private static final String ARE_YOU_HUMAN_FORM_ACTION_URL = KISSANIME_ORIGIN + ARE_YOU_HUMAN_URL_PATH;
     private static final String CLOUDFLARE_TITLE = "Just a moment";
     private static final String KISSANIME_TITLE = "KissAnime";
+    private static final String BANNED_TITLE = "Access Denied";
+    private static final String BANNED_URL = "https://kissanime.ru/ToYou/Banned/";
     private static final int NUM_ATTEMPTS_TO_BYPASS_CLOUDFLARE = 10;
     private static final String MOCK_FIREFOX_USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:77.0) Gecko/20100101 Firefox/77.0";
     private static final String COOKIE_AUTH_NAME = "cf_clearance";
@@ -81,6 +83,14 @@ public class KissanimeRuService {
                 log.info("Cloudflare has been bypassed, Kissanime is now accessible");
                 kissanimePage.close();
                 return CompletableFuture.completedFuture(true);
+            }
+
+            if (
+                pageTitle.toLowerCase().contains(BANNED_TITLE.toLowerCase())
+                || PageUtils.getUrl(kissanimePage).equalsIgnoreCase(BANNED_URL)
+            ) {
+                // attempt circumventing "Banned" page by re-navigating to Kissanime origin
+                kissanimePage = browser.navigate(KISSANIME_ORIGIN, pageConfiguration);
             }
 
             log.info("Cloudflare was not bypassed, trying attempt {}/10", attempt+1);
