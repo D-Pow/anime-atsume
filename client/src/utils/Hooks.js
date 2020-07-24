@@ -1,4 +1,4 @@
-import React, { useState, useReducer, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { elementIsInClickPath, getClickPath } from 'utils/Events';
 
 /**
