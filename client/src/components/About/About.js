@@ -8,7 +8,15 @@ function About(props) {
             <Header
                 navEntries={[
                     {
-                        children: '< Back',
+                        children: (
+                            <React.Fragment>
+                                <span className={'mr-2'}>
+                                    <i className={'fas fa-chevron-left'} />
+                                </span>
+
+                                Back
+                            </React.Fragment>
+                        ),
                         onClick: () => {
                             // Attempt to use back function from react-router-dom's
                             // `history` prop with native window.history object as
