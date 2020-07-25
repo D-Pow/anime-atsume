@@ -17,7 +17,7 @@ function SearchBar(props) {
     // font-awesome replaces <i/> with <svg/> so wrap in a tag
     // that will always be the same so React can mount/unmount as needed
     const renderedDefaultBtn = (<span><i className={'fas fa-search'} /></span>);
-    const renderedBtn = props.btnDisplay ? props.btnDisplay : renderedDefaultBtn;
+    const renderedBtn = props.btnChildren ? props.btnChildren : renderedDefaultBtn;
 
     return (
         <div className={'row mt-3 mb-5'}>
@@ -42,14 +42,14 @@ function SearchBar(props) {
 }
 
 SearchBar.propTypes = {
-    btnDisplay: PropTypes.node,
+    btnChildren: PropTypes.node,
     value: PropTypes.string,
     handleTyping: PropTypes.func,
     handleSubmit: PropTypes.func
 };
 
 SearchBar.defaultProps = {
-    btnDisplay: null,
+    btnChildren: null,
     value: '',
     handleTyping: () => {},
     handleSubmit: () => {}

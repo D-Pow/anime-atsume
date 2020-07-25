@@ -66,7 +66,7 @@ function Home() {
             {renderedTitle}
             {renderedDescription}
             <SearchBar
-                btnDisplay={renderedSearchButtonContent}
+                btnChildren={renderedSearchButtonContent}
                 value={typedText}
                 handleTyping={setTypedText}
                 handleSubmit={handleSubmit}
