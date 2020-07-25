@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { fetchKitsuTitleSearch } from 'services/KitsuAnimeSearchService';
 import SearchBar from 'components/ui/SearchBar';
 import KitsuSearchResults from 'components/ui/KitsuSearch/KitsuSearchResults';
-import Spinner from 'components/ui/Spinner';
 import { useQueryParams } from 'utils/Hooks';
 
 function Home() {
@@ -59,15 +58,13 @@ function Home() {
         </div>
     );
 
-    const renderedSearchButtonContent = showSpinner ? <Spinner type={Spinner.Type.CIRCLE} show={showSpinner} /> : null;
-
     return (
         <div className={'text-center mx-auto'}>
             {renderedTitle}
             {renderedDescription}
             <SearchBar
-                btnChildren={renderedSearchButtonContent}
                 value={typedText}
+                showBtnSpinner={showSpinner}
                 handleTyping={setTypedText}
                 handleSubmit={handleSubmit}
             />

@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import Spinner from 'components/ui/Spinner';
 import { useKeyboardEvent } from 'utils/Hooks';
 
 function SearchBar(props) {
@@ -17,7 +18,12 @@ function SearchBar(props) {
     // font-awesome replaces <i/> with <svg/> so wrap in a tag
     // that will always be the same so React can mount/unmount as needed
     const renderedDefaultBtn = (<span><i className={'fas fa-search'} /></span>);
-    const renderedBtn = props.btnChildren ? props.btnChildren : renderedDefaultBtn;
+    const renderedBtnSpinner = <Spinner type={Spinner.Type.CIRCLE} show={props.showBtnSpinner} />;
+    const renderedBtn = props.showBtnSpinner
+        ? renderedBtnSpinner
+        : props.btnChildren
+            ? props.btnChildren
+            : renderedDefaultBtn;
 
     return (
         <div className={'row mt-3 mb-5'}>
@@ -44,6 +50,7 @@ function SearchBar(props) {
 SearchBar.propTypes = {
     btnChildren: PropTypes.node,
     value: PropTypes.string,
+    showBtnSpinner: PropTypes.bool,
     handleTyping: PropTypes.func,
     handleSubmit: PropTypes.func
 };
@@ -51,6 +58,7 @@ SearchBar.propTypes = {
 SearchBar.defaultProps = {
     btnChildren: null,
     value: '',
+    showBtnSpinner: false,
     handleTyping: () => {},
     handleSubmit: () => {}
 };
