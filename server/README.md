@@ -70,7 +70,6 @@ Notes:
             * Heroku will pass any Config Vars to docker run, e.g. `docker run -e JAVA_OPTS=$JAVA_OPTS`.
             * JAVA_OPTS doesn't have to be set to run the container since CMD is in 'shell' form instead of 'exec' form.
         * Since Heroku's memory cap is a soft limit (will only kill the app if you go too much above the limit), `-Xmx640m` will likely work, giving the app more memory without triggering Heroku's kill switch.
-        * If restricting memory like this, it might be helpful to also decrease the number of threads Spring uses. Try `core-size=1`, `max-size=5`.
 
 ### Deploying to gcloud
 * If all else fails, rewrite code with Selenium and allow it via [this method](https://medium.com/@CapitalTerefe/selenium-grid-in-docker-using-serenity-in-google-cloud-47b57deab5d)
