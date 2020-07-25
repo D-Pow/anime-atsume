@@ -32,6 +32,7 @@ function SearchBar(props) {
                     <input
                         className={'form-control remove-focus-highlight'}
                         type={'text'}
+                        autoFocus={props.focusOnLoad}
                         placeholder={'e.g. "Kimi no na wa"'}
                         value={props.value}
                         onChange={handleTyping}
@@ -49,6 +50,7 @@ function SearchBar(props) {
 
 SearchBar.propTypes = {
     btnChildren: PropTypes.node,
+    focusOnLoad: PropTypes.bool,
     value: PropTypes.string,
     showBtnSpinner: PropTypes.bool,
     handleTyping: PropTypes.func,
@@ -57,6 +59,7 @@ SearchBar.propTypes = {
 
 SearchBar.defaultProps = {
     btnChildren: null,
+    focusOnLoad: true,
     value: '',
     showBtnSpinner: false,
     handleTyping: () => {},
