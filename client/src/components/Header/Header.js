@@ -30,13 +30,19 @@ function Header(props) {
         );
     });
 
+    const renderedHeaderChildren = (
+        <nav className={'navbar'}>
+            <ul className={'navbar-nav flex-row justify-content-between'}>
+                {renderedNavEntries}
+            </ul>
+        </nav>
+    );
+
+    const headerCls = `header ${props.border ? 'header-border' : ''}`;
+
     return (
-        <header className={`header ${props.border ? 'header-border' : ''}`}>
-            <nav className={'navbar'}>
-                <ul className={'navbar-nav flex-row justify-content-between'}>
-                    {renderedNavEntries}
-                </ul>
-            </nav>
+        <header className={headerCls}>
+            {renderedHeaderChildren}
         </header>
     );
 }
