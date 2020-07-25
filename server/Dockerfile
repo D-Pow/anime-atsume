@@ -15,4 +15,4 @@ RUN chmod a+rwx anime_atsume.db
 
 EXPOSE 8080
 
-CMD java -Dglass.platform=Monocle -Dmonocle.platform=Headless -jar anime-atsume.war --server.port=${PORT:-8080}
+CMD java ${JAVA_OPTS} -Dglass.platform=Monocle -Dmonocle.platform=Headless -jar anime-atsume.war --server.port=${PORT:-8080}
