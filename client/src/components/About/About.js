@@ -1,8 +1,26 @@
 import React from 'react';
+import PropTypes from 'prop-types';
+import Header from 'components/Header';
 
-function About() {
+function About(props) {
     return (
         <div className={'col-12'}>
+            <Header
+                navEntries={[
+                    {
+                        children: '< Back',
+                        onClick: () => {
+                            // Attempt to use back function from react-router-dom's
+                            // `history` prop with native window.history object as
+                            // a fallback
+                            const backFunction = props.history ? props.history.goBack : history.back;
+
+                            backFunction();
+                        }
+                    }
+                ]}
+            />
+
             <div className={'row mt-5'}>
                 <h1 className={'mx-auto'}>
                     About
@@ -27,6 +45,10 @@ function About() {
             </div>
         </div>
     );
+}
+
+About.propTypes = {
+    history: PropTypes.object // from react-router-dom
 }
 
 export default About;
