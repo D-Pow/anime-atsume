@@ -25,16 +25,16 @@ $container-max-widths: (
 }
 
 .nav-link {
-  color: $light;
+  color: $primary !important;
   transition: color 0.5s;
 }
 
 .nav-link:hover {
-  color: $danger;
+  color: $info !important;
 }
 
 .nav-link.active {
-  color: $info;
+  color: $danger !important;
 }
 
 @for $pix from 0 through 100 {
