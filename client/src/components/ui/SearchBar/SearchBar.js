@@ -30,7 +30,7 @@ function SearchBar(props) {
             <div className={'col-12 col-md-6 mx-auto'}>
                 <div className={'input-group my-3'}>
                     <input
-                        className={'form-control input-large remove-focus-highlight'}
+                        className={'form-control remove-focus-highlight'}
                         type={'text'}
                         placeholder={'e.g. "Kimi no na wa"'}
                         value={props.value}
