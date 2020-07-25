@@ -9,8 +9,13 @@ function Header(props) {
         onClick: () => {}
     };
 
+    const stubEmptyNavEntryPropsWithDefaults = navEntryProps => ({
+        ...defaultNavEntryProps,
+        ...navEntryProps
+    });
+
     const renderedNavEntries = props.navEntries.map((entryProps, i) => {
-        const navEntryProps = { ...defaultNavEntryProps, ...entryProps };
+        const navEntryProps = stubEmptyNavEntryPropsWithDefaults(entryProps);
 
         return (
             <li className={`nav-item p-2 ${navEntryProps.wrapperCls}`} key={i}>
