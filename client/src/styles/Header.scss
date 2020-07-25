@@ -1,0 +1,18 @@
+.header {
+    position: fixed;
+    width: fit-content;
+    top: 10px;
+    transition: all 0.5s ease-out;
+    z-index: 1035;
+}
+
+.header-border {
+    @extend .border;
+    @extend .border-primary;
+    border-width: 2px !important;
+}
+
+.header.header-hidden {
+    top: -100px;
+    visibility: hidden;
+}
