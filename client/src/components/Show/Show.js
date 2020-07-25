@@ -354,7 +354,7 @@ function Show(props) {
     );
 
     return (
-        <React.Fragment>
+        <div className={'col-12'}>
             <div className={'row pb-4'}>
                 <h1 className={'text-center mx-auto mt-5'}>
                     {title}
@@ -363,7 +363,7 @@ function Show(props) {
 
             {renderLastWatchedEpisodes()}
 
-            <div className={'row pt-5'}>
+            <div className={'row pt-5 px-2'}>
                 <div className={'col-12'}>
                     <div className={'card mb-5'}>
                         {renderedTabNavigation}
@@ -381,7 +381,7 @@ function Show(props) {
                 onClose={() => setSelectedEpisode(null)}
                 videoElementProps={{ onLoadStart: handleVideoLoad }}
             />
-        </React.Fragment>
+        </div>
     );
 }
 

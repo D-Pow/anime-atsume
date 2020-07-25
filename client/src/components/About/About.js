@@ -2,7 +2,9 @@ import React from 'react';
 
 function About() {
     return (
-        <div>About</div>
+        <div className={'col-12'}>
+            About
+        </div>
     );
 }
 

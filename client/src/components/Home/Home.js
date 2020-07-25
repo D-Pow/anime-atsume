@@ -73,7 +73,7 @@ function Home() {
     );
 
     return (
-        <div className={'text-center mx-auto'}>
+        <div className={'text-center mx-auto col-12'}>
             {renderedTitle}
             {renderedDescription}
             {renderedAboutLink}

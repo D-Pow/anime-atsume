@@ -54,7 +54,7 @@ function App() {
             fallback={<Spinner fullScreen={true} show={true} />}
         >
             <div className={'app container-fluid text-center'}>
-                <div className={'col-12'}>
+                <div className={'row'}>
                     <Router>
                         <React.Fragment>
                             {routes.map(routeAria => (
