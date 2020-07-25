@@ -26,7 +26,14 @@ function Show(props) {
     async function fetchKitsuInfo() {
         const response = await fetchKitsuTitleSearch(title.toLowerCase());
         const allKitsuResults = response.data;
-        const showInfo = allKitsuResults.find(show => show.attributes.canonicalTitle === title);
+        let showInfo = allKitsuResults.find(show => show.attributes.canonicalTitle === title);
+
+        if (allKitsuResults && !showInfo) {
+            // Could not find searched show in kitsuResults, likely
+            // from the user manually typing a show name in the URL bar.
+            // Default to first kitsuResult entry
+            showInfo = allKitsuResults[0];
+        }
 
         setKitsuResult(showInfo);
     }
