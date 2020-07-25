@@ -19,6 +19,8 @@ Notes:
 * Run app in image: `docker run -p 8080:8080 app`
     * Runs the newly built image, "app"
     * `-p host_port:container_port`
+    * Add env vars read in CMD line via `-e` flag
+        * `docker run -e PORT=3000 -p 80:3000 app`
 * Run bash in image: `docker run -it app /bin/bash`
 * Notes on Dockerfile:
     * It renames the .war file to `anime-atsume.war` so version number isn't needed (and CMD can just be this renamed filename).
@@ -30,6 +32,8 @@ Notes:
     * List running containers: `docker ps`
     * New bash terminal on running container: `docker exec -it <id_from_ps> /bin/bash`
     * Delete image: `docker rmi <image_id>`
+    * Stop container: `docker stop <container_id>`
+    * Stop all containers: `docker stop $(docker container ls -q)`
 
 ### Deploying to Heroku
 * General
