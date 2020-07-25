@@ -63,8 +63,12 @@ Notes:
         * `heroku container:push web`
         * `heroku container:release web`
     * Heroku's "free" and "hobby" tiers only allow a maximum of 512 MB.
-        * Force JVM to not exceed this cap by adding `-Xmx512m` to `CMD`.
+        * Force JVM to not exceed this cap by adding `-Xmx512m` to app run.
         * `-Xmx` is to set maximum memory usage, `m` specifies megabytes.
+        * For Heroku, set `JAVA_OPTS=-Xmx512m` in App > Settings > Config Vars.
+            * Dockerfile's CMD line applies JAVA_OPTS from the `-e` flag passed to `docker run`.
+            * Heroku will pass any Config Vars to docker run, e.g. `docker run -e JAVA_OPTS=$JAVA_OPTS`.
+            * JAVA_OPTS doesn't have to be set to run the container since CMD is in 'shell' form instead of 'exec' form.
         * Since Heroku's memory cap is a soft limit (will only kill the app if you go too much above the limit), `-Xmx640m` will likely work, giving the app more memory without triggering Heroku's kill switch.
         * If restricting memory like this, it might be helpful to also decrease the number of threads Spring uses. Try `core-size=1`, `max-size=5`.
 
