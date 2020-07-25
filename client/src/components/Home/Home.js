@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { fetchKitsuTitleSearch } from 'services/KitsuAnimeSearchService';
 import SearchBar from 'components/ui/SearchBar';
 import KitsuSearchResults from 'components/ui/KitsuSearch/KitsuSearchResults';
@@ -58,10 +59,24 @@ function Home() {
         </div>
     );
 
+    const renderedAboutLink = (
+        <div className={'row mt-3'}>
+            <h6 className={'col-12 col-md-6 text-center mx-auto'}>
+                <Link
+                    className={'underline'}
+                    to={'/about'}
+                >
+                    What is {pageText.title}?
+                </Link>
+            </h6>
+        </div>
+    );
+
     return (
         <div className={'text-center mx-auto'}>
             {renderedTitle}
             {renderedDescription}
+            {renderedAboutLink}
             <SearchBar
                 value={typedText}
                 showBtnSpinner={showSpinner}
