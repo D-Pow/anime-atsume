@@ -16,7 +16,7 @@ import Spinner from 'components/ui/Spinner';
 const homeImportPromise = import(/* webpackChunkName: 'Home' */ 'components/Home');
 const Home = React.lazy(() => homeImportPromise);
 
-const showImportPromise = import(/* webpackChunkName: 'Home' */ 'components/Show');
+const showImportPromise = import(/* webpackChunkName: 'Show' */ 'components/Show');
 const Show = React.lazy(() => showImportPromise);
 
 const routes = [
