@@ -16,8 +16,8 @@ function SearchBar(props) {
 
     // font-awesome replaces <i/> with <svg/> so wrap in a tag
     // that will always be the same so React can mount/unmount as needed
-    const defaultDisplay = (<span><i className={'fas fa-search'} /></span>);
-    const renderedDisplay = props.btnDisplay ? props.btnDisplay : defaultDisplay;
+    const renderedDefaultBtn = (<span><i className={'fas fa-search'} /></span>);
+    const renderedBtn = props.btnDisplay ? props.btnDisplay : renderedDefaultBtn;
 
     return (
         <div className={'row mt-3 mb-5'}>
@@ -32,7 +32,7 @@ function SearchBar(props) {
                     />
                     <div className={'input-group-append'}>
                         <button className={'btn btn-outline-secondary remove-focus-highlight'} onClick={() => props.handleSubmit()}>
-                            {renderedDisplay}
+                            {renderedBtn}
                         </button>
                     </div>
                 </div>
