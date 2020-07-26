@@ -41,9 +41,17 @@ function Header(props) {
     const headerCls = `header ${props.border ? 'header-border' : ''}`;
 
     return (
-        <header className={headerCls}>
-            {renderedHeaderChildren}
-        </header>
+        <React.Fragment>
+            <header className={`d-block d-sm-none ${headerCls}`} style={{ left: '0px' }}>
+                {renderedHeaderChildren}
+            </header>
+
+            <header className={`d-none d-sm-block ${headerCls}`}>
+                {renderedHeaderChildren}
+            </header>
+
+            <div className={'d-block d-sm-none pb-2'} />
+        </React.Fragment>
     );
 }
 
