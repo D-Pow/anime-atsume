@@ -11,6 +11,7 @@ function About(props) {
     return (
         <div className={'col-12'}>
             <Header
+                className={'position-absolute'}
                 navEntries={[
                     {
                         children: (
