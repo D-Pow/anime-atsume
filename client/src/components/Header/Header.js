@@ -38,7 +38,7 @@ function Header(props) {
         </nav>
     );
 
-    const headerCls = `header ${props.border ? 'header-border' : ''}`;
+    const headerCls = `header ${props.border ? 'header-border' : ''} ${props.className}`;
 
     return (
         <React.Fragment>
@@ -53,6 +53,7 @@ function Header(props) {
 
 Header.propTypes = {
     border: PropTypes.bool,
+    className: PropTypes.string,
     navEntries: PropTypes.arrayOf(
         PropTypes.shape({
             children: PropTypes.oneOfType([
@@ -69,6 +70,7 @@ Header.propTypes = {
 
 Header.defaultProps = {
     border: false,
+    className: '',
     navEntries: []
 };
 
