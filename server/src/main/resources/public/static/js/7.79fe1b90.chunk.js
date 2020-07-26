@@ -1,0 +1,1 @@
+(window.webpackJsonp=window.webpackJsonp||[]).push([[7],{608:function(p,n,o){p.exports=o.p+"static/assets/apple-touch-icon-80b728c2.png"}}]);
