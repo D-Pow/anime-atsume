@@ -56,7 +56,7 @@ function About(props) {
                         path from finding to watching your shows.
                     </div>
                     <div className={'p mt-5'}>
-                        <span className={'font-weight-bold'}>Note:</span>
+                        <span className={'font-weight-bold'}>Note: </span>
                         This app uses the {"browser's"} <pre className={'d-inline'}>localStorage</pre> feature to keep
                         track of your last watched episodes for a given show so you can easily continue a series from
                         where you last left off. This data is not collected and is in no way able to track identity
