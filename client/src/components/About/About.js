@@ -42,7 +42,7 @@ function About(props) {
             </div>
 
             <div className={'row mt-3'}>
-                <div className={'col-12 col-sm-9 col-md-8 col-lg-6 mx-auto'}>
+                <div className={'col-12 col-sm-9 col-md-8 col-lg-6 mx-auto mb-5'}>
                     <div>
                         We have all been there: you visit some website to watch your
                         favorite show just to be bombarded with ads, weird click-bait,
