@@ -80,6 +80,7 @@ function Home() {
             <SearchBar
                 value={typedText}
                 showBtnSpinner={showSpinner}
+                focusOnLoad={!queryParams[searchQueryParam]}
                 handleTyping={setTypedText}
                 handleSubmit={handleSubmit}
             />
