@@ -30,10 +30,10 @@ import java.util.stream.Collectors;
 public class KissanimeRuController {
     private static final Logger log = LoggerFactory.getLogger(KissanimeRuController.class);
 
-    @Value("#{new Boolean('${org.animeatsume.download-videos}')}")
+    @Value("${org.animeatsume.download-videos}")
     private Boolean downloadVideos;
 
-    @Value("#{new Boolean('${org.animeatsume.download-all-resolutions}')}")
+    @Value("${org.animeatsume.download-all-resolutions}")
     private Boolean downloadAllResolutions;
 
     @Autowired
