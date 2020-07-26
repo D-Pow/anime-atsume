@@ -42,11 +42,7 @@ function Header(props) {
 
     return (
         <React.Fragment>
-            <header className={`d-block d-sm-none ${headerCls}`} style={{ left: '0px' }}>
-                {renderedHeaderChildren}
-            </header>
-
-            <header className={`d-none d-sm-block ${headerCls}`}>
+            <header className={headerCls}>
                 {renderedHeaderChildren}
             </header>
 
