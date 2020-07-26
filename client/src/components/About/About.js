@@ -3,6 +3,11 @@ import PropTypes from 'prop-types';
 import Header from 'components/Header';
 
 function About(props) {
+    const handleStorageClearButtonClick = () => {
+        localStorage.clear();
+        alert('Show watch history has been cleared!');
+    };
+
     return (
         <div className={'col-12'}>
             <Header
@@ -48,6 +53,22 @@ function About(props) {
                         <span className={'font-weight-bold'}>Anime Atsume</span> is intended to be the exact opposite: overly
                         simplistic, easy to use interface, and the quickest possible
                         path from finding to watching your shows.
+                    </div>
+                    <div className={'p mt-5'}>
+                        <span className={'font-weight-bold'}>Note:</span>
+                        This app uses the {"browser's"} <pre className={'d-inline'}>localStorage</pre> feature to keep
+                        track of your last watched episodes for a given show so you can easily continue a series from
+                        where you last left off. This data is not collected and is in no way able to track identity
+                        or app usage. It is fully in your control. You may clear your watch history if you wish by
+                        clicking
+
+                        <button
+                            className={'btn btn-link p-0 pl-1 remove-focus-highlight border-0'}
+                            onClick={handleStorageClearButtonClick}
+                        >
+                            here
+                        </button>
+                        .
                     </div>
                 </div>
             </div>
