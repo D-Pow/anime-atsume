@@ -137,6 +137,11 @@ def copyDbToBuildDir() {
     println("Copied ${dbName} to ${warOutputDir}")
 }
 
+bootRun {
+    // support passing -Dsystem.property=value to bootRun task
+    systemProperties = System.properties
+}
+
 // WAR is needed because JAR doesn't include resources/public/
 // Spring disables `war` task and replaces it with `bootWar`
 bootWar {
