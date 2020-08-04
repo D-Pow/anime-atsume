@@ -12,6 +12,7 @@ import org.animeatsume.api.utils.regex.RegexUtils;
 import org.animeatsume.api.utils.ui4j.PageUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.http.*;
 import org.springframework.scheduling.annotation.Async;
@@ -45,12 +46,16 @@ public class KissanimeRuService {
     private static final String KISSANIME_TITLE = "KissAnime";
     private static final String BANNED_TITLE = "Access Denied";
     private static final String BANNED_URL = "https://kissanime.ru/ToYou/Banned/";
-    private static final int NUM_ATTEMPTS_TO_BYPASS_CLOUDFLARE = 10;
     private static final String MOCK_FIREFOX_USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:77.0) Gecko/20100101 Firefox/77.0";
     private static final String COOKIE_AUTH_NAME = "cf_clearance";
     private static final String NOVEL_PLANET_QUERY_PARAM = "&s=nova";
 
-    public KissanimeRuService() {
+    private final int numAttemptsToBypassCloudflare;
+
+    public KissanimeRuService(
+        @Value("${org.animeatsume.num-attempts-to-bypass-cloudflare}") Integer numAttemptsToBypassCloudflare
+    ) {
+        this.numAttemptsToBypassCloudflare = numAttemptsToBypassCloudflare;
         setup();
     }
 
@@ -76,7 +81,7 @@ public class KissanimeRuService {
 
         Page kissanimePage = browser.navigate(KISSANIME_ORIGIN, pageConfiguration);
 
-        for (int attempt = 0; attempt < NUM_ATTEMPTS_TO_BYPASS_CLOUDFLARE; attempt++) {
+        for (int attempt = 0; attempt < numAttemptsToBypassCloudflare; attempt++) {
             String pageTitle = PageUtils.getTitle(kissanimePage);
 
             if (!pageTitle.contains(CLOUDFLARE_TITLE) && pageTitle.contains(KISSANIME_TITLE)) {
@@ -93,7 +98,7 @@ public class KissanimeRuService {
                 kissanimePage = browser.navigate(KISSANIME_ORIGIN, pageConfiguration);
             }
 
-            log.info("Cloudflare was not bypassed, trying attempt {}/10", attempt+1);
+            log.info("Cloudflare was not bypassed, trying attempt {}/{}", attempt+1, numAttemptsToBypassCloudflare);
 
             try {
                 // Cloudflare has 4000 ms countdown before redirecting.
