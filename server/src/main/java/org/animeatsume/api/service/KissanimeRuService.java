@@ -94,11 +94,15 @@ public class KissanimeRuService {
                 pageTitle.toLowerCase().contains(BANNED_TITLE.toLowerCase())
                 || PageUtils.getUrl(kissanimePage).equalsIgnoreCase(BANNED_URL)
             ) {
-                // attempt circumventing "Banned" page by re-navigating to Kissanime origin
+                log.info("Redirected to banned page with title ({}) and URL ({}). Attempting circumventing by re-navigating to {}",
+                    pageTitle,
+                    PageUtils.getUrl(kissanimePage),
+                    KISSANIME_ORIGIN
+                );
                 kissanimePage = browser.navigate(KISSANIME_ORIGIN, pageConfiguration);
             }
 
-            log.info("Cloudflare was not bypassed, trying attempt {}/{}", attempt+1, numAttemptsToBypassCloudflare);
+            log.info("Cloudflare was not bypassed (title = \"{}\"), trying attempt {}/{}", pageTitle, attempt+1, numAttemptsToBypassCloudflare);
 
             try {
                 // Cloudflare has 4000 ms countdown before redirecting.

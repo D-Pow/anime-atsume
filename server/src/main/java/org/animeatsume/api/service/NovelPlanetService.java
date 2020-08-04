@@ -73,8 +73,8 @@ public class NovelPlanetService {
     }
 
     public void removeLowQualityVideos(NovelPlanetSourceResponse sourceResponse) {
-        log.info("Removing lower quality MP4 sources from response");
         List<NovelPlanetSourceResponse.NovelPlanetSource> videoSources = sourceResponse.getData();
+        log.info("Removing lower quality MP4 sources from response. Original length = {}", videoSources.size());
 
         NovelPlanetSourceResponse.NovelPlanetSource largestResSource = videoSources.stream()
             .reduce(null, (previous, next) -> {
