@@ -33,8 +33,8 @@ public class KissanimeRuController {
     @Value("${org.animeatsume.download-videos}")
     private Boolean downloadVideos;
 
-    @Value("${org.animeatsume.download-all-resolutions}")
-    private Boolean downloadAllResolutions;
+    @Value("${org.animeatsume.extract-highest-resolution-video-only}")
+    private Boolean extractHighestResVideoOnly;
 
     @Autowired
     KissanimeRuService kissanimeService;
@@ -83,7 +83,7 @@ public class KissanimeRuController {
             if (videoHostUrl.contains(NovelPlanetService.DOMAIN)) {
                 NovelPlanetSourceResponse videoSources = getVideoSourcesForNovelPlanetHost(videoHostUrl);
 
-                if (!downloadAllResolutions) {
+                if (extractHighestResVideoOnly) {
                     novelPlanetService.removeLowQualityVideos(videoSources);
                 }
 
