@@ -65,6 +65,7 @@ Notes:
         * `heroku container:login`
         * `heroku container:push web`
         * `heroku container:release web`
+        * Final command: `./gradlew clean build && heroku container:push web && heroku container:release web`
     * Heroku's "free" and "hobby" tiers only allow a maximum of 512 MB.
         * Force JVM to not exceed this cap by adding `-Xmx512m` to app run.
         * `-Xmx` is to set maximum memory usage, `m` specifies megabytes.
