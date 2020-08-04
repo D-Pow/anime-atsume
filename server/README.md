@@ -37,6 +37,9 @@ Notes:
 
 ### Deploying to Heroku
 * General
+    * View logs:
+        * `heroku logs -n <num_lines>` view latest `n` lines.
+        * `heroku logs -t` tails logs live.
     * If you want heroku to log your process' memory usage stats, run `heroku labs:enable log-runtime-metrics` and re-deploy. Disable with `labs:disable`.
     * Use [Kaffeine](https://kaffeine.herokuapp.com/) or [cron-job](https://cron-job.org/en/) to keep the app awake forever (pings the specified URL every so often).
         * Adding a credit card bumps the number of awake hours for your account(all apps) up from 550 hours/month to 1000, which is plenty to keep a single app running forever.
