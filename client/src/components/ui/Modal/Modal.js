@@ -62,7 +62,7 @@ function Modal({
         : title;
 
     return (
-        <div className={`modal fade d-block ${displayCls}`}
+        <div className={`modal fade d-flex flex-center ${displayCls}`}
             style={{
                 // Bootstrap's CSS for the modal backdrop's opacity and size doesn't work correctly. Override it here
                 background: 'rgba(0, 0, 0, 0.7)',
@@ -70,7 +70,7 @@ function Modal({
                 height: sizeStyle
             }}
         >
-            <div className={'modal-dialog modal-dialog-centered width-fit m-auto'} style={{ maxWidth: '90vw' }}>
+            <div className={'modal-dialog modal-dialog-centered flex-center width-fit'} style={{ maxWidth: '90vw' }}>
                 <div className={'modal-content overflow-auto ' + className} style={{ maxHeight: '90vh' }} ref={forwardRef}>
 
                     <div className={'modal-header'} style={isSafariBrowser() ? { display: '-webkit-box' } : {}}>
