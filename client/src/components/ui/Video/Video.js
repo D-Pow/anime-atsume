@@ -9,7 +9,11 @@ function Video(props) {
     const defaultSeekSpeedDelta = 5;
     const [ seekSpeed, setSeekSpeed ] = useState(defaultSeekSpeedDelta);
     const [ keyEvent, setKeyEvent ] = useWindowEvent('keydown');
-    const videoRef = useRef(null);
+    let videoRef = useRef(null);
+
+    if (props.videoRef) {
+        videoRef = props.videoRef;
+    }
 
     /*
      * Custom video key listeners to normalize video experience
@@ -98,7 +102,8 @@ Video.propTypes = {
     className: PropTypes.string,
     src: PropTypes.string,
     type: PropTypes.string,
-    videoElementProps: PropTypes.object
+    videoElementProps: PropTypes.object,
+    videoRef: PropTypes.object
 };
 
 Video.defaultProps = {
