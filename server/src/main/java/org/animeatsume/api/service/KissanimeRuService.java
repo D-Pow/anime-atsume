@@ -278,12 +278,31 @@ public class KissanimeRuService {
         waitForCloudflareToAllowAccessToKissanime();
         RestTemplate noFollowRedirectsRequest = Requests.getNoFollowRedirectsRestTemplate();
 
-        ResponseEntity<Void> response = noFollowRedirectsRequest.exchange(
-            url,
-            HttpMethod.GET,
-            new HttpEntity<>(null, getNecessaryRequestHeaders()),
-            Void.class
-        );
+        ResponseEntity<Void> response;
+
+        try {
+            response = noFollowRedirectsRequest.exchange(
+                url,
+                HttpMethod.GET,
+                new HttpEntity<>(null, getNecessaryRequestHeaders()),
+                Void.class
+            );
+        } catch (HttpStatusCodeException e) {
+            log.error("Error determining if request is redirected: status code ({}), response body ({}), error = {}",
+                e.getStatusCode(),
+                e.getResponseBodyAsString(),
+                e.getMessage()
+            );
+
+            String errorHtmlBodyTitle = HtmlParser.getTitleTextFromHtml(e.getResponseBodyAsString());
+
+            if (errorHtmlBodyTitle != null && errorHtmlBodyTitle.contains(CLOUDFLARE_TITLE)) {
+                waitForCloudflareToAllowAccessToKissanime(true);
+                return requestIsRedirected(url);
+            }
+
+            throw e;
+        }
 
         return response.getStatusCode() == HttpStatus.FOUND;
     }
@@ -386,12 +405,34 @@ public class KissanimeRuService {
     public KissanimeVideoHostResponse getVideoHostUrlFromEpisodePage(String episodeUrl) {
         log.info("Getting video host iframe's src value for URL ({})", episodeUrl);
         waitForCloudflareToAllowAccessToKissanime();
-        String episodePageHtml = new RestTemplate().exchange(
-            episodeUrl,
-            HttpMethod.GET,
-            new HttpEntity<>(null, getNecessaryRequestHeaders()),
-            String.class
-        ).getBody();
+
+        ResponseEntity<String> response;
+
+        try {
+            response = new RestTemplate().exchange(
+                episodeUrl,
+                HttpMethod.GET,
+                new HttpEntity<>(null, getNecessaryRequestHeaders()),
+                String.class
+            );
+        } catch (HttpStatusCodeException e) {
+            log.error("Error getting video host: status code ({}), response body ({}), error = {}",
+                e.getStatusCode(),
+                e.getResponseBodyAsString(),
+                e.getMessage()
+            );
+
+            String errorHtmlBodyTitle = HtmlParser.getTitleTextFromHtml(e.getResponseBodyAsString());
+
+            if (errorHtmlBodyTitle != null && errorHtmlBodyTitle.contains(CLOUDFLARE_TITLE)) {
+                waitForCloudflareToAllowAccessToKissanime(true);
+                return getVideoHostUrlFromEpisodePage(episodeUrl);
+            }
+
+            throw e;
+        }
+
+        String episodePageHtml = response.getBody();
 
         String videoIframeSrcRegex = "(<iframe[^>]+my_video_1[^>]+src=[\"'])([^\"']+)";
         String videoHostUrl = RegexUtils.getFirstMatchGroups(videoIframeSrcRegex, episodePageHtml, Pattern.CASE_INSENSITIVE).get(2);
