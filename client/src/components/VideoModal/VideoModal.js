@@ -5,8 +5,10 @@ import Video from 'components/ui/Video';
 import Spinner from 'components/ui/Spinner';
 import ErrorDisplay from 'components/ui/ErrorDisplay';
 import Anchor from 'components/ui/Anchor';
+import IncompatibleBrowserFallback from 'components/IncompatibleBrowserFallback';
 import { searchForEpisodeHost } from 'services/EpisodeHostSearchService';
 import { getImageSrcPath, getVideoSrcPath, getVideoNameDataFromUrl } from 'services/Urls';
+import { isSafariBrowser } from 'utils/BrowserIdentification';
 
 function VideoModal(props) {
     const defaultStateValues = {
@@ -29,6 +31,7 @@ function VideoModal(props) {
     const [ captchaImagesLoaded, setCaptchaImagesLoaded ] = useState(defaultStateValues.captchaImagesLoaded);
     const [ videoHostUrl, setVideoHostUrl ] = useState(defaultStateValues.videoHostUrl);
     const modalRef = useRef(null);
+    const videoRef = useRef(null);
 
     const isDisplayingVideo = videoOptions.length > 0;
 
@@ -191,11 +194,26 @@ function VideoModal(props) {
         const { label, file } = videoOptions[0];
 
         return (
-            <Video
-                className={'w-100'}
-                src={getVideoSrcPath(showName, episodeName, label, file)}
-                videoElementProps={props.videoElementProps}
-            />
+            <div>
+                <Video
+                    className={'w-100'}
+                    src={getVideoSrcPath(showName, episodeName, label, file)}
+                    videoElementProps={props.videoElementProps}
+                    videoRef={videoRef}
+                />
+                <div>
+                    {(isSafariBrowser() && videoRef.current && videoRef.current.readyState < 3)
+                        ? (
+                            <IncompatibleBrowserFallback
+                                centered={false}
+                                displayElement={'h3'}
+                                text={"If the video doesn't load, then use a modern browser (Chrome, Firefox) to view this website."}
+                            />
+                        )
+                        : ''
+                    }
+                </div>
+            </div>
         );
     };
 
