@@ -1,4 +1,4 @@
-# <a href="https://anime-atsume.herokuapp.com/" target="_blank" rel="noopener noreferrer">Anime Atsume</a>
+# Anime Atsume
 
 An overly simplistic website for finding and watching anime.
 
