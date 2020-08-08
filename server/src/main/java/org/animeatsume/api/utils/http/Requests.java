@@ -10,6 +10,7 @@ import org.springframework.http.*;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
@@ -81,32 +82,42 @@ public class Requests {
         Object body;
 
         try {
-            response = restTemplate.exchange(
-                url,
-                method,
-                requestEntity,
-                responseType
-            );
-            body = response.getBody();
-        } catch (Exception e) {
-            log.info("Failed to parse response to type ({}), proceeding with getting plain text. Error cause = {}", responseType, e.getMessage());
+            try {
+                response = restTemplate.exchange(
+                    url,
+                    method,
+                    requestEntity,
+                    responseType
+                );
+                body = response.getBody();
+            } catch (Exception e) {
+                log.info("Failed to parse response to type ({}), proceeding with getting plain text. Error cause = {}", responseType, e.getMessage());
 
-            response = restTemplate.exchange(
-                url,
-                method,
-                requestEntity,
-                String.class
-            );
-            body = response.getBody();
+                response = restTemplate.exchange(
+                    url,
+                    method,
+                    requestEntity,
+                    String.class
+                );
+                body = response.getBody();
 
-            if (responseType != String.class) {
-                Object parsedObject = ObjectUtils.sanitizeAndParseJsonToClass((String) body, responseType);
+                if (responseType != String.class) {
+                    Object parsedObject = ObjectUtils.sanitizeAndParseJsonToClass((String) body, responseType);
 
-                if (parsedObject != null) {
-                    log.info("String from response body successfully parsed to ({})", responseType);
-                    body = parsedObject;
+                    if (parsedObject != null) {
+                        log.info("String from response body successfully parsed to ({})", responseType);
+                        body = parsedObject;
+                    }
                 }
             }
+        } catch (HttpStatusCodeException e) {
+            log.error("Error executing request: status code ({}), response body ({}), error = {}",
+                e.getStatusCode(),
+                e.getResponseBodyAsString(),
+                e.getMessage()
+            );
+
+            return new ResponseEntity<>(e.getResponseBodyAsString(), e.getResponseHeaders(), e.getStatusCode());
         }
 
         return new ResponseEntity<>(body, response.getHeaders(), response.getStatusCode());
