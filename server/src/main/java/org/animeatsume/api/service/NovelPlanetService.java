@@ -37,10 +37,13 @@ public class NovelPlanetService {
     }
 
     public NovelPlanetSourceResponse getRedirectorSourcesForVideo(String apiUrl, HttpEntity<Void> requestEntity) {
+        HttpHeaders redirectorHeaders = Requests.copyHttpHeaders(requestEntity.getHeaders());
+        redirectorHeaders.set(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE);
+
         ResponseEntity<NovelPlanetSourceResponse> response = new RestTemplate().exchange(
             apiUrl,
             HttpMethod.POST,
-            requestEntity,
+            new HttpEntity<>(requestEntity.getBody(), redirectorHeaders),
             NovelPlanetSourceResponse.class
         );
 
