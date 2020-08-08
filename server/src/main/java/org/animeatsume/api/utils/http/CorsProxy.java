@@ -44,7 +44,7 @@ public class CorsProxy {
         Requests.addAcceptableMediaTypes(restTemplate, MediaType.APPLICATION_FORM_URLENCODED);
         restTemplate.getMessageConverters().add(new FormHttpMessageConverter());
 
-        ResponseEntity<?> response = Requests.doRequestWithStringFallback(restTemplate, url, method, corsEntity, responseClass);
+        ResponseEntity<?> response = Requests.doRequestWithFallback(restTemplate, url, method, corsEntity, responseClass);
         Object responseBody = response.getBody();
         HttpHeaders responseHeaders = Requests.copyHttpHeaders(response.getHeaders());
 

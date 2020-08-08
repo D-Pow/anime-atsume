@@ -143,7 +143,7 @@ public class Requests {
         return Resource.class;
     }
 
-    public static ResponseEntity<?> doRequestWithStringFallback(
+    public static ResponseEntity<?> doRequestWithFallback(
         RestTemplate restTemplate,
         URI url,
         HttpMethod method,
@@ -163,17 +163,24 @@ public class Requests {
                 );
                 body = response.getBody();
             } catch (Exception e) {
-                log.info("Failed to parse response to type ({}), proceeding with getting plain text. Error cause = {}", responseType, e.getMessage());
+                log.info("Failed to parse response to type ({}), proceeding with getting type from header. Error cause = {}", responseType, e.getMessage());
+
+                HttpHeaders responseHeaders = headForHeadersWithAcceptAllFallback(url, restTemplate, requestEntity);
+                String contentTypeHeader = responseHeaders.getContentType().toString();
+                Class<?> actualResponseTypeClass = getClassFromContentTypeHeader(contentTypeHeader);
 
                 response = restTemplate.exchange(
                     url,
                     method,
                     requestEntity,
-                    String.class
+                    actualResponseTypeClass
                 );
                 body = response.getBody();
 
-                if (responseType != String.class) {
+                if (actualResponseTypeClass == String.class && responseType != String.class) {
+                    // If expecting an object but received a string, it's probably because
+                    // there are invalid characters.
+                    // Thus, attempt to parse the object after removing invalid characters.
                     Object parsedObject = ObjectUtils.sanitizeAndParseJsonToClass((String) body, responseType);
 
                     if (parsedObject != null) {
