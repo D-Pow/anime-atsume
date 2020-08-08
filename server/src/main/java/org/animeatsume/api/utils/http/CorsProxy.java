@@ -1,6 +1,5 @@
 package org.animeatsume.api.utils.http;
 
-import org.springframework.core.io.Resource;
 import org.springframework.http.*;
 import org.springframework.http.converter.FormHttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
@@ -13,31 +12,15 @@ public class CorsProxy {
     public static ResponseEntity<?> doCorsRequest(HttpMethod method, URI url, Object body, HttpHeaders headers) {
         String origin = UriParser.getOrigin(url);
         HttpEntity<Object> corsEntity = getCorsEntity(body, origin, origin, null, headers, true);
-        List<String> acceptHeaders = corsEntity.getHeaders().get(HttpHeaders.ACCEPT);
+        List<MediaType> requestAcceptHeaders = corsEntity.getHeaders().getAccept();
 
-        if (acceptHeaders == null || acceptHeaders.size() == 0) {
+        if (requestAcceptHeaders.size() == 0) {
             return ResponseEntity
                 .status(HttpStatus.NOT_ACCEPTABLE)
                 .body("You must add a value for the 'Accept' header");
         }
 
-        boolean responseIsText = acceptHeaders.stream().reduce(
-            false,
-            (isText, headerEntry) -> headerEntry.contains("text"),
-            (prevIsText, nextIsText) -> prevIsText || nextIsText
-        );
-
-        boolean responseIsResource = acceptHeaders.stream().reduce(
-            false,
-            (isResource, headerEntry) -> headerEntry.contains("image") || headerEntry.contains("video") || headerEntry.contains("audio"),
-            (prevIsResource, nextIsResource) -> prevIsResource || nextIsResource
-        );
-
-        Class<?> responseClass = responseIsText
-            ? String.class
-            : responseIsResource
-                ? Resource.class
-                : Object.class;
+        Class<?> responseClass = Requests.getClassFromContentTypeHeader(requestAcceptHeaders.toString());
         RestTemplate restTemplate = Requests.getNoFollowRedirectsRestTemplate();
 
         // Add support for form-data requests and Map<String,String> responses
