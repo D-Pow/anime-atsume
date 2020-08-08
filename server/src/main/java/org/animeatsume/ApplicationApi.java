@@ -38,7 +38,7 @@ public class ApplicationApi {
 
     @PostMapping(value = "/corsProxy", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     public ResponseEntity<?> postCorsRequestWithFormData(
-        @RequestParam Map<String, String> body,
+        @RequestParam(required = false) Map<String, String> body,
         @RequestParam("url") URI url,
         @RequestHeader HttpHeaders requestHeaders,
         HttpServletRequest request
