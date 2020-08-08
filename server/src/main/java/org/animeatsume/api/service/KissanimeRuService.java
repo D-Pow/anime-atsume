@@ -63,7 +63,12 @@ public class KissanimeRuService {
         // Load Kissanime on app startup to avoid having to wait for
         // Cloudflare's DDoS delay
         CookieHandler.setDefault(new CookieManager());
-        bypassCloudflareDdosScreen();
+        bypassCloudflareDdosScreen(false);
+    }
+
+    @Async
+    CompletableFuture<Boolean> bypassCloudflareDdosScreen() {
+        return bypassCloudflareDdosScreen(true);
     }
 
     /**
@@ -75,7 +80,7 @@ public class KissanimeRuService {
      * cookie it needs.
      */
     @Async
-    CompletableFuture<Boolean> bypassCloudflareDdosScreen() {
+    CompletableFuture<Boolean> bypassCloudflareDdosScreen(boolean throwErrorOnFailure) {
         PageConfiguration pageConfiguration = new PageConfiguration();
         pageConfiguration.setUserAgent(MOCK_FIREFOX_USER_AGENT);
 
@@ -120,7 +125,11 @@ public class KissanimeRuService {
             PageUtils.getInnerText(kissanimePage)
         );
 
-        throw new RuntimeException("Cannot bypass Cloudflare or access Kissanime");
+        if (throwErrorOnFailure) {
+            throw new RuntimeException("Cannot bypass Cloudflare or access Kissanime");
+        }
+
+        return CompletableFuture.completedFuture(false);
     }
 
     public HttpCookie getAuthCookie() {
