@@ -109,7 +109,7 @@ public class Requests {
             }
         }
 
-        return new ResponseEntity(body, response.getHeaders(), response.getStatusCode());
+        return new ResponseEntity<>(body, response.getHeaders(), response.getStatusCode());
     }
 
     /**
