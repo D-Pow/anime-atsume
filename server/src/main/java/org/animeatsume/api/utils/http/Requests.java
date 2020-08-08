@@ -130,7 +130,11 @@ public class Requests {
         List<String> textType = Arrays.asList("text");
 
         Predicate<List<String>> headerMatchesTypeListEntry = (List<String> typeList) ->
-            typeList.stream().anyMatch(type -> contentTypeHeader.toLowerCase().contains(type));
+            typeList.stream().anyMatch(type -> (
+                contentTypeHeader != null
+                && !contentTypeHeader.isEmpty()
+                && contentTypeHeader.toLowerCase().contains(type)
+            ));
 
         if (headerMatchesTypeListEntry.test(objectType)) {
             return Object.class;
