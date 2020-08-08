@@ -32,7 +32,7 @@ public class Requests {
         HttpHeaders copiedHeaders = new HttpHeaders();
 
         if (headers != null) {
-            copiedHeaders.putAll(headers);
+            headers.forEach(copiedHeaders::addAll);
         }
 
         return copiedHeaders;
