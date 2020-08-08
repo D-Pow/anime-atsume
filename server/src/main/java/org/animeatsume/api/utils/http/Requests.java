@@ -22,6 +22,7 @@ import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 public class Requests {
@@ -122,6 +123,24 @@ public class Requests {
         }
 
         return headResponseHeaders;
+    }
+
+    public static Class<?> getClassFromContentTypeHeader(String contentTypeHeader) {
+        List<String> objectType = Arrays.asList("json", "xml");
+        List<String> textType = Arrays.asList("text");
+
+        Predicate<List<String>> headerMatchesTypeListEntry = (List<String> typeList) ->
+            typeList.stream().anyMatch(type -> contentTypeHeader.toLowerCase().contains(type));
+
+        if (headerMatchesTypeListEntry.test(objectType)) {
+            return Object.class;
+        }
+
+        if (headerMatchesTypeListEntry.test(textType)) {
+            return String.class;
+        }
+
+        return Resource.class;
     }
 
     public static ResponseEntity<?> doRequestWithStringFallback(
