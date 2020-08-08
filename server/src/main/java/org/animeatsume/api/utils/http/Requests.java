@@ -10,6 +10,8 @@ import org.springframework.http.*;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 
@@ -69,6 +71,57 @@ public class Requests {
         MappingJackson2HttpMessageConverter httpMediaTypeConverter = new MappingJackson2HttpMessageConverter();
         httpMediaTypeConverter.setSupportedMediaTypes(Arrays.asList(mediaTypes));
         restTemplate.getMessageConverters().add(httpMediaTypeConverter);
+    }
+
+    public static HttpHeaders headForHeadersWithAcceptAllFallback(
+        URI url,
+        RestTemplate restTemplate,
+        HttpEntity<?> requestEntity
+    ) {
+        HttpHeaders headersForHeadRequest = new HttpHeaders();
+        Object requestBody = null;
+        RestTemplate headRequest = new RestTemplate();
+
+        if (requestEntity != null) {
+            headersForHeadRequest = copyHttpHeaders(requestEntity.getHeaders());
+            requestBody = requestEntity.getBody();
+            headRequest = restTemplate;
+        }
+
+        HttpHeaders headResponseHeaders;
+
+        try {
+            headResponseHeaders = headRequest.headForHeaders(url);
+        } catch (HttpClientErrorException e) {
+            log.error("Error executing HEAD request: status code ({}), response body ({}), error = {}",
+                e.getStatusCode(),
+                e.getResponseBodyAsString(),
+                e.getMessage()
+            );
+            log.info("Attempting HEAD request with 'Accept: */*'...");
+
+            headersForHeadRequest.add(HttpHeaders.ACCEPT, "*/*");
+
+            /*
+             * Use RestTemplate.exchange() instead of .headForHeaders() in
+             * order to add the "Accept: (all)" header to the request and let
+             * it, as well as any other headers in requestEntity, to be passed
+             * along in the HEAD request.
+             *
+             * Since HttpHeaders cannot be parsed by RestTemplate's responseExtractor,
+             * cast it to a MultiValueMap, the superclass of HttpMethod.
+             */
+            ResponseEntity<MultiValueMap> headResponse = headRequest.exchange(
+                url,
+                HttpMethod.HEAD,
+                new HttpEntity<>(requestBody, headersForHeadRequest),
+                MultiValueMap.class
+            );
+
+            headResponseHeaders = headResponse.getHeaders();
+        }
+
+        return headResponseHeaders;
     }
 
     public static ResponseEntity<?> doRequestWithStringFallback(
