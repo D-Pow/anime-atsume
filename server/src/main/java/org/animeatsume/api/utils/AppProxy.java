@@ -1,5 +1,7 @@
 package org.animeatsume.api.utils;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.client.RestTemplate;
 
@@ -7,10 +9,19 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Slf4j
 public class AppProxy {
+    @Data
+    @AllArgsConstructor
+    public static class Proxy {
+        private String ip;
+        private String port;
+    }
+
     private static final String IP_TEST_URL = "https://api.ipify.org";
+    private static final String RESIDENTIAL_PROXY_GEN_URL = "http://pubproxy.com/api/proxy";
     private static final Map<String, List<String>> JVM_HTTP_PROXY_OPTIONS;
 
     static {
@@ -67,5 +78,55 @@ public class AppProxy {
         return new RestTemplate()
             .getForEntity(IP_TEST_URL, String.class)
             .getBody();
+    }
+
+    public static Proxy getNewResidentialProxy() {
+        // PubProxy URL query param options and their optimum values
+        String[][] options = new String[][] {
+            { "format", "txt" },
+            { "type", "http" },
+            { "level", "anonymous" },
+            { "https", "true" },
+            { "post", "true" },
+            { "cookies", "true" }
+        };
+        String urlOptions = Arrays.stream(options)
+            .map(option -> String.format("%s=%s", option[0], option[1]))
+            .collect(Collectors.joining("&"));
+        String proxyGeneratorUrl = RESIDENTIAL_PROXY_GEN_URL + "?" + urlOptions;
+        String newProxyIpAndPort = new RestTemplate()
+            .getForEntity(proxyGeneratorUrl, String.class)
+            .getBody();
+
+        if (newProxyIpAndPort != null && !newProxyIpAndPort.isEmpty()) {
+            String[] proxyFields = newProxyIpAndPort.split(":");
+
+            return new Proxy(proxyFields[0], proxyFields[1]);
+        }
+
+        return null;
+    }
+
+    /**
+     * Gets a new residential proxy IP/port and attempts to set the
+     * system-wide proxy to use it.
+     *
+     * If the obtained residential proxy fails to connect, then it
+     * will continue to get other residential proxies until one succeeds.
+     */
+    public static void setHttpProxyToNewResidentialProxy() {
+        boolean setProxySuccess = false;
+
+        while (!setProxySuccess) {
+            Proxy newProxy = getNewResidentialProxy();
+
+            if (newProxy == null) {
+                log.info("Residential proxy could not be obtained.");
+                continue;
+            }
+
+            log.info("New residential proxy obtained ({}), setting system proxy...", newProxy);
+            setProxySuccess = setHttpProxy(newProxy.getIp(), newProxy.getPort());
+        }
     }
 }
