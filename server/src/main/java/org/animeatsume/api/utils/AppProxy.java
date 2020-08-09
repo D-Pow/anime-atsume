@@ -2,19 +2,23 @@ package org.animeatsume.api.utils;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
 public class AppProxy {
     @Data
     @AllArgsConstructor
+    @EqualsAndHashCode
     public static class Proxy {
         private String ip;
         private String port;
@@ -23,6 +27,7 @@ public class AppProxy {
     private static final String IP_TEST_URL = "https://api.ipify.org";
     private static final String RESIDENTIAL_PROXY_GEN_URL = "http://pubproxy.com/api/proxy";
     private static final Map<String, List<String>> JVM_HTTP_PROXY_OPTIONS;
+    private static final Set<Proxy> USED_PROXIES = new HashSet<>();
 
     static {
         JVM_HTTP_PROXY_OPTIONS = new HashMap<>();
@@ -120,12 +125,15 @@ public class AppProxy {
         while (!setProxySuccess) {
             Proxy newProxy = getNewResidentialProxy();
 
-            if (newProxy == null) {
-                log.info("Residential proxy could not be obtained.");
+            if (newProxy == null || USED_PROXIES.contains(newProxy)) {
+                log.info("Residential proxy {}. Retrying...",
+                    newProxy == null ? "could not be obtained" : "has already been used"
+                );
                 continue;
             }
 
             log.info("New residential proxy obtained ({}), setting system proxy...", newProxy);
+            USED_PROXIES.add(newProxy);
             setProxySuccess = setHttpProxy(newProxy.getIp(), newProxy.getPort());
         }
     }
