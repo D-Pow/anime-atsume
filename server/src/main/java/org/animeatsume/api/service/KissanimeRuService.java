@@ -173,8 +173,9 @@ public class KissanimeRuService {
             try {
                 bypassCloudflareDdosScreen().get();
             } catch (Exception e) {
-                log.error("Refreshing Kissanime auth token has failed. Error:");
-                e.printStackTrace();
+                log.error("Refreshing Kissanime auth token has failed. Error: {}",
+                    e.getMessage()
+                );
 
                 throw new RuntimeException("Cannot bypass Cloudflare or access Kissanime");
             }
