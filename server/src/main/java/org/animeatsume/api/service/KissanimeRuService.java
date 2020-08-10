@@ -33,6 +33,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.net.CookieHandler;
 import java.net.CookieManager;
+import java.net.CookieStore;
 import java.net.HttpCookie;
 import java.net.URI;
 import java.util.Arrays;
@@ -141,6 +142,13 @@ public class KissanimeRuService {
         }
 
         return CompletableFuture.completedFuture(false);
+    }
+
+    private void clearAllCookies() {
+        CookieStore cookieStore = ((CookieManager) CookieHandler.getDefault()).getCookieStore();
+        cookieStore.removeAll();
+
+        log.info("All cookies cleared.");
     }
 
     public HttpCookie getAuthCookie() {
