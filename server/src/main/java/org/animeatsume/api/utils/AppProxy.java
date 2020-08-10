@@ -6,6 +6,7 @@ import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -27,6 +28,7 @@ public class AppProxy {
     private static final String IP_TEST_URL = "https://api.ipify.org";
     private static final String RESIDENTIAL_PROXY_GEN_URL = "http://pubproxy.com/api/proxy";
     private static final Map<String, List<String>> JVM_HTTP_PROXY_OPTIONS;
+    private static final List<Proxy> AVAILABLE_PROXIES = new ArrayList<>();
     private static final Set<Proxy> USED_PROXIES = new HashSet<>();
 
     static {
@@ -85,10 +87,19 @@ public class AppProxy {
             .getBody();
     }
 
-    public static Proxy getNewResidentialProxy() {
+    private static void addUnusedProxiesToAvailableProxies(List<Proxy> proxies) {
+        proxies.forEach(proxy -> {
+            if (!USED_PROXIES.contains(proxy) && !AVAILABLE_PROXIES.contains(proxy)) {
+                AVAILABLE_PROXIES.add(proxy);
+            }
+        });
+    }
+
+    private static boolean getNewResidentialProxies() {
         // PubProxy URL query param options and their optimum values
         String[][] options = new String[][] {
             { "format", "txt" },
+            { "limit", "5" }, // free tier caps response list at 5
             { "type", "http" },
             { "level", "anonymous" },
             { "https", "true" },
@@ -99,17 +110,25 @@ public class AppProxy {
             .map(option -> String.format("%s=%s", option[0], option[1]))
             .collect(Collectors.joining("&"));
         String proxyGeneratorUrl = RESIDENTIAL_PROXY_GEN_URL + "?" + urlOptions;
-        String newProxyIpAndPort = new RestTemplate()
+        String newProxiesIpsAndPorts = new RestTemplate()
             .getForEntity(proxyGeneratorUrl, String.class)
             .getBody();
 
-        if (newProxyIpAndPort != null && !newProxyIpAndPort.isEmpty()) {
-            String[] proxyFields = newProxyIpAndPort.split(":");
+        if (newProxiesIpsAndPorts != null && !newProxiesIpsAndPorts.isEmpty()) {
+            List<Proxy> receivedProxies = Arrays.stream(newProxiesIpsAndPorts.split("\n"))
+                .map(proxyEntry -> {
+                    String[] proxyFields = proxyEntry.split(":");
 
-            return new Proxy(proxyFields[0], proxyFields[1]);
+                    return new Proxy(proxyFields[0], proxyFields[1]);
+                })
+                .collect(Collectors.toList());
+
+            addUnusedProxiesToAvailableProxies(receivedProxies);
+
+            return true;
         }
 
-        return null;
+        return false;
     }
 
     /**
@@ -123,18 +142,25 @@ public class AppProxy {
         boolean setProxySuccess = false;
 
         while (!setProxySuccess) {
-            Proxy newProxy = getNewResidentialProxy();
+            if (AVAILABLE_PROXIES.isEmpty()) {
+                boolean newProxiesObtained = getNewResidentialProxies();
 
-            if (newProxy == null || USED_PROXIES.contains(newProxy)) {
-                log.info("Residential proxy {}. Retrying...",
-                    newProxy == null ? "could not be obtained" : "has already been used"
-                );
-                continue;
+                if (!newProxiesObtained) {
+                    log.info("New residential proxies could not be obtained.");
+                    return;
+                }
             }
 
-            log.info("New residential proxy obtained ({}), setting system proxy...", newProxy);
-            USED_PROXIES.add(newProxy);
-            setProxySuccess = setHttpProxy(newProxy.getIp(), newProxy.getPort());
+            if (AVAILABLE_PROXIES.size() > 0) {
+                Proxy newProxy = AVAILABLE_PROXIES.remove(AVAILABLE_PROXIES.size() - 1);
+                USED_PROXIES.add(newProxy);
+
+                log.info("New residential proxy obtained ({}), {} left. Setting system proxy now...", newProxy, AVAILABLE_PROXIES.size());
+                setProxySuccess = setHttpProxy(newProxy.getIp(), newProxy.getPort());
+            } else {
+                log.info("All available proxies have been used.");
+                return;
+            }
         }
     }
 }
