@@ -10,6 +10,7 @@ import org.animeatsume.api.model.KissanimeSearchRequest;
 import org.animeatsume.api.model.KissanimeSearchResponse;
 import org.animeatsume.api.model.KissanimeVideoHostResponse;
 import org.animeatsume.api.utils.ObjectUtils;
+import org.animeatsume.api.utils.AppProxy;
 import org.animeatsume.api.utils.http.Requests;
 import org.animeatsume.api.utils.regex.HtmlParser;
 import org.animeatsume.api.utils.regex.RegexUtils;
@@ -111,11 +112,14 @@ public class KissanimeRuService {
                 pageTitle.toLowerCase().contains(BANNED_TITLE.toLowerCase())
                 || PageUtils.getUrl(kissanimePage).equalsIgnoreCase(BANNED_URL)
             ) {
-                log.info("Redirected to banned page with title ({}) and URL ({}). Attempting circumventing by re-navigating to {}",
+                log.info("Redirected to banned page with title ({}) and URL ({}). Attempting circumventing by setting new proxy and re-navigating to {}",
                     pageTitle,
                     PageUtils.getUrl(kissanimePage),
                     KISSANIME_ORIGIN
                 );
+                kissanimePage.close();
+                clearAllCookies();
+                AppProxy.setHttpProxyToNewResidentialProxy();
                 kissanimePage = browser.navigate(KISSANIME_ORIGIN, pageConfiguration);
             }
 
