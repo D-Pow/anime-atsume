@@ -169,6 +169,10 @@ public class Requests {
             } catch (Exception e) {
                 log.info("Failed to parse response to type ({}), proceeding with getting type from header. Error cause = {}", responseType, e.getMessage());
 
+                if (responseType == String.class && e instanceof HttpStatusCodeException) {
+                    throw e;
+                }
+
                 HttpHeaders responseHeaders = headForHeadersWithAcceptAllFallback(url, restTemplate, requestEntity);
                 String contentTypeHeader = responseHeaders.getContentType().toString();
                 Class<?> actualResponseTypeClass = getClassFromContentTypeHeader(contentTypeHeader);
