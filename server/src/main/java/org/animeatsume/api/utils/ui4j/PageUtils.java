@@ -18,4 +18,8 @@ public class PageUtils {
     public static String getUrl(Page page) {
         return page.getWindow().getLocation();
     }
+
+    public static String getHtml(Page page) {
+        return (String) page.executeScript("document.documentElement.outerHTML");
+    }
 }
