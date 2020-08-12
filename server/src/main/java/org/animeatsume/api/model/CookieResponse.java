@@ -39,4 +39,21 @@ public class CookieResponse {
 
         return cookie;
     }
+
+    public static CookieResponse fromHttpCookie(HttpCookie httpCookie) {
+        return new CookieResponse(
+            httpCookie.getName(),
+            httpCookie.getValue(),
+            httpCookie.getComment(),
+            httpCookie.getCommentURL(),
+            httpCookie.getDomain(),
+            httpCookie.getMaxAge(),
+            httpCookie.getPath(),
+            httpCookie.getPortlist(),
+            httpCookie.getSecure(),
+            httpCookie.isHttpOnly(),
+            httpCookie.getVersion(),
+            httpCookie.getDiscard()
+        );
+    }
 }
