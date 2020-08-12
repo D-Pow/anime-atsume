@@ -9,9 +9,9 @@ import java.util.List;
 import java.util.Map;
 
 public class CorsProxy {
-    public static ResponseEntity<?> doCorsRequest(HttpMethod method, URI url, Object body, HttpHeaders headers) {
-        String origin = UriParser.getOrigin(url);
-        HttpEntity<Object> corsEntity = getCorsEntity(body, origin, origin, null, headers, true);
+    public static ResponseEntity<?> doCorsRequest(HttpMethod method, URI url, URI origin, Object body, HttpHeaders headers) {
+        String corsOrigin = origin != null ? origin.toString() : UriParser.getOrigin(url);
+        HttpEntity<Object> corsEntity = getCorsEntity(body, corsOrigin, corsOrigin, null, headers, true);
         List<MediaType> requestAcceptHeaders = corsEntity.getHeaders().getAccept();
 
         if (requestAcceptHeaders.size() == 0) {

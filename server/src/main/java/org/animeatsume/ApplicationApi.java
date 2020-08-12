@@ -30,28 +30,32 @@ public class ApplicationApi {
     @GetMapping(value = "/corsProxy", consumes = MediaType.ALL_VALUE)
     public ResponseEntity<?> getCorsRequest(
         @RequestParam("url") URI url,
+        @RequestParam(value = "origin", required = false) URI origin,
         @RequestHeader HttpHeaders requestHeaders,
         HttpServletRequest request
     ) {
-        return postCorsRequest(null, url, requestHeaders, request);
+        return postCorsRequest(null, url, origin, requestHeaders, request);
     }
 
     @PostMapping(value = "/corsProxy", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     public ResponseEntity<?> postCorsRequestWithFormData(
         @RequestParam(required = false) Map<String, String> body,
         @RequestParam("url") URI url,
+        @RequestParam(value = "origin", required = false) URI origin,
         @RequestHeader HttpHeaders requestHeaders,
         HttpServletRequest request
     ) {
         body.remove("url");
+        body.remove("origin");
 
-        return postCorsRequest(body, url, requestHeaders, request);
+        return postCorsRequest(body, url, origin, requestHeaders, request);
     }
 
     @PostMapping("/corsProxy")
     public ResponseEntity<?> postCorsRequest(
         @RequestBody(required = false) Object body,
         @RequestParam("url") URI url,
+        @RequestParam(value = "origin", required = false) URI origin,
         @RequestHeader HttpHeaders requestHeaders,
         HttpServletRequest request
     ) {
@@ -59,7 +63,7 @@ public class ApplicationApi {
 
         log.info("Executing {} CORS request to URL ({}) with body ({})", method, url, body);
 
-        return CorsProxy.doCorsRequest(method, url, body, requestHeaders);
+        return CorsProxy.doCorsRequest(method, url, origin, body, requestHeaders);
     }
 
     @Cacheable(ApplicationConfig.KISSANIME_TITLE_SEARCH_CACHE_NAME)
