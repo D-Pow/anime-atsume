@@ -55,7 +55,7 @@ function About(props) {
                         simplistic, easy to use interface, and the quickest possible
                         path from finding to watching your shows.
                     </div>
-                    <div className={'p mt-5'}>
+                    <div className={'mt-5'}>
                         <span className={'font-weight-bold'}>Note: </span>
                         This app uses the {"browser's"} <pre className={'d-inline'}>localStorage</pre> feature to keep
                         track of your last watched episodes for a given show so you can easily continue a series from
