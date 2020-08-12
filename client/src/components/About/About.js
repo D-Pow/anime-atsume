@@ -1,6 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Header from 'components/Header';
+import Anchor from 'components/ui/Anchor';
+import Image from 'components/ui/Image';
+import { LINKS } from 'utils/Constants';
 
 function About(props) {
     const handleStorageClearButtonClick = () => {
@@ -70,6 +73,12 @@ function About(props) {
                             here
                         </button>
                         .
+                    </div>
+                    <div className={'mt-5'}>
+                        View the source code on GitHub
+                        <Anchor className={'d-block'} href={LINKS.AnimeAtsume}>
+                            <Image className={'w-7 h-7'} image={'github_logo.svg'} />
+                        </Anchor>
                     </div>
                 </div>
             </div>
