@@ -48,7 +48,7 @@ public class KissanimeRuService {
             CookieResponse.class
         );
 
-        HttpCookie authCookie = cookieGetterResponse.getBody().asHttpCookie();
+        HttpCookie authCookie = cookieGetterResponse.getBody().toHttpCookie();
 
         return authCookie;
     }

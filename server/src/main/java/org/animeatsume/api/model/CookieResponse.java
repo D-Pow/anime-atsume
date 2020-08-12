@@ -23,7 +23,7 @@ public class CookieResponse {
     private Integer version;
     private Boolean discard;
 
-    public HttpCookie asHttpCookie() {
+    public HttpCookie toHttpCookie() {
         HttpCookie cookie = new HttpCookie(this.getName(), this.getValue());
 
         cookie.setComment(this.getComment());
