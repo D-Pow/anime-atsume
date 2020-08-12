@@ -1,11 +1,9 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { importImageAsync } from 'utils/Events';
-import AppContext, { AppContextFields } from 'utils/AppContext';
 
 function Image(props) {
     const [ imageSrc, setImageSrc ] = useState('');
-    const { setContextState } = useContext(AppContext.Context);
 
     async function loadImageSrc() {
         const imageSrc = await importImageAsync(props.image);
@@ -14,23 +12,10 @@ function Image(props) {
     }
 
     useEffect(() => {
-        incrementAppContextField();
         loadImageSrc();
-    }, [props.image]);
-
-    function incrementAppContextField(finishedLoading = false) {
-        if (props.updateAppContext) {
-            const contextField = finishedLoading ? AppContextFields.LOADED : AppContextFields.REQUESTED;
-
-            setContextState(prevState => ({
-                ...prevState,
-                [contextField]: prevState[contextField] + 1
-            }));
-        }
-    }
+    }, [ props.image ]);
 
     function handleLoad(e) {
-        incrementAppContextField(true);
         props.onLoad(e);
     }
 
@@ -49,7 +34,6 @@ Image.propTypes = {
     className: PropTypes.string,
     image: PropTypes.string,
     fluidImage: PropTypes.bool,
-    updateAppContext: PropTypes.bool,
     onLoad: PropTypes.func,
     aria: PropTypes.object
 };
@@ -58,7 +42,6 @@ Image.defaultProps = {
     className: '',
     image: '',
     fluidImage: true,
-    updateAppContext: true,
     onLoad: () => {},
     aria: {}
 };
