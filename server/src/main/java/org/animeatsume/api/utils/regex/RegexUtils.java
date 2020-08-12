@@ -28,7 +28,7 @@ public class RegexUtils {
         Pattern regexPattern = Pattern.compile(regex, patternOption);
         Matcher strToSearchMatcher = regexPattern.matcher(toSearch);
 
-        while(strToSearchMatcher.find()) {
+        while (strToSearchMatcher.find()) {
             List<String> matchGroups = new ArrayList<>();
 
             for (int i = 0; i <= strToSearchMatcher.groupCount(); i++) {
