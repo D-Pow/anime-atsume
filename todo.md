@@ -1,6 +1,4 @@
 Front-end
-    * Add link to GitHub repo (via icon, like in personal website)
-    * Scroll down to episodes on show click on mobile
 
 Back-end
     * Set request timeout?
