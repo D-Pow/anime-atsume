@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { fetchKitsuTitleSearch } from 'services/KitsuAnimeSearchService';
 import { searchForShow } from 'services/ShowSearchService';
@@ -22,6 +22,7 @@ function Show(props) {
     const [ selectedShow, setSelectedShow ] = useState(null);
     const [ selectedEpisode, setSelectedEpisode ] = useState(null);
     const [ showsProgress, setShowsProgress ] = useStorage('showsProgress', { initialValue: {} });
+    const episodesTitleRef = useRef()
 
     async function fetchKitsuInfo() {
         const response = await fetchKitsuTitleSearch(title.toLowerCase());
@@ -161,7 +162,13 @@ function Show(props) {
                     className={`btn list-group-item remove-focus-highlight ${selectedShow === i ? 'active' : ''}`}
                     id={getIdForSelectableElement(i, showTitle)}
                     key={i}
-                    onClick={() => setSelectedShow(i)}
+                    onClick={() => {
+                        setSelectedShow(i)
+
+                        if (episodesTitleRef.current) {
+                            episodesTitleRef.current.scrollIntoView({ block: 'start', inline: 'center' });
+                        }
+                    }}
                 >
                     <div className={'d-flex justify-content-between align-items-center'}>
                         <h5 className={'mb-2 d-flex d-sm-none'}>
@@ -310,7 +317,7 @@ function Show(props) {
                 <div className={'col-sm-12 col-md-6'}>
                     <div>
                         <h3 className={'mb-2 d-none d-sm-block'}>Episodes</h3>
-                        <h4 className={'mb-2 d-block d-sm-none'}>Episodes</h4>
+                        <h4 className={'mb-2 d-block d-sm-none'} ref={episodesTitleRef}>Episodes</h4>
                     </div>
                     <div
                         className={`text-left list-group overflow-auto ${episodeBorderCls} fix-strange-z-index-scrollbars`}
