@@ -31,5 +31,6 @@ export const MOBILE_OR_TABLET_REGEX = new RegExp(mobileBrowserRegexBase.replace(
 export const EMAIL_REGEX = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
 
 export const LINKS = {
-    GitHub: 'https://github.com/'
+    GitHub: 'https://github.com/',
+    AnimeAtsume: 'https://github.com/D-Pow/anime-atsume'
 };
