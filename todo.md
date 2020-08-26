@@ -16,5 +16,6 @@ Back-end
         - One option: https://www.reddit.com/r/reactjs/comments/i1sxu4/project_stream_torrent_in_the_browser/?utm_medium=android_app&utm_source=share
     * Add bypass logic for Cloudflare's "One more step" captcha page
     * Duplicate refactors done in other branch on master
+        - Include refactor: return video response as `{ url, isVideoSrcNestable }` or related var name.
     * Decide on best buffer size (1080p is about 16.5 MB/min, 720p is about 9 MB/min) if UrlResource doesn't work
     * Way to download videos
