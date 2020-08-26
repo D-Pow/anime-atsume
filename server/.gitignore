@@ -1,3 +1,4 @@
 .gradle/
 build/
 videos/
+src/main/resources/public/
