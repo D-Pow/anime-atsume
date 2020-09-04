@@ -17,5 +17,6 @@ Back-end
     * Add bypass logic for Cloudflare's "One more step" captcha page
     * Duplicate refactors done in other branch on master
         - Include refactor: return video response as `{ url, isVideoSrcNestable }` or related var name.
+    * Add sanitization for database insertions since they come from front-end.
     * Decide on best buffer size (1080p is about 16.5 MB/min, 720p is about 9 MB/min) if UrlResource doesn't work
     * Way to download videos
