@@ -78,8 +78,7 @@ public class ApplicationApi {
 
         if (activateKissanime) {
             return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(kissanimeRuController.searchKissanimeTitles(titleSearchRequest));
+                .ok(kissanimeRuController.searchKissanimeTitles(titleSearchRequest));
         }
 
         return ResponseEntity
@@ -102,8 +101,7 @@ public class ApplicationApi {
     public ResponseEntity<NovelPlanetSourceResponse> getNovelPlanetSources(@RequestBody NovelPlanetUrlRequest novelPlanetRequest) {
         if (activateKissanime) {
             return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(kissanimeRuController.getVideoSourcesForNovelPlanetHost(novelPlanetRequest.getNovelPlanetUrl().toString()));
+                .ok(kissanimeRuController.getVideoSourcesForNovelPlanetHost(novelPlanetRequest.getNovelPlanetUrl().toString()));
         }
 
         return ResponseEntity
