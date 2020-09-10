@@ -6,7 +6,7 @@ import io.webfolder.ui4j.api.browser.Page;
 import io.webfolder.ui4j.api.browser.PageConfiguration;
 import org.animeatsume.api.model.Anchor;
 import org.animeatsume.api.model.CaptchaAttempt;
-import org.animeatsume.api.model.KissanimeSearchRequest;
+import org.animeatsume.api.model.TitleSearchRequest;
 import org.animeatsume.api.model.KissanimeSearchResponse;
 import org.animeatsume.api.model.KissanimeVideoHostResponse;
 import org.animeatsume.api.utils.ObjectUtils;
@@ -210,9 +210,9 @@ public class KissanimeRuService {
         return headers;
     }
 
-    public KissanimeSearchResponse searchKissanimeTitles(KissanimeSearchRequest kissanimeSearchRequest) {
+    public KissanimeSearchResponse searchKissanimeTitles(TitleSearchRequest titleSearchRequest) {
         waitForCloudflareToAllowAccessToKissanime();
-        String requestSearchTitle = kissanimeSearchRequest.getTitle();
+        String requestSearchTitle = titleSearchRequest.getTitle();
 
         log.info("Searching Kissanime for title ({}) ...", requestSearchTitle);
 
@@ -249,7 +249,7 @@ public class KissanimeRuService {
              */
             if (errorHtmlBodyTitle != null && errorHtmlBodyTitle.contains(CLOUDFLARE_TITLE)) {
                 waitForCloudflareToAllowAccessToKissanime(true);
-                return searchKissanimeTitles(kissanimeSearchRequest);
+                return searchKissanimeTitles(titleSearchRequest);
             }
 
             throw e;

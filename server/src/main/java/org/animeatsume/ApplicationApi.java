@@ -72,11 +72,11 @@ public class ApplicationApi {
 
     @Cacheable(ApplicationConfig.KISSANIME_TITLE_SEARCH_CACHE_NAME)
     @PostMapping(value = "/searchKissanime", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<KissanimeSearchResponse> searchKissanime(@RequestBody KissanimeSearchRequest kissanimeSearchRequest) {
+    public ResponseEntity<KissanimeSearchResponse> searchKissanime(@RequestBody TitleSearchRequest titleSearchRequest) {
         if (activateKissanime) {
             return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(kissanimeRuController.searchKissanimeTitles(kissanimeSearchRequest));
+                .body(kissanimeRuController.searchKissanimeTitles(titleSearchRequest));
         }
 
         return ResponseEntity

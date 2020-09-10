@@ -5,6 +5,6 @@ import lombok.Data;
 
 @Data
 @JsonIgnoreProperties
-public class KissanimeSearchRequest {
+public class TitleSearchRequest {
     private String title;
 }
