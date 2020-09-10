@@ -4,6 +4,7 @@ import org.animeatsume.api.controller.KissanimeRuController;
 import org.animeatsume.api.service.NovelPlanetService;
 import org.animeatsume.api.model.*;
 import org.animeatsume.api.utils.http.CorsProxy;
+import org.animeatsume.api.utils.regex.RegexUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,6 +74,8 @@ public class ApplicationApi {
     @Cacheable(ApplicationConfig.KISSANIME_TITLE_SEARCH_CACHE_NAME)
     @PostMapping(value = "/searchKissanime", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<KissanimeSearchResponse> searchKissanime(@RequestBody TitleSearchRequest titleSearchRequest) {
+        titleSearchRequest.setTitle(RegexUtils.removeNonAlphanumericChars(titleSearchRequest.getTitle()));
+
         if (activateKissanime) {
             return ResponseEntity
                 .status(HttpStatus.OK)
