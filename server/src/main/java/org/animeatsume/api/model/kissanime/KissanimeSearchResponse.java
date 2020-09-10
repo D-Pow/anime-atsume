@@ -1,9 +1,10 @@
-package org.animeatsume.api.model;
+package org.animeatsume.api.model.kissanime;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.animeatsume.api.model.Anchor;
 
 import java.util.List;
 

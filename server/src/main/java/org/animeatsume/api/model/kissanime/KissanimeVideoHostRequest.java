@@ -1,4 +1,4 @@
-package org.animeatsume.api.model;
+package org.animeatsume.api.model.kissanime;
 
 import lombok.Data;
 

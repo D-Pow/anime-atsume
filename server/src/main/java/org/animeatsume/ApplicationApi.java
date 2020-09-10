@@ -1,8 +1,12 @@
 package org.animeatsume;
 
 import org.animeatsume.api.controller.KissanimeRuController;
+import org.animeatsume.api.model.TitleSearchRequest;
+import org.animeatsume.api.model.kissanime.KissanimeSearchResponse;
+import org.animeatsume.api.model.kissanime.KissanimeVideoHostRequest;
+import org.animeatsume.api.model.kissanime.NovelPlanetSourceResponse;
+import org.animeatsume.api.model.kissanime.NovelPlanetUrlRequest;
 import org.animeatsume.api.service.NovelPlanetService;
-import org.animeatsume.api.model.*;
 import org.animeatsume.api.utils.http.CorsProxy;
 import org.animeatsume.api.utils.regex.RegexUtils;
 import org.slf4j.Logger;

@@ -1,6 +1,6 @@
 package org.animeatsume.api.service;
 
-import org.animeatsume.api.model.NovelPlanetSourceResponse;
+import org.animeatsume.api.model.kissanime.NovelPlanetSourceResponse;
 import org.animeatsume.api.utils.http.Cookies;
 import org.animeatsume.api.utils.http.CorsProxy;
 import org.animeatsume.api.utils.http.Requests;

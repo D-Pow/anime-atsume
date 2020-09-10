@@ -1,4 +1,4 @@
-package org.animeatsume.api.model;
+package org.animeatsume.api.model.kissanime;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
