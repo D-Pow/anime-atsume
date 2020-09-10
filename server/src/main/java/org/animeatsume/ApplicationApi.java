@@ -7,6 +7,7 @@ import org.animeatsume.api.utils.http.CorsProxy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.io.Resource;
 import org.springframework.http.*;
@@ -26,6 +27,9 @@ public class ApplicationApi {
 
     @Autowired
     NovelPlanetService novelPlanetService;
+
+    @Value("${org.animeatsume.activate-kissanime}")
+    Boolean activateKissanime;
 
     @GetMapping(value = "/corsProxy", consumes = MediaType.ALL_VALUE)
     public ResponseEntity<?> getCorsRequest(
@@ -68,18 +72,40 @@ public class ApplicationApi {
 
     @Cacheable(ApplicationConfig.KISSANIME_TITLE_SEARCH_CACHE_NAME)
     @PostMapping(value = "/searchKissanime", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public KissanimeSearchResponse searchKissanime(@RequestBody KissanimeSearchRequest kissanimeSearchRequest) {
-        return kissanimeRuController.searchKissanimeTitles(kissanimeSearchRequest);
+    public ResponseEntity<KissanimeSearchResponse> searchKissanime(@RequestBody KissanimeSearchRequest kissanimeSearchRequest) {
+        if (activateKissanime) {
+            return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(kissanimeRuController.searchKissanimeTitles(kissanimeSearchRequest));
+        }
+
+        return ResponseEntity
+            .status(HttpStatus.NOT_FOUND)
+            .build();
     }
 
     @PostMapping(value = "/getVideosForEpisode")
     public ResponseEntity<Object> getVideoHostUrlForKissanimeEpisode(@RequestBody KissanimeVideoHostRequest kissanimeEpisodeRequest) {
-        return kissanimeRuController.getVideosForKissanimeEpisode(kissanimeEpisodeRequest);
+        if (activateKissanime) {
+            return kissanimeRuController.getVideosForKissanimeEpisode(kissanimeEpisodeRequest);
+        }
+
+        return ResponseEntity
+            .status(HttpStatus.NOT_FOUND)
+            .build();
     }
 
     @PostMapping(value = "/getNovelPlanetSources", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public NovelPlanetSourceResponse getNovelPlanetSources(@RequestBody NovelPlanetUrlRequest novelPlanetRequest) {
-        return kissanimeRuController.getVideoSourcesForNovelPlanetHost(novelPlanetRequest.getNovelPlanetUrl().toString());
+    public ResponseEntity<NovelPlanetSourceResponse> getNovelPlanetSources(@RequestBody NovelPlanetUrlRequest novelPlanetRequest) {
+        if (activateKissanime) {
+            return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(kissanimeRuController.getVideoSourcesForNovelPlanetHost(novelPlanetRequest.getNovelPlanetUrl().toString()));
+        }
+
+        return ResponseEntity
+            .status(HttpStatus.NOT_FOUND)
+            .build();
     }
 
     @GetMapping(value = "/video/{show}/{episode}/{quality}", produces = { "video/mp4", MediaType.APPLICATION_OCTET_STREAM_VALUE })
@@ -109,17 +135,29 @@ public class ApplicationApi {
                 .build();
         }
 
-        return kissanimeRuController.getNovelPlanetVideoStream(
-            showName,
-            episodeName,
-            videoQuality,
-            novelPlanetUrl,
-            requestHeaders
-        );
+        if (activateKissanime) {
+            return kissanimeRuController.getNovelPlanetVideoStream(
+                showName,
+                episodeName,
+                videoQuality,
+                novelPlanetUrl,
+                requestHeaders
+            );
+        }
+
+        return ResponseEntity
+            .status(HttpStatus.NOT_FOUND)
+            .build();
     }
 
     @GetMapping(value = "/image/{id}", produces = { MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_PNG_VALUE })
     public ResponseEntity<Resource> getKissanimeCaptchaImage(@PathVariable("id") String imageId) {
-        return kissanimeRuController.getProxiedKissanimeCaptchaImage(imageId);
+        if (activateKissanime) {
+            return kissanimeRuController.getProxiedKissanimeCaptchaImage(imageId);
+        }
+
+        return ResponseEntity
+            .status(HttpStatus.NOT_FOUND)
+            .build();
     }
 }

@@ -63,11 +63,14 @@ public class KissanimeRuService {
     private static final String COOKIE_AUTH_NAME = "cf_clearance";
     private static final String NOVEL_PLANET_QUERY_PARAM = "&s=nova";
 
+    private final Boolean activateKissanime;
     private final int numAttemptsToBypassCloudflare;
 
     public KissanimeRuService(
+        @Value("${org.animeatsume.activate-kissanime}") Boolean activateKissanime,
         @Value("${org.animeatsume.num-attempts-to-bypass-cloudflare}") Integer numAttemptsToBypassCloudflare
     ) {
+        this.activateKissanime = activateKissanime;
         this.numAttemptsToBypassCloudflare = numAttemptsToBypassCloudflare;
         setup();
     }
@@ -76,7 +79,10 @@ public class KissanimeRuService {
         // Load Kissanime on app startup to avoid having to wait for
         // Cloudflare's DDoS delay
         CookieHandler.setDefault(new CookieManager());
-        bypassCloudflareDdosScreen(false);
+
+        if (activateKissanime) {
+            bypassCloudflareDdosScreen(false);
+        }
     }
 
     @Async
