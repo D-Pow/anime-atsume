@@ -46,7 +46,7 @@ public class KissanimeRuService {
     private static final Logger log = LoggerFactory.getLogger(KissanimeRuService.class);
 
     // BrowserEngine is a singleton; improve performance by avoiding making `synchronized` calls in endpoint handling
-    private static final BrowserEngine browser = BrowserFactory.getWebKit();
+    private static BrowserEngine browser;
 
     private static final String KISSANIME_ORIGIN = "https://kissanime.ru";
     private static final String ARE_YOU_HUMAN_IMG_PATH = "/Special/CapImg/";
@@ -81,6 +81,7 @@ public class KissanimeRuService {
         CookieHandler.setDefault(new CookieManager());
 
         if (activateKissanime) {
+            browser = BrowserFactory.getWebKit();
             bypassCloudflareDdosScreen(false);
         }
     }
