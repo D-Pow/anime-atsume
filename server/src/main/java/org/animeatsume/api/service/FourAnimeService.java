@@ -1,8 +1,13 @@
 package org.animeatsume.api.service;
 
 import lombok.extern.slf4j.Slf4j;
+import org.animeatsume.api.model.TitlesEpisodesSearchResults;
+import org.animeatsume.api.model.TitlesEpisodesSearchResults.TitleResults;
 import org.animeatsume.api.utils.http.CorsProxy;
 import org.animeatsume.api.utils.http.Requests;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -12,12 +17,14 @@ import org.springframework.stereotype.Service;
 
 import java.net.URI;
 import java.util.Arrays;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 public class FourAnimeService {
     private static final String ORIGIN = "https://4anime.to";
     private static final String SEARCH_URL = ORIGIN + "/wp-admin/admin-ajax.php";
+    private static final String TITLE_ANCHOR_SELECTOR = "a.name";
 
     @Value("${org.animeatsume.mock-firefox-user-agent}")
     private String mockFirefoxUserAgent;
@@ -37,7 +44,7 @@ public class FourAnimeService {
         return headers;
     }
 
-    public String searchTitle(String title) {
+    public TitlesEpisodesSearchResults searchTitle(String title) {
         String[][] titleSearchFormData = getTitleSearchHttpEntity(title);
 
         HttpHeaders headers = getNecessaryRequestHeaders();
@@ -53,6 +60,18 @@ public class FourAnimeService {
             titleSearchHttpEntity.getHeaders()
         ).getBody();
 
-        return searchResponseHtml;
+        if (searchResponseHtml != null) {
+            Document titleResultsDocument = Jsoup.parse(searchResponseHtml);
+            Elements titleAnchors = titleResultsDocument.select(TITLE_ANCHOR_SELECTOR);
+
+            return new TitlesEpisodesSearchResults(titleAnchors.stream()
+                .map(element -> new TitleResults(
+                    element.attr("href"),
+                    element.text()
+                ))
+                .collect(Collectors.toList()));
+        }
+
+        return null;
     }
 }
