@@ -76,7 +76,7 @@ public class Requests {
         restTemplate.getMessageConverters().add(httpMediaTypeConverter);
     }
 
-    public static HttpEntity<?> getFormDataHttpEntity(@Nullable HttpHeaders requestHeaders, String[][] bodyEntries) {
+    public static HttpEntity<MultiValueMap<String, String>> getFormDataHttpEntity(@Nullable HttpHeaders requestHeaders, String[][] bodyEntries) {
         HttpHeaders headers = requestHeaders != null ? requestHeaders : new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 

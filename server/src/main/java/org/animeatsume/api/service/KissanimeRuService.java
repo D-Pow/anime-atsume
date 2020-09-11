@@ -397,7 +397,7 @@ public class KissanimeRuService {
         HttpHeaders headers = getNecessaryRequestHeaders();
         headers.setAccept(Arrays.asList(MediaType.TEXT_HTML, MediaType.APPLICATION_XHTML_XML, MediaType.APPLICATION_XML));
 
-        HttpEntity<?> requestHttpEntity = Requests.getFormDataHttpEntity(headers, new String[][]{
+        HttpEntity requestHttpEntity = Requests.getFormDataHttpEntity(headers, new String[][]{
             { "reUrl", urlPathWithQueryParams },
             { "answerCap", captchaAnswerTextForKissanimeForm }
         });
