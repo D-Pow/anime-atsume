@@ -1,5 +1,6 @@
 package org.animeatsume;
 
+import org.animeatsume.api.controller.FourAnimeController;
 import org.animeatsume.api.controller.KissanimeRuController;
 import org.animeatsume.api.model.TitleSearchRequest;
 import org.animeatsume.api.model.kissanime.KissanimeSearchResponse;
@@ -29,6 +30,9 @@ public class ApplicationApi {
 
     @Autowired
     KissanimeRuController kissanimeRuController;
+
+    @Autowired
+    FourAnimeController fourAnimeController;
 
     @Autowired
     NovelPlanetService novelPlanetService;
@@ -76,8 +80,8 @@ public class ApplicationApi {
     }
 
     @Cacheable(ApplicationConfig.KISSANIME_TITLE_SEARCH_CACHE_NAME)
-    @PostMapping(value = "/searchKissanime", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<KissanimeSearchResponse> searchKissanime(@RequestBody TitleSearchRequest titleSearchRequest) {
+    @PostMapping(value = "/searchAnime", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Object> searchKissanime(@RequestBody TitleSearchRequest titleSearchRequest) {
         titleSearchRequest.setTitle(RegexUtils.removeNonAlphanumericChars(titleSearchRequest.getTitle()));
 
         if (activateKissanime) {
@@ -86,8 +90,7 @@ public class ApplicationApi {
         }
 
         return ResponseEntity
-            .status(HttpStatus.NOT_FOUND)
-            .build();
+            .ok(fourAnimeController.searchTitle(titleSearchRequest));
     }
 
     @PostMapping(value = "/getVideosForEpisode")
