@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 public class TitlesEpisodesSearchResults {
     @Data
     @EqualsAndHashCode(callSuper = true)
-    public static class SearchResults extends VideoSearchResult {
+    public static class TitleResults extends VideoSearchResult {
         private List<VideoSearchResult> episodes;
 
         private static List<VideoSearchResult> mapAnchorListToVideoSearchResult(List<Anchor> episodes, boolean isDirectSource) {
@@ -24,12 +24,12 @@ public class TitlesEpisodesSearchResults {
                 .collect(Collectors.toList());
         }
 
-        public SearchResults(String url, String title) {
+        public TitleResults(String url, String title) {
             this(url, title, new ArrayList<>(), false);
         }
 
-        public SearchResults(String url, String title, List<Anchor> episodes, boolean areVideosDirectSource) {
-            super(url, title, areVideosDirectSource);
+        public TitleResults(String url, String title, List<Anchor> episodes, boolean areVideosDirectSource) {
+            super(url, title, false);
             setEpisodes(episodes, areVideosDirectSource);
         }
 
@@ -42,5 +42,5 @@ public class TitlesEpisodesSearchResults {
         }
     }
 
-    private List<SearchResults> results;
+    private List<TitleResults> results;
 }

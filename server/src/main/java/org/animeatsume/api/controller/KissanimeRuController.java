@@ -56,7 +56,7 @@ public class KissanimeRuController {
 
     public TitlesEpisodesSearchResults searchKissanimeTitles(TitleSearchRequest titleSearchRequest) {
         TitlesEpisodesSearchResults titlesEpisodesSearchResults = kissanimeService.searchKissanimeTitles(titleSearchRequest);
-        List<TitlesEpisodesSearchResults.SearchResults> titleSearchResults = titlesEpisodesSearchResults.getResults();
+        List<TitlesEpisodesSearchResults.TitleResults> titleSearchResults = titlesEpisodesSearchResults.getResults();
 
         if (titleSearchResults != null) {
             List<CompletableFuture<List<Anchor>>> episodeSearchResultsFutures = new ArrayList<>();
@@ -66,7 +66,7 @@ public class KissanimeRuController {
             });
 
             ObjectUtils.getAllCompletableFutureResults(episodeSearchResultsFutures, (episodeAnchorList, index) -> {
-                TitlesEpisodesSearchResults.SearchResults episodeSearchResult = titleSearchResults.get(index);
+                TitlesEpisodesSearchResults.TitleResults episodeSearchResult = titleSearchResults.get(index);
                 List<Anchor> episodeLinks = new ArrayList<>();
 
                 if (episodeAnchorList != null) {

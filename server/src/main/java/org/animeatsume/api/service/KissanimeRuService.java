@@ -261,12 +261,12 @@ public class KissanimeRuService {
             String anchorResultsWithoutSpan = searchResults.replaceAll("</?span>", "");
             List<String> anchorResultsList = Arrays.asList(anchorResultsWithoutSpan.split("><"));
 
-            List<TitlesEpisodesSearchResults.SearchResults> searchResponses = anchorResultsList.stream()
+            List<TitlesEpisodesSearchResults.TitleResults> searchResponses = anchorResultsList.stream()
                 .map(anchorString -> {
                     String url = HtmlParser.getUrlFromAnchor(anchorString);
                     String title = HtmlParser.getTextFromAnchor(anchorString);
 
-                    return new TitlesEpisodesSearchResults.SearchResults(url, title);
+                    return new TitlesEpisodesSearchResults.TitleResults(url, title);
                 })
                 .collect(Collectors.toList());
 
