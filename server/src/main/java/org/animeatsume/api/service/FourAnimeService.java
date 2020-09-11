@@ -3,12 +3,12 @@ package org.animeatsume.api.service;
 import lombok.extern.slf4j.Slf4j;
 import org.animeatsume.api.utils.http.CorsProxy;
 import org.animeatsume.api.utils.http.Requests;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
 import java.util.Arrays;
@@ -19,6 +19,9 @@ public class FourAnimeService {
     private static final String ORIGIN = "https://4anime.to";
     private static final String SEARCH_URL = ORIGIN + "/wp-admin/admin-ajax.php";
 
+    @Value("${org.animeatsume.mock-firefox-user-agent}")
+    private String mockFirefoxUserAgent;
+
     private static String[][] getTitleSearchHttpEntity(String title) {
         return new String[][] {
             { "action", "ajaxsearchlite_search" },
@@ -28,24 +31,20 @@ public class FourAnimeService {
         };
     }
 
+    private HttpHeaders getNecessaryRequestHeaders() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("User-Agent", mockFirefoxUserAgent);
+        return headers;
+    }
+
     public String searchTitle(String title) {
         String[][] titleSearchFormData = getTitleSearchHttpEntity(title);
 
-        HttpHeaders headers = new HttpHeaders();
+        HttpHeaders headers = getNecessaryRequestHeaders();
         headers.setAccept(Arrays.asList(MediaType.TEXT_PLAIN, MediaType.TEXT_HTML, MediaType.ALL));
 
         HttpEntity titleSearchHttpEntity = Requests.getFormDataHttpEntity(headers, titleSearchFormData);
 
-        log.info("Plain request: {}",
-            new RestTemplate().exchange(
-                ORIGIN,
-                HttpMethod.GET,
-                new HttpEntity<>(headers, null),
-                String.class
-            )
-        );
-
-log.info("Headers: {}", titleSearchHttpEntity.getHeaders());
         String searchResponseHtml = (String) CorsProxy.doCorsRequest(
             HttpMethod.POST,
             URI.create(SEARCH_URL),
@@ -53,8 +52,6 @@ log.info("Headers: {}", titleSearchHttpEntity.getHeaders());
             titleSearchHttpEntity.getBody(),
             titleSearchHttpEntity.getHeaders()
         ).getBody();
-
-        log.info("Response: {}", searchResponseHtml);
 
         return searchResponseHtml;
     }
