@@ -10,6 +10,8 @@ import org.springframework.http.*;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.lang.Nullable;
+import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpStatusCodeException;
@@ -72,6 +74,19 @@ public class Requests {
         MappingJackson2HttpMessageConverter httpMediaTypeConverter = new MappingJackson2HttpMessageConverter();
         httpMediaTypeConverter.setSupportedMediaTypes(Arrays.asList(mediaTypes));
         restTemplate.getMessageConverters().add(httpMediaTypeConverter);
+    }
+
+    public static HttpEntity<?> getFormDataHttpEntity(@Nullable HttpHeaders requestHeaders, String[][] bodyEntries) {
+        HttpHeaders headers = requestHeaders != null ? requestHeaders : new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+        MultiValueMap<String, String> formDataBody = new LinkedMultiValueMap<>();
+
+        Stream.of(bodyEntries).forEach(keyValPair -> {
+            formDataBody.add(keyValPair[0], keyValPair[1]);
+        });
+
+        return new HttpEntity<>(formDataBody, headers);
     }
 
     public static HttpHeaders headForHeadersWithAcceptAllFallback(

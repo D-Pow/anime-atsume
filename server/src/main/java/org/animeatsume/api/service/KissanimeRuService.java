@@ -27,8 +27,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 
@@ -217,11 +215,10 @@ public class KissanimeRuService {
         log.info("Searching Kissanime for title ({}) ...", requestSearchTitle);
 
         HttpHeaders headers = getNecessaryRequestHeaders();
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-
-        MultiValueMap<String, String> formDataBody = new LinkedMultiValueMap<>();
-        formDataBody.add("type", "Anime");
-        formDataBody.add("keyword", requestSearchTitle);
+        HttpEntity searchHttpEntity = Requests.getFormDataHttpEntity(headers, new String[][]{
+            { "type", "Anime" },
+            { "keyword", requestSearchTitle }
+        });
 
         ResponseEntity<String> searchResponse;
 
@@ -229,7 +226,7 @@ public class KissanimeRuService {
             searchResponse = new RestTemplate().exchange(
                 TITLE_SEARCH_URL,
                 HttpMethod.POST,
-                new HttpEntity<>(formDataBody, headers),
+                searchHttpEntity,
                 String.class
             );
         } catch (HttpStatusCodeException e) {
@@ -398,19 +395,19 @@ public class KissanimeRuService {
             .collect(Collectors.joining(","));
 
         HttpHeaders headers = getNecessaryRequestHeaders();
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         headers.setAccept(Arrays.asList(MediaType.TEXT_HTML, MediaType.APPLICATION_XHTML_XML, MediaType.APPLICATION_XML));
 
-        MultiValueMap<String, String> formDataBody = new LinkedMultiValueMap<>();
-        formDataBody.add("reUrl", urlPathWithQueryParams);
-        formDataBody.add("answerCap", captchaAnswerTextForKissanimeForm);
+        HttpEntity<?> requestHttpEntity = Requests.getFormDataHttpEntity(headers, new String[][]{
+            { "reUrl", urlPathWithQueryParams },
+            { "answerCap", captchaAnswerTextForKissanimeForm }
+        });
 
         RestTemplate captchaSolverRequest = Requests.getNoFollowRedirectsRestTemplate();
 
         ResponseEntity<Void> captchaSolverResponse = captchaSolverRequest.exchange(
             ARE_YOU_HUMAN_FORM_ACTION_URL,
             HttpMethod.POST,
-            new HttpEntity<>(formDataBody, headers),
+            requestHttpEntity,
             Void.class
         );
 
