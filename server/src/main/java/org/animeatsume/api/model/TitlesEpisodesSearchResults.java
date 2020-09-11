@@ -1,11 +1,9 @@
-package org.animeatsume.api.model.kissanime;
+package org.animeatsume.api.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.animeatsume.api.model.Anchor;
-import org.animeatsume.api.model.VideoSearchResult;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +12,7 @@ import java.util.stream.Collectors;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class KissanimeSearchResponse {
+public class TitlesEpisodesSearchResults {
     @Data
     @EqualsAndHashCode(callSuper = true)
     public static class SearchResults extends VideoSearchResult {

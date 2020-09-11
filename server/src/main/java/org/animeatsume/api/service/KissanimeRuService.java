@@ -7,7 +7,7 @@ import io.webfolder.ui4j.api.browser.PageConfiguration;
 import org.animeatsume.api.model.Anchor;
 import org.animeatsume.api.model.kissanime.CaptchaAttempt;
 import org.animeatsume.api.model.TitleSearchRequest;
-import org.animeatsume.api.model.kissanime.KissanimeSearchResponse;
+import org.animeatsume.api.model.TitlesEpisodesSearchResults;
 import org.animeatsume.api.model.kissanime.KissanimeVideoHostResponse;
 import org.animeatsume.api.utils.ObjectUtils;
 import org.animeatsume.api.utils.AppProxy;
@@ -211,7 +211,7 @@ public class KissanimeRuService {
         return headers;
     }
 
-    public KissanimeSearchResponse searchKissanimeTitles(TitleSearchRequest titleSearchRequest) {
+    public TitlesEpisodesSearchResults searchKissanimeTitles(TitleSearchRequest titleSearchRequest) {
         waitForCloudflareToAllowAccessToKissanime();
         String requestSearchTitle = titleSearchRequest.getTitle();
 
@@ -261,19 +261,19 @@ public class KissanimeRuService {
             String anchorResultsWithoutSpan = searchResults.replaceAll("</?span>", "");
             List<String> anchorResultsList = Arrays.asList(anchorResultsWithoutSpan.split("><"));
 
-            List<KissanimeSearchResponse.SearchResults> searchResponses = anchorResultsList.stream()
+            List<TitlesEpisodesSearchResults.SearchResults> searchResponses = anchorResultsList.stream()
                 .map(anchorString -> {
                     String url = HtmlParser.getUrlFromAnchor(anchorString);
                     String title = HtmlParser.getTextFromAnchor(anchorString);
 
-                    return new KissanimeSearchResponse.SearchResults(url, title);
+                    return new TitlesEpisodesSearchResults.SearchResults(url, title);
                 })
                 .collect(Collectors.toList());
 
-            return new KissanimeSearchResponse(searchResponses);
+            return new TitlesEpisodesSearchResults(searchResponses);
         }
 
-        return new KissanimeSearchResponse();
+        return new TitlesEpisodesSearchResults();
     }
 
     @Async

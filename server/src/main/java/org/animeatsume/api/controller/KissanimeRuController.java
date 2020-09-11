@@ -3,7 +3,7 @@ package org.animeatsume.api.controller;
 import org.animeatsume.api.model.Anchor;
 import org.animeatsume.api.model.TitleSearchRequest;
 import org.animeatsume.api.model.kissanime.CaptchaAttempt;
-import org.animeatsume.api.model.kissanime.KissanimeSearchResponse;
+import org.animeatsume.api.model.TitlesEpisodesSearchResults;
 import org.animeatsume.api.model.kissanime.KissanimeVideoHostRequest;
 import org.animeatsume.api.model.kissanime.KissanimeVideoHostResponse;
 import org.animeatsume.api.model.kissanime.NovelPlanetSourceResponse;
@@ -54,9 +54,9 @@ public class KissanimeRuController {
     @Autowired
     AnimeAtsumeDao dao;
 
-    public KissanimeSearchResponse searchKissanimeTitles(TitleSearchRequest titleSearchRequest) {
-        KissanimeSearchResponse kissanimeSearchResponse = kissanimeService.searchKissanimeTitles(titleSearchRequest);
-        List<KissanimeSearchResponse.SearchResults> titleSearchResults = kissanimeSearchResponse.getResults();
+    public TitlesEpisodesSearchResults searchKissanimeTitles(TitleSearchRequest titleSearchRequest) {
+        TitlesEpisodesSearchResults titlesEpisodesSearchResults = kissanimeService.searchKissanimeTitles(titleSearchRequest);
+        List<TitlesEpisodesSearchResults.SearchResults> titleSearchResults = titlesEpisodesSearchResults.getResults();
 
         if (titleSearchResults != null) {
             List<CompletableFuture<List<Anchor>>> episodeSearchResultsFutures = new ArrayList<>();
@@ -66,7 +66,7 @@ public class KissanimeRuController {
             });
 
             ObjectUtils.getAllCompletableFutureResults(episodeSearchResultsFutures, (episodeAnchorList, index) -> {
-                KissanimeSearchResponse.SearchResults episodeSearchResult = titleSearchResults.get(index);
+                TitlesEpisodesSearchResults.SearchResults episodeSearchResult = titleSearchResults.get(index);
                 List<Anchor> episodeLinks = new ArrayList<>();
 
                 if (episodeAnchorList != null) {
@@ -77,7 +77,7 @@ public class KissanimeRuController {
             });
         }
 
-        return kissanimeSearchResponse;
+        return titlesEpisodesSearchResults;
     }
 
     public ResponseEntity<Object> getVideosForKissanimeEpisode(KissanimeVideoHostRequest request) {
