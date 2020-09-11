@@ -57,19 +57,21 @@ public class KissanimeRuService {
     private static final String KISSANIME_TITLE = "KissAnime";
     private static final String BANNED_TITLE = "Access Denied";
     private static final String BANNED_URL = "https://kissanime.ru/ToYou/Banned/";
-    private static final String MOCK_FIREFOX_USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:77.0) Gecko/20100101 Firefox/77.0";
     private static final String COOKIE_AUTH_NAME = "cf_clearance";
     private static final String NOVEL_PLANET_QUERY_PARAM = "&s=nova";
 
     private final Boolean activateKissanime;
     private final int numAttemptsToBypassCloudflare;
+    private final String mockFirefoxUserAgent;
 
     public KissanimeRuService(
         @Value("${org.animeatsume.activate-kissanime}") Boolean activateKissanime,
-        @Value("${org.animeatsume.num-attempts-to-bypass-cloudflare}") Integer numAttemptsToBypassCloudflare
+        @Value("${org.animeatsume.num-attempts-to-bypass-cloudflare}") Integer numAttemptsToBypassCloudflare,
+        @Value("${org.animeatsume.mock-firefox-user-agent}") String mockFirefoxUserAgent
     ) {
         this.activateKissanime = activateKissanime;
         this.numAttemptsToBypassCloudflare = numAttemptsToBypassCloudflare;
+        this.mockFirefoxUserAgent = mockFirefoxUserAgent;
         setup();
     }
 
@@ -99,7 +101,7 @@ public class KissanimeRuService {
     @Async
     CompletableFuture<Boolean> bypassCloudflareDdosScreen(boolean throwErrorOnFailure) {
         PageConfiguration pageConfiguration = new PageConfiguration();
-        pageConfiguration.setUserAgent(MOCK_FIREFOX_USER_AGENT);
+        pageConfiguration.setUserAgent(mockFirefoxUserAgent);
 
         Page kissanimePage = browser.navigate(KISSANIME_ORIGIN, pageConfiguration);
 
@@ -201,7 +203,7 @@ public class KissanimeRuService {
     private HttpHeaders getNecessaryRequestHeaders() {
         HttpHeaders headers = new HttpHeaders();
 
-        headers.set("User-Agent", MOCK_FIREFOX_USER_AGENT);
+        headers.set("User-Agent", mockFirefoxUserAgent);
         headers.set("Cookie", getAuthCookie().toString());
         headers.add("Origin", KISSANIME_ORIGIN);
 
