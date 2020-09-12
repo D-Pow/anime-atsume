@@ -15,7 +15,7 @@ export const IMAGE_BASE_PATH = '/image';
 export const CORS_PROXY_URL = '/corsProxy?url=';
 
 export const getCorsProxyUrl = url => getSearchUrl(CORS_PROXY_URL, url);
-export const getVideoSrcPath = (showName, episodeName, quality, hostUrl) => `${VIDEO_BASE_PATH}/${showName}/${episodeName}/${quality}?url=${hostUrl}`;
+export const getVideoSrcPath = (showName, episodeName, quality, hostUrl) => `${VIDEO_BASE_PATH}/${showName.replaceAll(' ', '-')}/${episodeName.replaceAll(' ', '-')}/${quality}?url=${hostUrl}`;
 export const getImageSrcPath = imageId => `${IMAGE_BASE_PATH}/${imageId}`;
 
 export function getVideoNameDataFromUrl(kissanimeEpisodeUrl) {
