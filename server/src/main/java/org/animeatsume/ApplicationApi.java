@@ -145,19 +145,21 @@ public class ApplicationApi {
                 .build();
         }
 
-        if (activateKissanime) {
-            return kissanimeRuController.getNovelPlanetVideoStream(
+        try {
+            return kissanimeRuController.getProxiedVideoStream(
                 showName,
                 episodeName,
                 videoQuality,
                 videoUrl,
                 requestHeaders
             );
-        }
+        } catch (Exception e) {
+            log.error("Could not proxy video stream. Error: {}", e.getMessage());
 
-        return ResponseEntity
-            .status(HttpStatus.NOT_FOUND)
-            .build();
+            return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .build();
+        }
     }
 
     @GetMapping(value = "/image/{id}", produces = { MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_PNG_VALUE })

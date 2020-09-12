@@ -270,31 +270,31 @@ public class KissanimeRuController {
         );
     }
 
-    public ResponseEntity<Resource> getNovelPlanetVideoStream(
+    public ResponseEntity<Resource> getProxiedVideoStream(
         String showName,
         String episodeName,
         String videoQuality,
-        String novelPlanetSourceUrl,
+        String videoUrl,
         HttpHeaders requestHeaders
     ) {
         log.info("Serving video stream: show name ({}), episode name ({}), video quality ({}), source URL ({})",
             showName,
             episodeName,
             videoQuality,
-            novelPlanetSourceUrl
+            videoUrl
         );
 
         if (!downloadVideos) {
             // Proxy video bytes from URL since the videos aren't being downloaded.
             // Buffer videos with default buffer defined in {@code getContentRangeStartAndEndAndLength()}.
-            List<Long> ranges = Requests.getContentRangeStartAndEndAndLength(novelPlanetSourceUrl, requestHeaders, false);
+            List<Long> ranges = Requests.getContentRangeStartAndEndAndLength(videoUrl, requestHeaders, false);
 
             HttpHeaders proxyHeaders = new HttpHeaders();
             proxyHeaders.set(HttpHeaders.ACCEPT_RANGES, "bytes");
             proxyHeaders.set(HttpHeaders.RANGE, String.format("bytes=%d-%d", ranges.get(0), ranges.get(1)));
 
             return new RestTemplate().exchange(
-                novelPlanetSourceUrl,
+                videoUrl,
                 HttpMethod.GET,
                 new HttpEntity<>(null, proxyHeaders),
                 Resource.class
@@ -304,8 +304,8 @@ public class KissanimeRuController {
         File videoFile = videoFileService.getVideoFile(showName, episodeName, videoQuality);
 
         if (videoFile == null) {
-            log.info("Video file not found. Serving content from UrlResource at URL ({})", novelPlanetSourceUrl);
-            return Requests.getUrlResourceStreamResponse(novelPlanetSourceUrl);
+            log.info("Video file not found. Serving content from UrlResource at URL ({})", videoUrl);
+            return Requests.getUrlResourceStreamResponse(videoUrl);
         }
 
         String rangeHeader = requestHeaders.getFirst("Range");
@@ -323,7 +323,7 @@ public class KissanimeRuController {
                 videoFile.length(),
                 firstBytePositionInRange
             );
-            return Requests.getUrlResourceStreamResponse(novelPlanetSourceUrl);
+            return Requests.getUrlResourceStreamResponse(videoUrl);
         }
 
         FileSystemResource fileResource = new FileSystemResource(videoFile);
