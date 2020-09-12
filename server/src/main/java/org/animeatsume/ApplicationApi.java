@@ -80,7 +80,7 @@ public class ApplicationApi {
 
     @Cacheable(ApplicationConfig.KISSANIME_TITLE_SEARCH_CACHE_NAME)
     @PostMapping(value = "/searchAnime", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Object> searchKissanime(@RequestBody TitleSearchRequest titleSearchRequest) {
+    public ResponseEntity<Object> searchAnime(@RequestBody TitleSearchRequest titleSearchRequest) {
         titleSearchRequest.setTitle(RegexUtils.removeNonAlphanumericChars(titleSearchRequest.getTitle()));
 
         if (activateKissanime) {
@@ -93,7 +93,7 @@ public class ApplicationApi {
     }
 
     @PostMapping(value = "/getVideosForEpisode")
-    public ResponseEntity<Object> getVideoHostUrlForKissanimeEpisode(@RequestBody KissanimeVideoHostRequest kissanimeEpisodeRequest) {
+    public ResponseEntity<Object> getVideosForEpisode(@RequestBody KissanimeVideoHostRequest kissanimeEpisodeRequest) {
         if (activateKissanime) {
             return kissanimeRuController.getVideosForKissanimeEpisode(kissanimeEpisodeRequest);
         }
@@ -112,11 +112,11 @@ public class ApplicationApi {
     }
 
     @GetMapping(value = "/video/{show}/{episode}/{quality}", produces = { "video/mp4", MediaType.APPLICATION_OCTET_STREAM_VALUE })
-    public ResponseEntity<Resource> getNovelPlanetVideoStream(
+    public ResponseEntity<Resource> getProxiedVideoStream(
         @PathVariable("show") String showName,
         @PathVariable("episode") String episodeName,
         @PathVariable("quality") String videoQuality,
-        @RequestParam("url") String novelPlanetUrl,
+        @RequestParam("url") String videoUrl,
         @RequestHeader HttpHeaders requestHeaders
     ) {
         String validCharactersRegex = "^[a-zA-Z0-9-]+$"; // alphanumeric and '-'
@@ -126,12 +126,12 @@ public class ApplicationApi {
             && videoQuality.matches(validCharactersRegex)
         );
 
-        if (!paramsAreValid || novelPlanetUrl == null || novelPlanetUrl.isEmpty()) {
+        if (!paramsAreValid || videoUrl == null || videoUrl.isEmpty()) {
             log.info("Invalid video stream parameters: showName ({}), episodeName ({}), videoQuality ({}), url ({})",
                 showName,
                 episodeName,
                 videoQuality,
-                novelPlanetUrl
+                videoUrl
             );
             return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
@@ -143,7 +143,7 @@ public class ApplicationApi {
                 showName,
                 episodeName,
                 videoQuality,
-                novelPlanetUrl,
+                videoUrl,
                 requestHeaders
             );
         }
