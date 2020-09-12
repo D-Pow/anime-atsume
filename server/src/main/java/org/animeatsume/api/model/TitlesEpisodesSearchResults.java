@@ -33,10 +33,6 @@ public class TitlesEpisodesSearchResults {
             setEpisodes(episodes, areVideosDirectSource);
         }
 
-        public void setEpisodes(List<Anchor> episodes) {
-            setEpisodes(episodes, false);
-        }
-
         public void setEpisodes(List<Anchor> episodes, boolean areVideosDirectSource) {
             this.episodes = mapAnchorListToVideoSearchResult(episodes, areVideosDirectSource);
         }

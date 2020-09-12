@@ -73,7 +73,7 @@ public class KissanimeRuController {
                     episodeLinks = episodeAnchorList;
                 }
 
-                episodeSearchResult.setEpisodes(episodeLinks);
+                episodeSearchResult.setEpisodes(episodeLinks, false);
             });
         }
 
