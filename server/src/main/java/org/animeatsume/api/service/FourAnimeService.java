@@ -6,6 +6,7 @@ import org.animeatsume.api.model.TitlesAndEpisodes.EpisodesForTitle;
 import org.animeatsume.api.model.VideoSearchResult;
 import org.animeatsume.api.utils.http.CorsProxy;
 import org.animeatsume.api.utils.http.Requests;
+import org.animeatsume.api.utils.regex.RegexUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -132,8 +133,15 @@ public class FourAnimeService {
             Element videoSource = Jsoup.parse(episodeHtml)
                 .select(EPISODE_VIDEO_SOURCE_SELECTOR)
                 .first();
+            String srcUrl = videoSource.attr("src");
+            List<String> videoQualityMatches = RegexUtils.getFirstMatchGroups("(\\d+p)(?=\\.mp4)", srcUrl);
+            String videoQuality = null;
 
-            return new VideoSearchResult(videoSource.attr("src"), null, true);
+            if (!videoQualityMatches.isEmpty()) {
+                videoQuality = videoQualityMatches.get(0);
+            }
+
+            return new VideoSearchResult(srcUrl, videoQuality, true);
         }
 
         return null;
