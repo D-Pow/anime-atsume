@@ -9,7 +9,24 @@ import java.util.List;
 import java.util.Map;
 
 public class CorsProxy {
-    public static ResponseEntity<?> doCorsRequest(HttpMethod method, URI url, URI origin, Object body, HttpHeaders headers) {
+    public static ResponseEntity<?> doCorsRequest(
+        HttpMethod method,
+        URI url,
+        URI origin,
+        Object body,
+        HttpHeaders headers
+    ) {
+        return doCorsRequest(method, url, origin, body, headers, true);
+    }
+
+    public static ResponseEntity<?> doCorsRequest(
+        HttpMethod method,
+        URI url,
+        URI origin,
+        Object body,
+        HttpHeaders headers,
+        boolean noFollowRedirects
+    ) {
         String corsOrigin = origin != null ? origin.toString() : UriParser.getOrigin(url);
         HttpEntity<Object> corsEntity = getCorsEntity(body, corsOrigin, corsOrigin, null, headers, true);
         List<MediaType> requestAcceptHeaders = corsEntity.getHeaders().getAccept();
@@ -21,7 +38,7 @@ public class CorsProxy {
         }
 
         Class<?> responseClass = Requests.getClassFromContentTypeHeader(requestAcceptHeaders.toString());
-        RestTemplate restTemplate = Requests.getNoFollowRedirectsRestTemplate();
+        RestTemplate restTemplate = noFollowRedirects ? Requests.getNoFollowRedirectsRestTemplate() : new RestTemplate();
 
         // Add support for form-data requests and Map<String,String> responses
         Requests.addAcceptableMediaTypes(restTemplate, MediaType.APPLICATION_FORM_URLENCODED);
