@@ -137,6 +137,10 @@ function VideoModal(props) {
         });
     };
 
+    const handleVideoLoadError = () => {
+        setHasError(true);
+    };
+
     useEffect(() => {
         // useEffect is necessary instead of calling submitAnswers() in handleImageSelection()
         // because state updates are async and not guaranteed to take effect as soon as setState()
@@ -200,7 +204,10 @@ function VideoModal(props) {
                 <Video
                     className={'w-100'}
                     src={directSource ? url : getVideoSrcPath(props.showTitle, props.episodeTitle, title, url)}
-                    videoElementProps={props.videoElementProps}
+                    videoElementProps={{
+                        ...props.videoElementProps,
+                        onError: handleVideoLoadError
+                    }}
                     videoRef={videoRef}
                 />
                 <div>
