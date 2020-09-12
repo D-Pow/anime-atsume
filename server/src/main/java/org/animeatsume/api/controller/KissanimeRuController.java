@@ -97,7 +97,7 @@ public class KissanimeRuController {
                     initiateEpisodeVideoDownloads(request.getEpisodeUrl(), videoSources);
                 }
 
-                body = videoSources;
+                body = normalizeNovelPlanetSources(videoSources);
             }
         }
 
@@ -253,6 +253,21 @@ public class KissanimeRuController {
                 e.getMessage()
             );
         }
+    }
+
+    private TitlesEpisodesSearchResults.TitleResults normalizeNovelPlanetSources(NovelPlanetSourceResponse sources) {
+        List<Anchor> episodeAnchors = sources.getData().stream()
+            .map(novelPlanetSource -> new Anchor(
+                novelPlanetSource.getFile(),
+                novelPlanetSource.getLabel()
+            )).collect(Collectors.toList());
+
+        return new TitlesEpisodesSearchResults.TitleResults(
+            sources.getWebsiteUrl(),
+            null,
+            episodeAnchors,
+            false
+        );
     }
 
     public ResponseEntity<Resource> getNovelPlanetVideoStream(
