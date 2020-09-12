@@ -1,7 +1,7 @@
 import { EPISODE_HOST_SEARCH_URL } from 'services/Urls';
 
 /**
- * @typedef {Object} EpisodeHostResponse
+ * @typedef {Object} KissanimeEpisodeHostResponse
  * @property {String} videoHostUrl - URL of original website with nested video.
  * @property {Object} captchaContent - Data associated with captcha returned by original website.
  * @property {String[]} captchaContent.promptTexts - Prompt texts for solving captcha.
@@ -17,12 +17,16 @@ import { EPISODE_HOST_SEARCH_URL } from 'services/Urls';
  */
 
 /**
- * @typedef {Object} NovelPlanetSource
- * @property {String} websiteUrl - URL of website that hosts the video originally (as a middle-man).
- * @property {Object} data - Data of the actual video files.
- * @property {String} data.file - URL of video.
- * @property {String} data.label - Video quality of video.
- * @property {String} data.type - Mime type of video.
+ * @typedef {Object} VideoResult
+ * @property {string} url - URL of video source (may or may not need to be proxied).
+ * @property {string} title - Quality of video (e.g. '1080p').
+ * @property {boolean} directSource - If the URL can be plugged into video[src] or if it needs to be proxied.
+ */
+
+/**
+ * @typedef {Object} EpisodeVideoResults
+ * @property {String} url - URL of website that hosts the video originally (either direct or middle-man).
+ * @property {VideoResult[]} episodes - Videos offered by the host website.
  */
 
 /**
@@ -30,7 +34,7 @@ import { EPISODE_HOST_SEARCH_URL } from 'services/Urls';
  *
  * @param {String} episodeUrl - Episode URL returned from {@link searchForShow.js}.
  * @param {CaptchaAttempt[]} captchaAnswers - List of answers used to attempt to bypass captcha.
- * @returns {Promise<(EpisodeHostResponse|NovelPlanetSource)>} - Data for either solving a captcha or the resolved video info.
+ * @returns {Promise<(KissanimeEpisodeHostResponse|EpisodeVideoResults)>} - Data for either solving a captcha or the resolved video info.
  */
 export async function searchForEpisodeHost(episodeUrl, captchaAnswers = null) {
     return await fetch(EPISODE_HOST_SEARCH_URL, {
