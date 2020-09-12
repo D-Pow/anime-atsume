@@ -1,8 +1,8 @@
 package org.animeatsume.api.service;
 
 import lombok.extern.slf4j.Slf4j;
-import org.animeatsume.api.model.TitlesEpisodesSearchResults;
-import org.animeatsume.api.model.TitlesEpisodesSearchResults.TitleResults;
+import org.animeatsume.api.model.TitlesAndEpisodes;
+import org.animeatsume.api.model.TitlesAndEpisodes.EpisodesForTitle;
 import org.animeatsume.api.model.VideoSearchResult;
 import org.animeatsume.api.utils.http.CorsProxy;
 import org.animeatsume.api.utils.http.Requests;
@@ -50,7 +50,7 @@ public class FourAnimeService {
         return headers;
     }
 
-    public TitlesEpisodesSearchResults searchTitle(String title) {
+    public TitlesAndEpisodes searchTitle(String title) {
         log.info("Searching 4anime for title ({}) ...", title);
 
         String[][] titleSearchFormData = getTitleSearchHttpEntity(title);
@@ -70,8 +70,8 @@ public class FourAnimeService {
 
             log.info("Obtained {} show(s) for ({})", titleAnchors.size(), title);
 
-            return new TitlesEpisodesSearchResults(titleAnchors.stream()
-                .map(element -> new TitleResults(
+            return new TitlesAndEpisodes(titleAnchors.stream()
+                .map(element -> new EpisodesForTitle(
                     element.attr("href"),
                     element.text()
                 ))
@@ -82,12 +82,12 @@ public class FourAnimeService {
     }
 
     @Async
-    public CompletableFuture<Void> searchEpisodes(TitleResults titleResults) {
-        log.info("Searching 4anime for episode list at ({}) ...", titleResults.getUrl());
+    public CompletableFuture<Void> searchEpisodes(EpisodesForTitle episodesForTitle) {
+        log.info("Searching 4anime for episode list at ({}) ...", episodesForTitle.getUrl());
 
         String showHtml = (String) CorsProxy.doCorsRequest(
             HttpMethod.GET,
-            URI.create(titleResults.getUrl()),
+            URI.create(episodesForTitle.getUrl()),
             URI.create(ORIGIN),
             null,
             getNecessaryRequestHeaders()
@@ -103,12 +103,12 @@ public class FourAnimeService {
                 ))
                 .collect(Collectors.toList());
 
-            titleResults.setEpisodes(episodeAnchors);
+            episodesForTitle.setEpisodes(episodeAnchors);
         }
 
         log.info("Obtained {} episodes for ({})",
-            titleResults.getEpisodes().size(),
-            titleResults.getTitle()
+            episodesForTitle.getEpisodes().size(),
+            episodesForTitle.getTitle()
         );
 
         return CompletableFuture.completedFuture(null);

@@ -3,9 +3,8 @@ package org.animeatsume;
 import org.animeatsume.api.controller.FourAnimeController;
 import org.animeatsume.api.controller.KissanimeRuController;
 import org.animeatsume.api.model.TitleSearchRequest;
-import org.animeatsume.api.model.TitlesEpisodesSearchResults;
+import org.animeatsume.api.model.TitlesAndEpisodes;
 import org.animeatsume.api.model.kissanime.KissanimeVideoHostRequest;
-import org.animeatsume.api.model.kissanime.NovelPlanetSourceResponse;
 import org.animeatsume.api.model.kissanime.NovelPlanetUrlRequest;
 import org.animeatsume.api.service.NovelPlanetService;
 import org.animeatsume.api.utils.http.CorsProxy;
@@ -105,7 +104,7 @@ public class ApplicationApi {
     }
 
     @PostMapping(value = "/getNovelPlanetSources", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<TitlesEpisodesSearchResults.TitleResults> getNovelPlanetSources(@RequestBody NovelPlanetUrlRequest novelPlanetRequest) {
+    public ResponseEntity<TitlesAndEpisodes.EpisodesForTitle> getNovelPlanetSources(@RequestBody NovelPlanetUrlRequest novelPlanetRequest) {
         return ResponseEntity
             .ok(kissanimeRuController.normalizeNovelPlanetSources(
                 kissanimeRuController.getVideoSourcesForNovelPlanetHost(novelPlanetRequest.getNovelPlanetUrl().toString())

@@ -12,10 +12,10 @@ import java.util.stream.Collectors;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class TitlesEpisodesSearchResults {
+public class TitlesAndEpisodes {
     @Data
     @EqualsAndHashCode(callSuper = true)
-    public static class TitleResults extends VideoSearchResult {
+    public static class EpisodesForTitle extends VideoSearchResult {
         private List<VideoSearchResult> episodes;
 
         private static List<VideoSearchResult> mapAnchorListToVideoSearchResult(List<Anchor> episodes, boolean isDirectSource) {
@@ -24,11 +24,11 @@ public class TitlesEpisodesSearchResults {
                 .collect(Collectors.toList());
         }
 
-        public TitleResults(String url, String title) {
+        public EpisodesForTitle(String url, String title) {
             this(url, title, new ArrayList<>(), false);
         }
 
-        public TitleResults(String url, String title, List<Anchor> episodes, boolean areVideosDirectSource) {
+        public EpisodesForTitle(String url, String title, List<Anchor> episodes, boolean areVideosDirectSource) {
             super(url, title, false);
             setEpisodes(episodes, areVideosDirectSource);
         }
@@ -38,5 +38,5 @@ public class TitlesEpisodesSearchResults {
         }
     }
 
-    private List<TitleResults> results;
+    private List<EpisodesForTitle> results;
 }

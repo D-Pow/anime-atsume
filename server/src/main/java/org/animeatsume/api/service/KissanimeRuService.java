@@ -7,7 +7,7 @@ import io.webfolder.ui4j.api.browser.PageConfiguration;
 import org.animeatsume.api.model.Anchor;
 import org.animeatsume.api.model.kissanime.CaptchaAttempt;
 import org.animeatsume.api.model.TitleSearchRequest;
-import org.animeatsume.api.model.TitlesEpisodesSearchResults;
+import org.animeatsume.api.model.TitlesAndEpisodes;
 import org.animeatsume.api.model.kissanime.KissanimeVideoHostResponse;
 import org.animeatsume.api.utils.ObjectUtils;
 import org.animeatsume.api.utils.AppProxy;
@@ -211,7 +211,7 @@ public class KissanimeRuService {
         return headers;
     }
 
-    public TitlesEpisodesSearchResults searchKissanimeTitles(TitleSearchRequest titleSearchRequest) {
+    public TitlesAndEpisodes searchKissanimeTitles(TitleSearchRequest titleSearchRequest) {
         waitForCloudflareToAllowAccessToKissanime();
         String requestSearchTitle = titleSearchRequest.getTitle();
 
@@ -261,19 +261,19 @@ public class KissanimeRuService {
             String anchorResultsWithoutSpan = searchResults.replaceAll("</?span>", "");
             List<String> anchorResultsList = Arrays.asList(anchorResultsWithoutSpan.split("><"));
 
-            List<TitlesEpisodesSearchResults.TitleResults> searchResponses = anchorResultsList.stream()
+            List<TitlesAndEpisodes.EpisodesForTitle> searchResponses = anchorResultsList.stream()
                 .map(anchorString -> {
                     String url = HtmlParser.getUrlFromAnchor(anchorString);
                     String title = HtmlParser.getTextFromAnchor(anchorString);
 
-                    return new TitlesEpisodesSearchResults.TitleResults(url, title);
+                    return new TitlesAndEpisodes.EpisodesForTitle(url, title);
                 })
                 .collect(Collectors.toList());
 
-            return new TitlesEpisodesSearchResults(searchResponses);
+            return new TitlesAndEpisodes(searchResponses);
         }
 
-        return new TitlesEpisodesSearchResults();
+        return new TitlesAndEpisodes();
     }
 
     @Async
