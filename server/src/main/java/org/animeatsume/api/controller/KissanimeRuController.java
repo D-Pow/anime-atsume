@@ -255,7 +255,7 @@ public class KissanimeRuController {
         }
     }
 
-    private TitlesEpisodesSearchResults.TitleResults normalizeNovelPlanetSources(NovelPlanetSourceResponse sources) {
+    public TitlesEpisodesSearchResults.TitleResults normalizeNovelPlanetSources(NovelPlanetSourceResponse sources) {
         List<Anchor> episodeAnchors = sources.getData().stream()
             .map(novelPlanetSource -> new Anchor(
                 novelPlanetSource.getFile(),
