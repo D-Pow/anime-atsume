@@ -61,15 +61,15 @@ function VideoModal(props) {
                 throw `Got HTTP status code ${res.status} from server. Error: ${res.error}.`;
             }
 
-            const { data, captchaContent, videoHostUrl } = res;
+            const { episodes, captchaContent, videoHostUrl } = res;
 
             if (captchaContent) {
                 setCaptchaPrompts(captchaContent.promptTexts);
                 setCaptchaOptions(captchaContent.imgIdsAndSrcs);
             }
 
-            if (data) {
-                setVideoOptions(data);
+            if (episodes) {
+                setVideoOptions(episodes);
             }
 
             if (videoHostUrl) {
@@ -191,13 +191,13 @@ function VideoModal(props) {
         }
 
         const { showName, episodeName } = getVideoNameDataFromUrl(props.episodeUrl);
-        const { label, file } = videoOptions[0];
+        const { title, url } = videoOptions[0];
 
         return (
             <div>
                 <Video
                     className={'w-100'}
-                    src={getVideoSrcPath(showName, episodeName, label, file)}
+                    src={getVideoSrcPath(showName, episodeName, title, url)}
                     videoElementProps={props.videoElementProps}
                     videoRef={videoRef}
                 />
