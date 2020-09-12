@@ -41,16 +41,13 @@ public class FourAnimeService {
     private HttpHeaders getNecessaryRequestHeaders() {
         HttpHeaders headers = new HttpHeaders();
         headers.set("User-Agent", mockFirefoxUserAgent);
+        headers.setAccept(Arrays.asList(MediaType.TEXT_PLAIN, MediaType.TEXT_HTML, MediaType.ALL));
         return headers;
     }
 
     public TitlesEpisodesSearchResults searchTitle(String title) {
         String[][] titleSearchFormData = getTitleSearchHttpEntity(title);
-
-        HttpHeaders headers = getNecessaryRequestHeaders();
-        headers.setAccept(Arrays.asList(MediaType.TEXT_PLAIN, MediaType.TEXT_HTML, MediaType.ALL));
-
-        HttpEntity titleSearchHttpEntity = Requests.getFormDataHttpEntity(headers, titleSearchFormData);
+        HttpEntity titleSearchHttpEntity = Requests.getFormDataHttpEntity(getNecessaryRequestHeaders(), titleSearchFormData);
 
         String searchResponseHtml = (String) CorsProxy.doCorsRequest(
             HttpMethod.POST,
