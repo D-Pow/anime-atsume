@@ -141,7 +141,7 @@ public class FourAnimeService {
                 videoQuality = videoQualityMatches.get(0);
             }
 
-            return new VideoSearchResult(srcUrl, videoQuality, true);
+            return new VideoSearchResult(srcUrl, videoQuality, false);
         }
 
         return null;
