@@ -8,7 +8,7 @@ export const myAnimeListSearchUrl = 'https://myanimelist.net/anime.php?q=';
 export const getKitsuTitleSearchUrl = searchText => getSearchUrl(kitsuTitleSearchUrl, searchText);
 export const getMyAnimeListSearchUrl = searchText => getSearchUrl(myAnimeListSearchUrl, searchText);
 
-export const SHOW_SEARCH_URL = '/searchKissanime';
+export const SHOW_SEARCH_URL = '/searchAnime';
 export const EPISODE_HOST_SEARCH_URL = '/getVideosForEpisode';
 export const VIDEO_BASE_PATH = '/video';
 export const IMAGE_BASE_PATH = '/image';
