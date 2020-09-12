@@ -9,6 +9,7 @@ import org.animeatsume.api.utils.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
@@ -33,7 +34,17 @@ public class FourAnimeController {
         return titleResults;
     }
 
-    public VideoSearchResult getVideoForEpisode(String url) {
-        return fourAnimeService.getVideoForEpisode(url);
+    public TitlesAndEpisodes.EpisodesForTitle getVideoForEpisode(String url) {
+        VideoSearchResult video = fourAnimeService.getVideoForEpisode(url);
+
+        if (video == null) {
+            return null;
+        }
+
+        return new TitlesAndEpisodes.EpisodesForTitle(
+            url,
+            null,
+            Arrays.asList(video)
+        );
     }
 }

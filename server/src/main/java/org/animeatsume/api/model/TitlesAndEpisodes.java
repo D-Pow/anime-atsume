@@ -33,6 +33,11 @@ public class TitlesAndEpisodes {
             setEpisodes(episodes, areVideosDirectSource);
         }
 
+        public EpisodesForTitle(String url, String title, List<VideoSearchResult> episodes) {
+            super(url, title, false);
+            this.episodes = episodes;
+        }
+
         public void setEpisodes(List<Anchor> episodes, boolean areVideosDirectSource) {
             this.episodes = mapAnchorListToVideoSearchResult(episodes, areVideosDirectSource);
         }

@@ -99,10 +99,10 @@ public class ApplicationApi {
             return kissanimeRuController.getVideosForKissanimeEpisode(kissanimeEpisodeRequest);
         }
 
-        VideoSearchResult videoForEpisode = fourAnimeController.getVideoForEpisode(kissanimeEpisodeRequest.getEpisodeUrl());
+        TitlesAndEpisodes.EpisodesForTitle videosForEpisode = fourAnimeController.getVideoForEpisode(kissanimeEpisodeRequest.getEpisodeUrl());
 
-        if (videoForEpisode != null) {
-            return ResponseEntity.ok(videoForEpisode);
+        if (videosForEpisode != null) {
+            return ResponseEntity.ok(videosForEpisode);
         }
 
         return ResponseEntity
