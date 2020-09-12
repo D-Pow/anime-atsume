@@ -51,6 +51,8 @@ public class FourAnimeService {
     }
 
     public TitlesEpisodesSearchResults searchTitle(String title) {
+        log.info("Searching 4anime for title ({}) ...", title);
+
         String[][] titleSearchFormData = getTitleSearchHttpEntity(title);
         HttpEntity titleSearchHttpEntity = Requests.getFormDataHttpEntity(getNecessaryRequestHeaders(), titleSearchFormData);
 
@@ -65,6 +67,8 @@ public class FourAnimeService {
         if (searchResponseHtml != null) {
             Document titleResultsDocument = Jsoup.parse(searchResponseHtml);
             Elements titleAnchors = titleResultsDocument.select(TITLE_ANCHOR_SELECTOR);
+
+            log.info("Obtained {} show(s) for ({})", titleAnchors.size(), title);
 
             return new TitlesEpisodesSearchResults(titleAnchors.stream()
                 .map(element -> new TitleResults(
@@ -102,7 +106,7 @@ public class FourAnimeService {
             titleResults.setEpisodes(episodeAnchors);
         }
 
-        log.info("Obtained {} episodes for {}",
+        log.info("Obtained {} episodes for ({})",
             titleResults.getEpisodes().size(),
             titleResults.getTitle()
         );
