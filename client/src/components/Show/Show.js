@@ -385,6 +385,7 @@ function Show(props) {
             <VideoModal
                 {...selectedEpisode}
                 show={selectedEpisode != null}
+                showTitle={getShowTitle()}
                 onClose={() => setSelectedEpisode(null)}
                 videoElementProps={{ onLoadStart: handleVideoLoad }}
             />

@@ -190,14 +190,13 @@ function VideoModal(props) {
             return;
         }
 
-        const { showName, episodeName } = getVideoNameDataFromUrl(props.episodeUrl);
         const { title, url } = videoOptions[0];
 
         return (
             <div>
                 <Video
                     className={'w-100'}
-                    src={getVideoSrcPath(showName, episodeName, title, url)}
+                    src={getVideoSrcPath(props.showTitle, props.episodeTitle, title, url)}
                     videoElementProps={props.videoElementProps}
                     videoRef={videoRef}
                 />
@@ -267,6 +266,7 @@ VideoModal.propTypes = {
     episodeTitle: PropTypes.string,
     episodeUrl: PropTypes.string,
     show: PropTypes.bool,
+    showTitle: PropTypes.string,
     onClose: PropTypes.func,
     videoElementProps: PropTypes.object
 };
@@ -275,6 +275,7 @@ VideoModal.defaultProps = {
     episodeTitle: '',
     episodeUrl: null,
     show: false,
+    showTitle: '',
     onClose: () => {},
     videoElementProps: {}
 };
