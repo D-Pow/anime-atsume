@@ -6,6 +6,7 @@ import { getMyAnimeListSearchUrl } from 'services/Urls';
 import { useStorage } from 'utils/Hooks';
 import { debounce } from 'utils/Events';
 import { isSafariBrowser } from 'utils/BrowserIdentification';
+import { asNumber } from 'utils/Numbers';
 import Spinner from 'components/ui/Spinner';
 import VideoModal from 'components/VideoModal';
 import Anchor from 'components/ui/Anchor';
@@ -48,8 +49,10 @@ function Show(props) {
             }
 
             if (episodeResults.results != null && episodeResults.results.length >= 0) {
+                const sortEpisodesByTitleInAscendingOrder = (show1, show2) => asNumber(show1.title) - asNumber(show2.title);
+
                 episodeResults.results.forEach(show => {
-                    show.episodes.reverse();
+                    show.episodes.sort(sortEpisodesByTitleInAscendingOrder);
                 });
             }
 
