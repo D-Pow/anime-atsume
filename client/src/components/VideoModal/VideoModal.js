@@ -9,6 +9,7 @@ import IncompatibleBrowserFallback from 'components/IncompatibleBrowserFallback'
 import { searchForEpisodeHost } from 'services/EpisodeHostSearchService';
 import { getImageSrcPath, getVideoSrcPath, getVideoNameDataFromUrl } from 'services/Urls';
 import { isSafariBrowser } from 'utils/BrowserIdentification';
+import { asNumber } from 'utils/Numbers';
 
 function VideoModal(props) {
     const defaultStateValues = {
@@ -69,6 +70,8 @@ function VideoModal(props) {
             }
 
             if (episodes) {
+                const sortEpisodesByQualityInDescendingOrder = (vidA, vidB) => asNumber(vidB.title) - asNumber(vidA.title);
+                episodes.sort(sortEpisodesByQualityInDescendingOrder);
                 setVideoOptions(episodes);
             }
 
