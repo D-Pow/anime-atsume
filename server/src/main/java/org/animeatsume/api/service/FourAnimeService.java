@@ -135,7 +135,7 @@ public class FourAnimeService {
                 .first();
             String srcUrl = videoSource.attr("src");
             List<String> videoQualityMatches = RegexUtils.getFirstMatchGroups("(\\d+p)(?=\\.mp4)", srcUrl);
-            String videoQuality = null;
+            String videoQuality = "NA";
 
             if (!videoQualityMatches.isEmpty()) {
                 videoQuality = videoQualityMatches.get(0);
