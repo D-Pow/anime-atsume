@@ -101,11 +101,11 @@ public class CorsProxy {
             corsHeaders = Requests.copyHttpHeaders(headers);
         }
 
-        corsHeaders.set("Origin", origin);
-        corsHeaders.set("Referer", referer);
+        corsHeaders.set(HttpHeaders.ORIGIN, origin);
+        corsHeaders.set(HttpHeaders.REFERER, referer);
 
         if (cookie != null) {
-            corsHeaders.set("Cookie", cookie);
+            corsHeaders.set(HttpHeaders.COOKIE, cookie);
         }
 
         if (preventGzipResponses) {
