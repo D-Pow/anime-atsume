@@ -8,6 +8,7 @@ import org.animeatsume.api.utils.http.CorsProxy;
 import org.animeatsume.api.utils.http.Requests;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -30,6 +31,7 @@ public class FourAnimeService {
     private static final String SEARCH_URL = ORIGIN + "/wp-admin/admin-ajax.php";
     private static final String TITLE_ANCHOR_SELECTOR = "a.name";
     private static final String EPISODE_ANCHOR_SELECTOR = "ul.episodes a[title]";
+    private static final String EPISODE_VIDEO_SOURCE_SELECTOR = "video source";
 
     @Value("${org.animeatsume.mock-firefox-user-agent}")
     private String mockFirefoxUserAgent;
@@ -112,5 +114,28 @@ public class FourAnimeService {
         );
 
         return CompletableFuture.completedFuture(null);
+    }
+
+    public VideoSearchResult getVideoForEpisode(String url) {
+        log.info("Getting 4anime MP4 video from ({})", url);
+
+        String episodeHtml = (String) CorsProxy.doCorsRequest(
+            HttpMethod.GET,
+            URI.create(url),
+            URI.create(ORIGIN),
+            null,
+            getNecessaryRequestHeaders(),
+            false
+        ).getBody();
+
+        if (episodeHtml != null) {
+            Element videoSource = Jsoup.parse(episodeHtml)
+                .select(EPISODE_VIDEO_SOURCE_SELECTOR)
+                .first();
+
+            return new VideoSearchResult(videoSource.attr("src"), null, true);
+        }
+
+        return null;
     }
 }
