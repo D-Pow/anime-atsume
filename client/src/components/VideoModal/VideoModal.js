@@ -7,7 +7,7 @@ import ErrorDisplay from 'components/ui/ErrorDisplay';
 import Anchor from 'components/ui/Anchor';
 import IncompatibleBrowserFallback from 'components/IncompatibleBrowserFallback';
 import { searchForEpisodeHost } from 'services/EpisodeHostSearchService';
-import { getImageSrcPath, getVideoSrcPath, getVideoNameDataFromUrl } from 'services/Urls';
+import { getImageSrcPath, getVideoSrcPath } from 'services/Urls';
 import { isSafariBrowser } from 'utils/BrowserIdentification';
 import { asNumber } from 'utils/Numbers';
 
