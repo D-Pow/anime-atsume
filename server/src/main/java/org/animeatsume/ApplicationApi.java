@@ -4,7 +4,6 @@ import org.animeatsume.api.controller.FourAnimeController;
 import org.animeatsume.api.controller.KissanimeRuController;
 import org.animeatsume.api.model.TitleSearchRequest;
 import org.animeatsume.api.model.TitlesAndEpisodes;
-import org.animeatsume.api.model.VideoSearchResult;
 import org.animeatsume.api.model.kissanime.KissanimeVideoHostRequest;
 import org.animeatsume.api.model.kissanime.NovelPlanetUrlRequest;
 import org.animeatsume.api.service.NovelPlanetService;

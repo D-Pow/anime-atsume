@@ -48,7 +48,7 @@ public class FourAnimeService {
 
     private HttpHeaders getNecessaryRequestHeaders() {
         HttpHeaders headers = new HttpHeaders();
-        headers.set("User-Agent", mockFirefoxUserAgent);
+        headers.set(HttpHeaders.USER_AGENT, mockFirefoxUserAgent);
         headers.setAccept(Arrays.asList(MediaType.TEXT_PLAIN, MediaType.TEXT_HTML, MediaType.ALL));
         return headers;
     }

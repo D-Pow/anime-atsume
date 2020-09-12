@@ -204,9 +204,9 @@ public class KissanimeRuService {
     private HttpHeaders getNecessaryRequestHeaders() {
         HttpHeaders headers = new HttpHeaders();
 
-        headers.set("User-Agent", mockFirefoxUserAgent);
-        headers.set("Cookie", getAuthCookie().toString());
-        headers.add("Origin", KISSANIME_ORIGIN);
+        headers.set(HttpHeaders.USER_AGENT, mockFirefoxUserAgent);
+        headers.set(HttpHeaders.COOKIE, getAuthCookie().toString());
+        headers.add(HttpHeaders.ORIGIN, KISSANIME_ORIGIN);
 
         return headers;
     }
