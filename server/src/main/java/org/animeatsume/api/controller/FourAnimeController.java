@@ -3,6 +3,7 @@ package org.animeatsume.api.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.animeatsume.api.model.TitleSearchRequest;
 import org.animeatsume.api.model.TitlesAndEpisodes;
+import org.animeatsume.api.model.VideoSearchResult;
 import org.animeatsume.api.service.FourAnimeService;
 import org.animeatsume.api.utils.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,5 +31,9 @@ public class FourAnimeController {
         }
 
         return titleResults;
+    }
+
+    public VideoSearchResult getVideoForEpisode(String url) {
+        return fourAnimeService.getVideoForEpisode(url);
     }
 }

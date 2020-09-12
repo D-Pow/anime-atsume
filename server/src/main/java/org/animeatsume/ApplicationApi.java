@@ -4,6 +4,7 @@ import org.animeatsume.api.controller.FourAnimeController;
 import org.animeatsume.api.controller.KissanimeRuController;
 import org.animeatsume.api.model.TitleSearchRequest;
 import org.animeatsume.api.model.TitlesAndEpisodes;
+import org.animeatsume.api.model.VideoSearchResult;
 import org.animeatsume.api.model.kissanime.KissanimeVideoHostRequest;
 import org.animeatsume.api.model.kissanime.NovelPlanetUrlRequest;
 import org.animeatsume.api.service.NovelPlanetService;
@@ -96,6 +97,12 @@ public class ApplicationApi {
     public ResponseEntity<Object> getVideosForEpisode(@RequestBody KissanimeVideoHostRequest kissanimeEpisodeRequest) {
         if (activateKissanime) {
             return kissanimeRuController.getVideosForKissanimeEpisode(kissanimeEpisodeRequest);
+        }
+
+        VideoSearchResult videoForEpisode = fourAnimeController.getVideoForEpisode(kissanimeEpisodeRequest.getEpisodeUrl());
+
+        if (videoForEpisode != null) {
+            return ResponseEntity.ok(videoForEpisode);
         }
 
         return ResponseEntity
