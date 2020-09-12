@@ -105,14 +105,8 @@ public class ApplicationApi {
 
     @PostMapping(value = "/getNovelPlanetSources", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<NovelPlanetSourceResponse> getNovelPlanetSources(@RequestBody NovelPlanetUrlRequest novelPlanetRequest) {
-        if (activateKissanime) {
-            return ResponseEntity
-                .ok(kissanimeRuController.getVideoSourcesForNovelPlanetHost(novelPlanetRequest.getNovelPlanetUrl().toString()));
-        }
-
         return ResponseEntity
-            .status(HttpStatus.NOT_FOUND)
-            .build();
+            .ok(kissanimeRuController.getVideoSourcesForNovelPlanetHost(novelPlanetRequest.getNovelPlanetUrl().toString()));
     }
 
     @GetMapping(value = "/video/{show}/{episode}/{quality}", produces = { "video/mp4", MediaType.APPLICATION_OCTET_STREAM_VALUE })
