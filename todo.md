@@ -8,6 +8,7 @@ Back-end
         - 4anime.to (they don't put IP in src so <video> could have their video plugged right in)
         - https://www.wcostream.com/ (Watch cartoon online)
         - 9anime.(to|ru|com?)
+        - Kissanime.nz
         - Kissanime.pro
         - Animetribes.ru
         - Animepahe.com
