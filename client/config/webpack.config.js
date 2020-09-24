@@ -53,7 +53,8 @@ const publicEnv = {
 const jsRegex = /\.jsx?$/;
 const tsRegex = /\.tsx?$/;
 const scssRegex = /\.s?css$/;
-const assetRegex = /\.(png|gif|jpe?g|svg|ico|pdf|tex)$/;
+const assetRegex = /\.(png|gif|jpe?g|ico|pdf|tex)$/;
+const svgRegex = /\.svg$/;
 const fontRegex = /\.(ttf|woff2?|eot)$/;
 
 const hotReloading = false; // process.env.NODE_ENV === 'development';
@@ -165,6 +166,10 @@ module.exports = {
                         }
                     }
                 ]
+            },
+            {
+                test: svgRegex,
+                use: [ '@svgr/webpack', 'file-loader' ]
             }
         ]
     },
