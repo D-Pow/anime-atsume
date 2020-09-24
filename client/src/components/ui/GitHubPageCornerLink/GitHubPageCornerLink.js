@@ -20,19 +20,18 @@ function GitHubPageCornerLink(props) {
                 zIndex: 1000 // ensure div is placed on top of other, overlapping elements
             }}
         >
-            <div
-                className={'position-relative w-50 h-50'}
-                style={{
-                    top: '7%',
-                    left: '42%'
+            <Anchor
+                href={props.href}
+                className={'d-inline-block position-relative w-40 h-40'}
+                aria={{
+                    style: {
+                        top: 6,
+                        right: 6
+                    }
                 }}
             >
-                <Anchor
-                    href={props.href}
-                >
-                    <GitHubLogo className={'w-75 h-75'} fill={'white'} />
-                </Anchor>
-            </div>
+                <GitHubLogo fill={'white'} />
+            </Anchor>
         </div>
     );
 }
