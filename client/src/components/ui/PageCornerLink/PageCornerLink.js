@@ -2,13 +2,12 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Anchor from 'components/ui/Anchor';
 import { isMobileBrowser } from 'utils/BrowserIdentification';
-import { ReactComponent as GitHubLogo } from 'assets/github_logo.svg';
 
-function GitHubPageCornerLink(props) {
+function PageCornerLink(props) {
     const isMobile = isMobileBrowser({ onlyXsScreenSizes: true });
     const sizePx = isMobile ? props.sizePx - props.sizePxDecreaseOnMobile : props.sizePx;
     const linearGradientAngleDegree = 45;
-    const linearGradientAngleFactor = props.side === GitHubPageCornerLink.Sides.LEFT ? -1 : 1;
+    const linearGradientAngleFactor = props.side === PageCornerLink.Sides.LEFT ? -1 : 1;
     const linearGradientAngle = linearGradientAngleDegree * linearGradientAngleFactor;
 
     return (
@@ -33,31 +32,31 @@ function GitHubPageCornerLink(props) {
                     }
                 }}
             >
-                <GitHubLogo fill={'white'} />
+                {props.children}
             </Anchor>
         </div>
     );
 }
 
-GitHubPageCornerLink.Sides = {
+PageCornerLink.Sides = {
     LEFT: 'left',
     RIGHT: 'right'
 };
 
-GitHubPageCornerLink.propTypes = {
+PageCornerLink.propTypes = {
     bgColor: PropTypes.string,
     href: PropTypes.string,
-    side: PropTypes.oneOf(Object.values(GitHubPageCornerLink.Sides)),
+    side: PropTypes.oneOf(Object.values(PageCornerLink.Sides)),
     sizePx: PropTypes.number,
     sizePxDecreaseOnMobile: PropTypes.number
 };
 
-GitHubPageCornerLink.defaultProps = {
+PageCornerLink.defaultProps = {
     bgColor: 'black',
     href: '',
-    side: GitHubPageCornerLink.Sides.LEFT,
+    side: PageCornerLink.Sides.LEFT,
     sizePx: 100,
     sizePxDecreaseOnMobile: 20
 };
 
-export default GitHubPageCornerLink;
+export default PageCornerLink;
