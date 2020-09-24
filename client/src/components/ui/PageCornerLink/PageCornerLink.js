@@ -54,7 +54,7 @@ PageCornerLink.propTypes = {
 PageCornerLink.defaultProps = {
     bgColor: 'black',
     href: '',
-    side: PageCornerLink.Sides.LEFT,
+    side: PageCornerLink.Sides.RIGHT,
     sizePx: 100,
     sizePxDecreaseOnMobile: 20
 };
