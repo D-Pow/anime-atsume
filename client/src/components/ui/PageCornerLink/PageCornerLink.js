@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Anchor from 'components/ui/Anchor';
+import Image from 'components/ui/Image';
 import { isMobileBrowser } from 'utils/BrowserIdentification';
 
 function PageCornerLink(props) {
@@ -9,6 +10,19 @@ function PageCornerLink(props) {
     const linearGradientAngleDegree = 45;
     const linearGradientAngleFactor = props.side === PageCornerLink.Sides.LEFT ? -1 : 1;
     const linearGradientAngle = linearGradientAngleDegree * linearGradientAngleFactor;
+
+    const renderChildren = () => {
+        if (props.image) {
+            return (
+                <React.Fragment>
+                    <Image image={props.image} />
+                    {props.children}
+                </React.Fragment>
+            );
+        }
+
+        return props.children;
+    }
 
     return (
         <div
@@ -32,7 +46,7 @@ function PageCornerLink(props) {
                     }
                 }}
             >
-                {props.children}
+                {renderChildren()}
             </Anchor>
         </div>
     );
@@ -46,9 +60,11 @@ PageCornerLink.Sides = {
 PageCornerLink.propTypes = {
     bgColor: PropTypes.string,
     href: PropTypes.string,
+    image: PropTypes.string,
     side: PropTypes.oneOf(Object.values(PageCornerLink.Sides)),
     sizePx: PropTypes.number,
-    sizePxDecreaseOnMobile: PropTypes.number
+    sizePxDecreaseOnMobile: PropTypes.number,
+    children: PropTypes.node
 };
 
 PageCornerLink.defaultProps = {
