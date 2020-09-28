@@ -80,7 +80,7 @@ public class ObjectUtils {
             try {
                 result = future.get();
             } catch (InterruptedException | ExecutionException e) {
-                log.error("Could not get future. Cause = {}, Message = {}", e.getCause(), e.getMessage());
+                log.error("Could not get future. Error = {}", e.getMessage());
             }
 
             sideEffect.accept(result, i);
