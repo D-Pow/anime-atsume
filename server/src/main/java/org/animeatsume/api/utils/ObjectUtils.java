@@ -28,7 +28,7 @@ public class ObjectUtils {
     }
 
     public static <T> List<T> getAllCompletableFutureResults(List<CompletableFuture<T>> futures) {
-        return getAllCompletableFutureResults(futures, (result, index) -> {});
+        return getAllCompletableFutureResults(futures, result -> {});
     }
 
     public static <T> List<T> getAllCompletableFutureResults(
