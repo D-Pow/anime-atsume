@@ -71,7 +71,7 @@ public class ObjectUtils {
         List<CompletableFuture<T>> futures,
         BiConsumer<T, Integer> sideEffect
     ) {
-        List<T> results = new ArrayList<>();
+        List<T> results = new ArrayList<>(futures.size());
 
         for (int i = 0; i < futures.size(); i++) {
             CompletableFuture<T> future = futures.get(i);
