@@ -67,11 +67,7 @@ public class KissanimeRuController {
 
             ObjectUtils.getAllCompletableFutureResults(episodeSearchResultsFutures, (episodeAnchorList, index) -> {
                 TitlesAndEpisodes.EpisodesForTitle episodeSearchResult = titleSearchResults.get(index);
-                List<Anchor> episodeLinks = new ArrayList<>();
-
-                if (episodeAnchorList != null) {
-                    episodeLinks = episodeAnchorList;
-                }
+                List<Anchor> episodeLinks = episodeAnchorList != null ? episodeAnchorList : new ArrayList<>();
 
                 episodeSearchResult.setEpisodes(episodeLinks, false);
             });
