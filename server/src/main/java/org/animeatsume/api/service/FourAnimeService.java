@@ -141,6 +141,10 @@ public class FourAnimeService {
                 videoQuality = videoQualityMatches.get(0);
             }
 
+            // TODO change to true if URL matches
+            //  https://storage.googleapis.com/justawesome-183319.appspot.com/v6.4animu.me/Shigatsu-wa-Kimi-no-Uso/Shigatsu-wa-Kimi-no-Uso-Episode-02-1080p.mp4
+
+            // TODO see if prepending `storage.googleapis` to non-google-storage URLs works
             return new VideoSearchResult(srcUrl, videoQuality, false);
         }
 
