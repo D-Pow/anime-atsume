@@ -27,10 +27,28 @@ public class ObjectUtils {
         return list.stream().filter(filterPredicate).findFirst().orElse(null);
     }
 
+    /**
+     * Waits for all {@link CompletableFuture}s to complete and extracts
+     * the result from each.
+     *
+     * @param futures List of futures to complete.
+     * @return All future results in the same order as the {@code futures} parameter.
+     */
     public static <T> List<T> getAllCompletableFutureResults(List<CompletableFuture<T>> futures) {
         return getAllCompletableFutureResults(futures, result -> {});
     }
 
+    /**
+     * Waits for all {@link CompletableFuture}s to complete and extracts
+     * the result from each.
+     *
+     * @param futures List of futures to complete.
+     * @param sideEffect Function to run on each {@link CompletableFuture#get()} call.
+     *                   Accepts the future result as the argument.
+     *                   Runs sequentially from {@code futures} start (index 0) to end,
+     *                   regardless of individual future completion order.
+     * @return All future results in the same order as the {@code futures} parameter.
+     */
     public static <T> List<T> getAllCompletableFutureResults(
         List<CompletableFuture<T>> futures,
         Consumer<T> sideEffect
@@ -38,6 +56,17 @@ public class ObjectUtils {
         return getAllCompletableFutureResults(futures, (result, index) -> sideEffect.accept(result));
     }
 
+    /**
+     * Waits for all {@link CompletableFuture}s to complete and extracts
+     * the result from each.
+     *
+     * @param futures List of futures to complete.
+     * @param sideEffect Function to run on each {@link CompletableFuture#get()} call.
+     *                   Accepts the future result and its index in the {@code futures} list as arguments.
+     *                   Runs sequentially from {@code futures} start (index 0) to end,
+     *                   regardless of individual future completion order.
+     * @return All future results in the same order as the {@code futures} parameter.
+     */
     public static <T> List<T> getAllCompletableFutureResults(
         List<CompletableFuture<T>> futures,
         BiConsumer<T, Integer> sideEffect
