@@ -17,10 +17,12 @@ public class AnimeAtsumeDaoImpl implements AnimeAtsumeDao {
         return captchaAnswerRepository.getAllCaptchaAnswersByPrompt(prompt);
     }
 
+    @Override
     public CaptchaAnswer saveNewCaptchaAnswer(CaptchaAnswer captchaAnswer) {
         return captchaAnswerRepository.save(captchaAnswer);
     }
 
+    @Override
     public List<CaptchaAnswer> saveNewCaptchaAnswers(List<CaptchaAnswer> captchaAnswers) {
         return captchaAnswerRepository.saveAll(captchaAnswers);
     }

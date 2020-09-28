@@ -58,11 +58,11 @@ public class CorsProxy {
     }
 
     public static <T> HttpEntity<T> getCorsEntity(T body, String origin, String referer) {
-        return CorsProxy.getCorsEntity(body, origin, referer, null);
+        return getCorsEntity(body, origin, referer, null);
     }
 
     public static <T> HttpEntity<T> getCorsEntity(T body, String origin, String referer, String cookie) {
-        return getCorsEntity(body, origin, referer, cookie, (HttpHeaders) null, false);
+        return getCorsEntity(body, origin, referer, cookie, null, false);
     }
 
     public static <T> HttpEntity<T> getCorsEntity(
