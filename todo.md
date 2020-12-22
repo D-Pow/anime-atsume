@@ -1,4 +1,8 @@
 Front-end
+    * Spinner too large on Firefox
+    * VideoModal
+        - Show 'use modern browser' in <ErrorDisplay>
+        - Add videoHostUrl in <ErrorDisplay>
 
 Back-end
     * Set request timeout?
