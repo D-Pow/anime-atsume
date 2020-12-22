@@ -25,3 +25,26 @@
 * Add sanitization for database insertions since they come from front-end.
 * Decide on best buffer size (1080p is about 16.5 MB/min, 720p is about 9 MB/min) if UrlResource doesn't work
 * Way to download videos
+* Maybe make `dao.model.CaptchaAnswer` primary key more like this format:
+    ```java
+    public class MyTable {
+        // ...
+        @Data
+        @Embeddable
+        public static class MyTablePk implements Serializable {
+            @SequenceGenerator(
+                name="seq_gen_name_in_java",
+                sequenceName="sequence_name_in_db",
+                allocationSize=1
+            )
+            @GeneratedValue(strategy=GenerationType.SEQUENCE, generator="seq_gen_name_in_java")
+            @Column(name="id", nullable=false)
+            private int id;
+
+            @Column(name="version", nullable=false)
+            private int version;
+        }
+
+        @EmbeddedId
+        private MyTablePk myTablePk;
+    ```
