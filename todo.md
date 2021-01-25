@@ -5,6 +5,8 @@
     - Add videoHostUrl in `<ErrorDisplay>`
 
 # Back-end
+* Update `/video?url=X` to include `?directSource=(true|false)` to determine if CORS proxy is necessary
+    - Relatedly, add `directSource=true` to `storage.googleapis.com` videos (see TODO in FourAnimeService.java)
 * Set request timeout?
 * Try UrlResource with client's range headers (I don't think I forwarded the range header previously, so it'd be worth trying again)
 * Other anime sites (Kissanime was shut down)
