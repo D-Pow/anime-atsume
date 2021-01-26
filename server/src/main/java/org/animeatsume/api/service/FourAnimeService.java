@@ -30,6 +30,7 @@ import java.util.stream.Collectors;
 public class FourAnimeService {
     private static final String ORIGIN = "https://4anime.to";
     private static final String SEARCH_URL = ORIGIN + "/wp-admin/admin-ajax.php";
+    private static final String DIRECT_SOURCE_VIDEO_ORIGIN = "https://storage.googleapis.com";
     private static final String TITLE_ANCHOR_SELECTOR = "a.name";
     private static final String EPISODE_ANCHOR_SELECTOR = "ul.episodes a[title]";
     private static final String EPISODE_VIDEO_SOURCE_SELECTOR = "video source";
@@ -134,6 +135,26 @@ public class FourAnimeService {
                 .select(EPISODE_VIDEO_SOURCE_SELECTOR)
                 .first();
             String srcUrl = videoSource.attr("src");
+
+            String secretVideoInIndexHtmlRegex = "(document.write.*href=\\\\\")(" + DIRECT_SOURCE_VIDEO_ORIGIN + ".*?\\.mp4)";
+            List<String> secretVideoInIndexHtmlMatches = RegexUtils.getFirstMatchGroups(
+                secretVideoInIndexHtmlRegex,
+                episodeHtml
+            );
+
+            if (!secretVideoInIndexHtmlMatches.isEmpty()) {
+                int secretVideoInIndexHtmlCaptureGroupForSrc = 2;
+                String secretVideoInIndexHtmlSrcUrl = secretVideoInIndexHtmlMatches.get(secretVideoInIndexHtmlCaptureGroupForSrc);
+
+                log.info("4anime video src not in video.src property [{}], rather in index.html [{}]",
+                    srcUrl,
+                    secretVideoInIndexHtmlSrcUrl
+                );
+
+                srcUrl = secretVideoInIndexHtmlSrcUrl;
+            }
+
+            boolean isDirectSource = srcUrl.contains(DIRECT_SOURCE_VIDEO_ORIGIN);
             List<String> videoQualityMatches = RegexUtils.getFirstMatchGroups("(\\d+p)(?=\\.mp4)", srcUrl);
             String videoQuality = "NA";
 
@@ -141,11 +162,8 @@ public class FourAnimeService {
                 videoQuality = videoQualityMatches.get(0);
             }
 
-            // TODO change to true if URL matches
-            //  https://storage.googleapis.com/justawesome-183319.appspot.com/v6.4animu.me/Shigatsu-wa-Kimi-no-Uso/Shigatsu-wa-Kimi-no-Uso-Episode-02-1080p.mp4
-
             // TODO see if prepending `storage.googleapis` to non-google-storage URLs works
-            return new VideoSearchResult(srcUrl, videoQuality, false);
+            return new VideoSearchResult(srcUrl, videoQuality, isDirectSource);
         }
 
         return null;

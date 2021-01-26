@@ -2,15 +2,16 @@ package org.animeatsume.api.controller;
 
 import org.animeatsume.api.model.Anchor;
 import org.animeatsume.api.model.TitleSearchRequest;
-import org.animeatsume.api.model.kissanime.CaptchaAttempt;
 import org.animeatsume.api.model.TitlesAndEpisodes;
+import org.animeatsume.api.model.kissanime.CaptchaAttempt;
 import org.animeatsume.api.model.kissanime.KissanimeVideoHostRequest;
 import org.animeatsume.api.model.kissanime.KissanimeVideoHostResponse;
 import org.animeatsume.api.model.kissanime.NovelPlanetSourceResponse;
-import org.animeatsume.api.service.VideoFileService;
 import org.animeatsume.api.service.KissanimeRuService;
 import org.animeatsume.api.service.NovelPlanetService;
+import org.animeatsume.api.service.VideoFileService;
 import org.animeatsume.api.utils.ObjectUtils;
+import org.animeatsume.api.utils.http.CorsProxy;
 import org.animeatsume.api.utils.http.Requests;
 import org.animeatsume.api.utils.regex.RegexUtils;
 import org.animeatsume.dao.AnimeAtsumeDao;
@@ -21,9 +22,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.MediaTypeFactory;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
 
 import java.io.File;
 import java.net.URI;
@@ -289,11 +295,12 @@ public class KissanimeRuController {
             proxyHeaders.set(HttpHeaders.ACCEPT_RANGES, "bytes");
             proxyHeaders.set(HttpHeaders.RANGE, String.format("bytes=%d-%d", ranges.get(0), ranges.get(1)));
 
-            return new RestTemplate().exchange(
-                videoUrl,
+            return (ResponseEntity<Resource>) CorsProxy.doCorsRequest(
                 HttpMethod.GET,
-                new HttpEntity<>(null, proxyHeaders),
-                Resource.class
+                URI.create(videoUrl),
+                null,
+                null,
+                proxyHeaders
             );
         }
 

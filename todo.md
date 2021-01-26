@@ -6,7 +6,6 @@
 
 # Back-end
 * Update `/video?url=X` to include `?directSource=(true|false)` to determine if CORS proxy is necessary
-    - Relatedly, add `directSource=true` to `storage.googleapis.com` videos (sample URL: `https://storage.googleapis.com/justawesome-183319.appspot.com/v6.4animu.me/Shigatsu-wa-Kimi-no-Uso/Shigatsu-wa-Kimi-no-Uso-Episode-02-1080p.mp4`)
 * Set request timeout?
 * Try UrlResource with client's range headers (I don't think I forwarded the range header previously, so it'd be worth trying again)
 * Other anime sites (Kissanime was shut down)
