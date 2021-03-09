@@ -1,5 +1,6 @@
 package org.animeatsume.api.controller;
 
+import lombok.extern.slf4j.Slf4j;
 import org.animeatsume.api.model.Anchor;
 import org.animeatsume.api.model.TitleSearchRequest;
 import org.animeatsume.api.model.TitlesAndEpisodes;
@@ -16,8 +17,6 @@ import org.animeatsume.api.utils.http.Requests;
 import org.animeatsume.api.utils.regex.RegexUtils;
 import org.animeatsume.dao.AnimeAtsumeDao;
 import org.animeatsume.dao.model.CaptchaAnswer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
@@ -29,7 +28,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.MediaTypeFactory;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Controller;
 
 import java.io.File;
 import java.net.URI;
@@ -38,10 +37,9 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
-@Component
+@Controller
+@Slf4j
 public class KissanimeRuController {
-    private static final Logger log = LoggerFactory.getLogger(KissanimeRuController.class);
-
     @Value("${org.animeatsume.download-videos}")
     private Boolean downloadVideos;
 
