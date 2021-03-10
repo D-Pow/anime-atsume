@@ -5,6 +5,9 @@
     - Add videoHostUrl in `<ErrorDisplay>`
 
 # Back-end
+* New 4anime.to video host doesn't work with anime-atsume
+    - At least most videos seem to be using this new host
+    - https://mountainoservoo002.animecdn.com/Naruto/Naruto-Episode-1-1080p.mp4
 * Update `/video?url=X` to include `?directSource=(true|false)` to determine if CORS proxy is necessary
 * Set request timeout?
 * Try UrlResource with client's range headers (I don't think I forwarded the range header previously, so it'd be worth trying again)
