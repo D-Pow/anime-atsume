@@ -1,7 +1,6 @@
 package org.animeatsume;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CacheEvict;
@@ -18,12 +17,12 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.concurrent.Executor;
 
+@Slf4j
 @Configuration
 @EnableAsync
 @EnableCaching
 @EnableScheduling
 public class ApplicationConfig {
-    private static final Logger log = LoggerFactory.getLogger(ApplicationConfig.class);
     private static final long WEEK_IN_MILLISECONDS = 1000 * 60 * 60 * 24 * 7;
     private static final long ANIME_TITLE_SEARCH_CACHE_CLEAR_INTERVAL = WEEK_IN_MILLISECONDS;
     public static final String ANIME_TITLE_SEARCH_CACHE_NAME = "animeTitleSearch";

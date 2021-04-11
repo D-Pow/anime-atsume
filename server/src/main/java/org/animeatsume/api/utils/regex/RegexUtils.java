@@ -81,7 +81,7 @@ public class RegexUtils {
      * @return String without leading or trailing spaces.
      */
     public static String strip(String str) {
-        return str.replaceAll("^\\s+", "").replaceAll("\\s+$", "");
+        return str.replaceAll("(^\\s+)|(\\s+$)", "");
     }
 
     public static String removeNonAlphanumericChars(String str) {
