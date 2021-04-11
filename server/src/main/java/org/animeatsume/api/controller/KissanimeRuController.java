@@ -290,6 +290,7 @@ public class KissanimeRuController {
             List<Long> ranges = Requests.getContentRangeStartAndEndAndLength(videoUrl, requestHeaders, false);
 
             HttpHeaders proxyHeaders = new HttpHeaders();
+            proxyHeaders.setAccept(requestHeaders.getAccept());
             proxyHeaders.set(HttpHeaders.ACCEPT_RANGES, "bytes");
             proxyHeaders.set(HttpHeaders.RANGE, String.format("bytes=%d-%d", ranges.get(0), ranges.get(1)));
 
