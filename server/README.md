@@ -65,9 +65,9 @@ Notes:
         * Likely not needed since Spring and Heroku both default to port 8080.
     * Make sure you're in the server/ directory. Then run:
         * `heroku container:login`
-        * `heroku container:push web`
-        * `heroku container:release web`
-        * Final command: `./gradlew clean build && heroku container:push web && heroku container:release web`
+        * `heroku container:push web` (depending on if you set this app as the default Heroku app, you'll need to add `-a anime-atsume` to specify which app to update in the push)
+        * `heroku container:release web` (same as above with `-a` flag)
+        * Final command: `./gradlew clean build && heroku container:push web -a anime-atsume && heroku container:release web -a anime-atsume`
     * Heroku's "free" and "hobby" tiers only allow a maximum of 512 MB.
         * Force JVM to not exceed this cap by adding `-Xmx512m` to app run.
         * `-Xmx` is to set maximum memory usage, `m` specifies megabytes.
