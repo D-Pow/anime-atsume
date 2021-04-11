@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
 public class FourAnimeService {
     private static final String ORIGIN = "https://4anime.to";
     private static final String SEARCH_URL = ORIGIN + "/wp-admin/admin-ajax.php";
-    private static final List<String> DIRECT_SOURCE_VIDEO_ORIGIN = Arrays.asList("https://storage.googleapis.com", "https://v6.4animu.me");
+    private static final List<String> DIRECT_SOURCE_VIDEO_ORIGINS = Arrays.asList("https://storage.googleapis.com", "https://[^\\.]+.4animu.me");
     private static final String TITLE_ANCHOR_SELECTOR = "a.name";
     private static final String EPISODE_ANCHOR_SELECTOR = "ul.episodes a[title]";
     private static final String EPISODE_VIDEO_SOURCE_SELECTOR = "video source";
@@ -170,6 +170,6 @@ public class FourAnimeService {
     }
 
     private static String getDirectSourceVideoOriginsAsSearchRegex() {
-        return "(" + String.join("|", DIRECT_SOURCE_VIDEO_ORIGIN) + ")";
+        return "(" + String.join("|", DIRECT_SOURCE_VIDEO_ORIGINS) + ")";
     }
 }
