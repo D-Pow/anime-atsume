@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { elementIsInClickPath, getClickPath } from 'utils/Events';
 import { getQueryParams, pushQueryParamOnHistory } from 'utils/BrowserNavigation';
 import { objEquals } from 'utils/Objects';
@@ -8,7 +8,6 @@ import { objEquals } from 'utils/Objects';
  *
  * @typedef {(String|Number|Object|Array|boolean|null)} JsonPrimitive
  */
-
 /**
  * The type of a hook's setState(value) function's {@code value} parameter.
  * Can either be the new state value or a function that takes in the previous
@@ -22,6 +21,7 @@ import { objEquals } from 'utils/Objects';
  *
  * @typedef {function(value:HookSetStateParam): void} HookSetStateFunction
  */
+
 
 /**
  * @callback hookedChildRenderer
