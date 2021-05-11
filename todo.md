@@ -2,6 +2,7 @@
 * Spinner too large on Firefox
 * VideoModal
     - Show 'use modern browser' in `<ErrorDisplay>`
+    - Full-screen doesn't work in Safari. Requires a [special function](https://developer.mozilla.org/en-US/docs/Web/API/Fullscreen_API/Guide)
 
 # Back-end
 * Convert `directSource` to use a test request from the back-end to determine if the video host allows cross-origin requests or not rather than using an origin string check
