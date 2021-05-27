@@ -1,4 +1,4 @@
-# [Anime Atsume](https://anime-atsume.herokuapp.com/)
+# Anime Atsume
 
 An overly simplistic website for finding and watching anime.
 
@@ -11,10 +11,12 @@ Anime Atsume is intended to be the exact opposite: overly simplistic, easy to us
 ### Running locally
 
 ##### Client
+
 * `cd client/`
 * `npm i`
 * `npm start`
 
 ##### Server
+
 * `cd server/`
 * `./gradlew bootRun`
