@@ -7,7 +7,7 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 const TerserJSPlugin = require('terser-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
-const resolveMocks = require('mock-requests/bin/resolve-mocks');
+const MockRequestsWebpackPlugin = require('mock-requests/bin/MockRequestsWebpackPlugin');
 const packageJson = require('../package.json');
 const babelConfig = require('./babel.config.json');
 
@@ -59,15 +59,13 @@ const fontRegex = /\.(ttf|woff2?|eot)$/;
 
 const hotReloading = false; // process.env.NODE_ENV === 'development';
 
-const resolvedMocks = resolveMocks('mocks', 'mocks/MockConfig.js', process.env.MOCK === 'true');
-
 module.exports = {
     module: {
         rules: [
             {
                 test: jsRegex,
+                include: /src/,
                 exclude: /node_modules/,
-                include: [ /src/, ...resolvedMocks.include ],
                 use: {
                     loader: 'babel-loader',
                     options: babelConfig
@@ -75,8 +73,8 @@ module.exports = {
             },
             {
                 test: tsRegex,
-                exclude: /node_modules/,
                 include: /src/,
+                exclude: /node_modules/,
                 use: [
                     {
                         loader: 'babel-loader',
@@ -181,7 +179,7 @@ module.exports = {
         ]
     },
     entry: {
-        client: [ 'core-js', 'isomorphic-fetch', paths.root + '/src/index.js', ...resolvedMocks.entry ],
+        client: [ 'core-js', 'isomorphic-fetch', paths.root + '/src/index.js' ],
         vendor: ['react', 'react-dom', 'react-router-dom', 'prop-types']
     },
     output: {
@@ -204,6 +202,12 @@ module.exports = {
         new MiniCssExtractPlugin({
             filename: `${transpiledSrcOutputPath}/css/[name].[contenthash:8].css`
         }),
+        // Adds mocks automatically
+        new MockRequestsWebpackPlugin(
+            'mocks',
+            'MockConfig.js',
+            process.env.MOCK === 'true'
+        ),
         // manually copies files from src to dest
         new CopyWebpackPlugin({
             patterns: [
