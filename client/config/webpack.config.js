@@ -248,7 +248,9 @@ module.exports = {
         port: 3000,
         proxy: {
             '/**': {
-                target: 'http://localhost:8080'
+                target: 'http://localhost:8080',
+                secure: false,
+                changeOrigin: true
             }
         },
         stats: 'minimal',  // silence superfluous webpack-dev-server "emitted" output
