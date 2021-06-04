@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
+import ModalHeader from './ModalHeader';
+import ModalBody from './ModalBody';
+import ModalFooter from './ModalFooter';
 import { useRootClose, useBlockDocumentScrolling } from 'utils/Hooks';
-import { isSafariBrowser } from 'utils/BrowserIdentification';
 
 function Modal({
     className,
@@ -55,11 +57,6 @@ function Modal({
 
     const displayCls = (show && !hideMomentarily) ? 'show' : '';
     const sizeStyle = show ? '' : '0%';
-    // Default title text to be a header.
-    // Clear the margin since that's handled by .modal-title
-    const renderedTitle = typeof title === typeof ''
-        ? <h4 className={'margin-clear'}>{title}</h4>
-        : title;
 
     return (
         <div className={`modal fade d-flex flex-center ${displayCls}`}
@@ -73,30 +70,17 @@ function Modal({
             <div className={'modal-dialog modal-dialog-centered flex-center width-fit'} style={{ maxWidth: '90vw' }}>
                 <div className={'modal-content overflow-auto ' + className} style={{ maxHeight: '90vh' }} ref={forwardRef}>
 
-                    <div className={'modal-header'} style={isSafariBrowser() ? { display: '-webkit-box' } : {}}>
-                        <div className={'modal-title'}>
-                            {renderedTitle}
-                        </div>
-                        {showCloseButton && (
-                            <button className={'close'} onClick={handleClose}>
-                                <span>&times;</span>
-                            </button>
-                        )}
-                    </div>
+                    <ModalHeader showCloseButton={showCloseButton} onClose={handleClose}>
+                        {title}
+                    </ModalHeader>
 
-                    <div className={'modal-body'}>
-                        <div className={useGridForBody ? 'container-fluid' : ''}>
-                            {children}
-                        </div>
-                    </div>
+                    <ModalBody useGridForBody={useGridForBody}>
+                        {children}
+                    </ModalBody>
 
-                    {footer && (
-                        <div className={'modal-footer'}>
-                            <div className={useGridForFooter ? 'container-fluid' : ''}>
-                                {footer}
-                            </div>
-                        </div>
-                    )}
+                    <ModalFooter useGridForFooter={useGridForFooter}>
+                        {footer}
+                    </ModalFooter>
 
                 </div>
             </div>
@@ -105,32 +89,24 @@ function Modal({
 }
 
 Modal.propTypes = {
+    ...ModalHeader.propTypes,
+    ...ModalBody.propTypes,
+    ...ModalFooter.propTypes,
     className: PropTypes.string,
     title: PropTypes.node,
-    children: PropTypes.node,
     footer: PropTypes.node,
     escapeClosesModal: PropTypes.bool,
-    useGridForBody: PropTypes.bool,
-    useGridForFooter: PropTypes.bool,
     preventDocumentScrolling: PropTypes.bool,
     show: PropTypes.bool,
-    showCloseButton: PropTypes.bool,
-    onClose: PropTypes.func,
     forwardRef: PropTypes.object
 };
 
 Modal.defaultProps = {
     className: '',
-    title: '',
-    children: '',
-    footer: '',
     escapeClosesModal: true,
-    useGridForBody: true,
-    useGridForFooter: true,
     preventDocumentScrolling: true,
     show: false,
-    showCloseButton: true,
-    onClose: () => {}
+    forwardRef: null
 };
 
 export default Modal;
