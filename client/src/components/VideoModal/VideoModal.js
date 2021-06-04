@@ -260,6 +260,16 @@ function VideoModal(props) {
             show={props.show}
             title={renderedTitle}
             onClose={handleClose}
+            modalContainerProps={{
+                style: {
+                    maxWidth: '90vw'
+                }
+            }}
+            modalContentProps={{
+                style: {
+                    maxHeight: '90vh'
+                }
+            }}
             forwardRef={modalRef}
         >
             <div

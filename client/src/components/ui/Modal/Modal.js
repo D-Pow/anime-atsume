@@ -17,6 +17,8 @@ function Modal({
     show,
     showCloseButton,
     onClose,
+    modalContainerProps,
+    modalContentProps,
     forwardRef
 }) {
     const [ hideMomentarily, setHideMomentarily ] = useState(false);
@@ -68,8 +70,8 @@ function Modal({
                 height: sizeStyle
             }}
         >
-            <div className={'modal-dialog modal-dialog-centered flex-center width-fit'} style={{ maxWidth: '90vw' }}>
-                <div className={'modal-content overflow-auto ' + className} style={{ maxHeight: '90vh' }} ref={forwardRef}>
+            <div className={'modal-dialog modal-dialog-centered flex-center width-fit'} {...modalContainerProps}>
+                <div className={'modal-content overflow-auto ' + className} ref={forwardRef} {...modalContentProps}>
 
                     <ModalHeader showCloseButton={showCloseButton} onClose={handleClose}>
                         {title}
@@ -99,6 +101,8 @@ Modal.propTypes = {
     escapeClosesModal: PropTypes.bool,
     preventDocumentScrolling: PropTypes.bool,
     show: PropTypes.bool,
+    modalContainerProps: PropTypes.object,
+    modalContentProps: PropTypes.object,
     forwardRef: PropTypes.object
 };
 
@@ -107,6 +111,8 @@ Modal.defaultProps = {
     escapeClosesModal: true,
     preventDocumentScrolling: true,
     show: false,
+    modalContainerProps: {},
+    modalContentProps: {},
     forwardRef: null
 };
 
