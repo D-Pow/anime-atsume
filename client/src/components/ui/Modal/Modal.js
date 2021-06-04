@@ -59,7 +59,8 @@ function Modal({
     const sizeStyle = show ? '' : '0%';
 
     return (
-        <div className={`modal fade d-flex flex-center ${displayCls}`}
+        <div
+            className={`modal fade d-flex flex-center ${displayCls}`}
             style={{
                 // Bootstrap's CSS for the modal backdrop's opacity and size doesn't work correctly. Override it here
                 background: 'rgba(0, 0, 0, 0.7)',
