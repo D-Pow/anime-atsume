@@ -7,7 +7,6 @@
 
 # Back-end
 
-* Convert `directSource` to use a test request from the back-end to determine if the video host allows cross-origin requests or not rather than using an origin string check
 * Set request timeout?
 * Try UrlResource with client's range headers (I don't think I forwarded the range header previously, so it'd be worth trying again)
 * Other anime sites (Kissanime was shut down)

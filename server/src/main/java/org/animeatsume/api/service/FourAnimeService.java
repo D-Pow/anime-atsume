@@ -18,6 +18,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
 import java.util.Arrays;
@@ -154,7 +155,7 @@ public class FourAnimeService {
                 srcUrl = secretVideoInIndexHtmlSrcUrl;
             }
 
-            boolean isDirectSource = srcUrl.matches(".*" + getDirectSourceVideoOriginsAsSearchRegex() + ".*");
+            boolean isDirectSource = isVideoUrlDirectSource(srcUrl);
             List<String> videoQualityMatches = RegexUtils.getFirstMatchGroups("(\\d+p)(?=\\.mp4)", srcUrl);
             String videoQuality = "NA";
 
@@ -167,6 +168,28 @@ public class FourAnimeService {
         }
 
         return null;
+    }
+
+    public static boolean isVideoUrlDirectSource(String videoUrl) {
+        return isVideoUrlDirectSource(videoUrl, false);
+    }
+
+    public static boolean isVideoUrlDirectSource(String videoUrl, boolean onlyFromSpecifiedSources) {
+        if (onlyFromSpecifiedSources) {
+            return videoUrl.matches(".*" + getDirectSourceVideoOriginsAsSearchRegex() + ".*");
+        }
+
+        try {
+            // If we can get the headers from our origin without the CORS proxy,
+            // then the client will be able to as well
+            HttpHeaders httpHeaders = new RestTemplate().headForHeaders(videoUrl);
+
+            return true;
+        } catch (Exception e) {
+            log.info("Video served from [{}] is not a direct source. Will have to proxy.", videoUrl);
+        }
+
+        return false;
     }
 
     private static String getDirectSourceVideoOriginsAsSearchRegex() {
