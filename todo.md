@@ -10,6 +10,10 @@
 * Set request timeout?
 * Try UrlResource with client's range headers (I don't think I forwarded the range header previously, so it'd be worth trying again)
 * Other anime sites (Kissanime was shut down)
+    - [Reddit r/animepiracy list](https://www.reddit.com/r/animepiracy/comments/ky7nz0/the_ranimepiracy_index_is_finally_in_beta/)
+        + List of accessible sites: https://piracy.moe/
+        + **Winner**: KimAnime.com
+            * e.g. https://kimanime.com/episode/76557/relife-episode-001 - both `source` tags work cross-domain
     - Twist.moe
     - https://www.wcostream.com/ (Watch cartoon online)
     - 9anime.(to|ru|com?)
