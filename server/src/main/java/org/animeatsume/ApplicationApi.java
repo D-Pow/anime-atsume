@@ -39,6 +39,9 @@ public class ApplicationApi {
     @Value("${org.animeatsume.activate-kissanime}")
     Boolean activateKissanime;
 
+    @Value("${org.animeatsume.activate-4anime}")
+    Boolean activate4Anime;
+
     @GetMapping(value = "/corsProxy", consumes = MediaType.ALL_VALUE)
     public ResponseEntity<?> getCorsRequest(
         @RequestParam("url") URI url,
@@ -88,6 +91,12 @@ public class ApplicationApi {
                 .ok(kissanimeRuController.searchKissanimeTitles(titleSearchRequest));
         }
 
+        if (activate4Anime) {
+            return ResponseEntity
+                .ok(fourAnimeController.searchTitle(titleSearchRequest));
+        }
+
+        // TODO kimAnime
         return ResponseEntity
             .ok(fourAnimeController.searchTitle(titleSearchRequest));
     }
@@ -98,12 +107,19 @@ public class ApplicationApi {
             return kissanimeRuController.getVideosForKissanimeEpisode(kissanimeEpisodeRequest);
         }
 
-        TitlesAndEpisodes.EpisodesForTitle videosForEpisode = fourAnimeController.getVideoForEpisode(kissanimeEpisodeRequest.getEpisodeUrl());
+        if (activate4Anime) {
+            TitlesAndEpisodes.EpisodesForTitle videosForEpisode = fourAnimeController.getVideoForEpisode(kissanimeEpisodeRequest.getEpisodeUrl());
 
-        if (videosForEpisode != null) {
-            return ResponseEntity.ok(videosForEpisode);
+            if (videosForEpisode != null) {
+                return ResponseEntity.ok(videosForEpisode);
+            }
+
+            return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .build();
         }
 
+        // TODO kimAnime
         return ResponseEntity
             .status(HttpStatus.NOT_FOUND)
             .build();
