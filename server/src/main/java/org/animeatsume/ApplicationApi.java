@@ -1,6 +1,7 @@
 package org.animeatsume;
 
 import org.animeatsume.api.controller.FourAnimeController;
+import org.animeatsume.api.controller.KimAnimeController;
 import org.animeatsume.api.controller.KissanimeRuController;
 import org.animeatsume.api.model.TitleSearchRequest;
 import org.animeatsume.api.model.TitlesAndEpisodes;
@@ -32,6 +33,9 @@ public class ApplicationApi {
 
     @Autowired
     FourAnimeController fourAnimeController;
+
+    @Autowired
+    KimAnimeController kimAnimeController;
 
     @Autowired
     NovelPlanetService novelPlanetService;
@@ -96,9 +100,8 @@ public class ApplicationApi {
                 .ok(fourAnimeController.searchTitle(titleSearchRequest));
         }
 
-        // TODO kimAnime
         return ResponseEntity
-            .ok(fourAnimeController.searchTitle(titleSearchRequest));
+            .ok(kimAnimeController.searchTitle(titleSearchRequest));
     }
 
     @PostMapping(value = "/getVideosForEpisode")

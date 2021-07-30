@@ -15,9 +15,9 @@ public class TitleSearchRequest {
     private String letter = "All";
     private String sort = "MostMatched";
     private String status = "All";
-    private String type = "All";
+    private String type = "All"; // TODO try to get only series, movies, ova, specials
 
-    public TitleSearchResults(String searchText) {
+    public TitleSearchRequest(String searchText) {
         this.text = searchText;
     }
 }

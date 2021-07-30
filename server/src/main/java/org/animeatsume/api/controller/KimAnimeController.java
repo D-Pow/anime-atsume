@@ -5,6 +5,7 @@ import org.animeatsume.api.model.TitleSearchRequest;
 import org.animeatsume.api.model.TitlesAndEpisodes;
 import org.animeatsume.api.model.VideoSearchResult;
 import org.animeatsume.api.service.FourAnimeService;
+import org.animeatsume.api.service.KimAnimeService;
 import org.animeatsume.api.utils.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -20,12 +21,15 @@ public class KimAnimeController {
     @Autowired
     FourAnimeService fourAnimeService;
 
+    @Autowired
+    KimAnimeService kimAnimeService;
+
     public TitlesAndEpisodes searchTitle(TitleSearchRequest request) {
-        TitlesAndEpisodes titleResults = fourAnimeService.searchTitle(request.getTitle());
+        TitlesAndEpisodes titleResults = kimAnimeService.searchTitle(request.getTitle());
 
         if (titleResults != null) {
             List<CompletableFuture<Void>> episodeSearchFutures = titleResults.getResults().stream()
-                .map(titleResult -> fourAnimeService.searchEpisodes(titleResult))
+                .map(titleResult -> kimAnimeService.searchEpisodes(titleResult))
                 .collect(Collectors.toList());
 
             ObjectUtils.getAllCompletableFutureResults(episodeSearchFutures);

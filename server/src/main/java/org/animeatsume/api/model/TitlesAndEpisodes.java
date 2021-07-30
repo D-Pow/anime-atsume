@@ -16,7 +16,7 @@ public class TitlesAndEpisodes {
     @Data
     @EqualsAndHashCode(callSuper = true)
     public static class EpisodesForTitle extends VideoSearchResult {
-        private List<VideoSearchResult> episodes;
+        private List<VideoSearchResult> episodes = new ArrayList<>();
 
         private static List<VideoSearchResult> mapAnchorListToVideoSearchResult(List<Anchor> episodes, boolean isDirectSource) {
             return episodes.stream()
