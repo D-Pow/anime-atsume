@@ -16,7 +16,9 @@ Notes:
 * Build image: `docker build -t app .`
     * Builds new image named "app" using the Dockerfile at root dir "."
     * Needs to be run in same directory where the Dockerfile is (in this case, server/).
-* Run app in image: `docker run -p 8080:8080 app`
+* Run app in (new) image: `docker run -p 8080:8080 app`
+    * `docker run` is a combo of `docker create` and `docker start`
+        * Only `run` supports exposing ports, unless `EXPOSE` is in the Dockerfile
     * Runs the newly built image, "app"
     * `-p host_port:container_port`
     * Add env vars read in CMD line via `-e` flag
