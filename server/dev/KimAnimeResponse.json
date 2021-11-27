@@ -1,0 +1,222 @@
+{
+    "status": "success",
+    "message": "OK",
+    "result": {
+        "current_page": 1,
+        "data": [{
+            "id": 3839,
+            "slug": "Shigatsu-Wa-Kimi-No-Uso",
+            "title": "Shigatsu wa Kimi no Uso",
+            "status": 0,
+            "view": 1663,
+            "summary": "Music accompanies the path of the human metronome, the prodigious pianist Kousei Arima. But after the passing of his mother, Saki Arima, Kousei falls into a downward spiral, rendering him unable to hear the sound of his own piano. Two years later, Kousei still avoids the piano, leaving behind his admirers and rivals, and lives a colorless life alongside his friends Tsubaki Sawabe and Ryouta Watari. However, everything changes when he meets a beautiful violinist, Kaori Miyazono, who stirs up his world and sets him on a journey to face music again. Based on the manga series of the same name, Shigatsu wa Kimi no Uso approaches the story of Kousei's recovery as he discovers that music is more than playing each note perfectly, and a single melody can bring in the fresh spring air of April. [Written by MAL Rewrite]",
+            "aired_at": "2014-10-10T00:00:00.000000Z",
+            "created_at": "2020-10-14T01:16:17.000000Z",
+            "updated_at": "2021-07-25T08:10:28.000000Z",
+            "deleted_at": null,
+            "completed_at": "2015-03-20T00:00:00.000000Z",
+            "mal_url": "https:\/\/myanimelist.net\/anime\/23273\/Shigatsu_wa_Kimi_no_Uso",
+            "anilist_url": null,
+            "language": "Subbed",
+            "type": "TV Series",
+            "cover": "\/images\/cover\/crqLLHMYHeUJCNWHkpOm-oWZqCQChDqGZExrbYsJe.jpg",
+            "query": "shigatsu wa kimi no uso",
+            "genres": [{
+                "id": 4,
+                "slug": "Drama",
+                "name": "Drama",
+                "summary": "Anime that often show life or characters through conflict and emotions. In general, the different parts of the story tend to form a whole that is greater than the sum of the parts. In other words, the story has a message that is bigger than just the story line itself.",
+                "created_at": "2020-10-13T23:52:18.000000Z",
+                "updated_at": "2021-07-25T20:40:56.000000Z",
+                "pivot": {
+                    "anime_id": 3839,
+                    "genre_id": 4
+                }
+            }, {
+                "id": 39,
+                "slug": "Music",
+                "name": "Music",
+                "summary": "Anime whose central theme revolves around singers\/idols or people playing instruments. This category is not intended for finding AMVs (Animated Music Videos).",
+                "created_at": "2020-10-13T23:56:23.000000Z",
+                "updated_at": "2021-07-25T20:40:56.000000Z",
+                "pivot": {
+                    "anime_id": 3839,
+                    "genre_id": 39
+                }
+            }, {
+                "id": 15,
+                "slug": "Romance",
+                "name": "Romance",
+                "summary": "Anime whose story is about two people who each want [sometimes unconciously] to win or keep the love of the other. This kind of anime might also fall in the 'Ecchi' category, while 'Romance' and 'Hentai' generally contradict each other.",
+                "created_at": "2020-10-13T23:52:39.000000Z",
+                "updated_at": "2021-07-25T20:38:43.000000Z",
+                "pivot": {
+                    "anime_id": 3839,
+                    "genre_id": 15
+                }
+            }, {
+                "id": 11,
+                "slug": "School",
+                "name": "School",
+                "summary": "Anime which are mainly set in a school environment.",
+                "created_at": "2020-10-13T23:52:29.000000Z",
+                "updated_at": "2021-07-25T20:38:43.000000Z",
+                "pivot": {
+                    "anime_id": 3839,
+                    "genre_id": 11
+                }
+            }, {
+                "id": 8,
+                "slug": "Shounen",
+                "name": "Shounen",
+                "summary": "In the context of manga and associated media, the word shounen refers to a male audience roughly between the ages of 10 and 18. In Japanese, the word means simply 'young male', and has no anime\/manga-related connotations at all. It does not comprise a style or a genre per se, but rather indicates the publisher`s intended target demographic. Still, while not mandatory, some easily identifiable traits are generally common to shounen works, such as: high-action, often humorous plots featuring male protagonists; camaraderie between male friends; sports teams and fighting squads (usually coupled with the aforementioned camaraderie); unrealistically attractive female characters (see fanservice). Additionally, the art style of shounen tends to be less flowery than that of shoujo and the plots tend to be less complex than seinen, but neither of those is a requirement.",
+                "created_at": "2020-10-13T23:52:18.000000Z",
+                "updated_at": "2021-07-25T20:44:24.000000Z",
+                "pivot": {
+                    "anime_id": 3839,
+                    "genre_id": 8
+                }
+            }],
+            "alt_title": [{
+                "id": 31107,
+                "anime_id": 3839,
+                "title": "Your Lie in April",
+                "created_at": "2021-06-30T14:07:07.000000Z",
+                "updated_at": "2021-06-30T14:07:07.000000Z",
+                "deleted_at": null,
+                "query": "your lie in april"
+            }, {
+                "id": 31108,
+                "anime_id": 3839,
+                "title": "\u56db\u6708\u306f\u541b\u306e\u5618",
+                "created_at": "2021-06-30T14:07:07.000000Z",
+                "updated_at": "2021-06-30T14:07:07.000000Z",
+                "deleted_at": null,
+                "query": "\u56db\u6708\u306f\u541b\u306e\u5618"
+            }],
+            "latest_episode": {
+                "id": 63953,
+                "slug": "Episode-022",
+                "anime_id": 3839,
+                "prefix": null,
+                "name": "Episode 022",
+                "created_at": "2020-10-14T01:16:17.000000Z",
+                "updated_at": "2021-07-01T21:19:14.000000Z",
+                "deleted_at": null,
+                "order": 22
+            }
+        }, {
+            "id": 1471,
+            "slug": "Shigatsu-Wa-Kimi-No-Uso-Dub",
+            "title": "Shigatsu wa Kimi no Uso (Dub)",
+            "status": 0,
+            "view": 898,
+            "summary": "Music accompanies the path of the human metronome, the prodigious pianist Kousei Arima. But after the passing of his mother, Saki Arima, Kousei falls into a downward spiral, rendering him unable to hear the sound of his own piano. Two years later, Kousei still avoids the piano, leaving behind his admirers and rivals, and lives a colorless life alongside his friends Tsubaki Sawabe and Ryouta Watari. However, everything changes when he meets a beautiful violinist, Kaori Miyazono, who stirs up his world and sets him on a journey to face music again. Based on the manga series of the same name, Shigatsu wa Kimi no Uso approaches the story of Kousei's recovery as he discovers that music is more than playing each note perfectly, and a single melody can bring in the fresh spring air of April. [Written by MAL Rewrite]",
+            "aired_at": "2014-10-10T00:00:00.000000Z",
+            "created_at": "2020-10-14T00:28:00.000000Z",
+            "updated_at": "2021-07-24T18:34:18.000000Z",
+            "deleted_at": null,
+            "completed_at": "2015-03-20T00:00:00.000000Z",
+            "mal_url": "https:\/\/myanimelist.net\/anime\/23273\/Shigatsu_wa_Kimi_no_Uso",
+            "anilist_url": null,
+            "language": "Dubbed",
+            "type": "TV Series",
+            "cover": "\/images\/cover\/OAQBNOrWje5lsoXnCaAH-PlBzef3Br2SArDDG4Es0.jpg",
+            "query": "shigatsu wa kimi no uso dub",
+            "genres": [{
+                "id": 4,
+                "slug": "Drama",
+                "name": "Drama",
+                "summary": "Anime that often show life or characters through conflict and emotions. In general, the different parts of the story tend to form a whole that is greater than the sum of the parts. In other words, the story has a message that is bigger than just the story line itself.",
+                "created_at": "2020-10-13T23:52:18.000000Z",
+                "updated_at": "2021-07-25T20:40:56.000000Z",
+                "pivot": {
+                    "anime_id": 1471,
+                    "genre_id": 4
+                }
+            }, {
+                "id": 39,
+                "slug": "Music",
+                "name": "Music",
+                "summary": "Anime whose central theme revolves around singers\/idols or people playing instruments. This category is not intended for finding AMVs (Animated Music Videos).",
+                "created_at": "2020-10-13T23:56:23.000000Z",
+                "updated_at": "2021-07-25T20:40:56.000000Z",
+                "pivot": {
+                    "anime_id": 1471,
+                    "genre_id": 39
+                }
+            }, {
+                "id": 15,
+                "slug": "Romance",
+                "name": "Romance",
+                "summary": "Anime whose story is about two people who each want [sometimes unconciously] to win or keep the love of the other. This kind of anime might also fall in the 'Ecchi' category, while 'Romance' and 'Hentai' generally contradict each other.",
+                "created_at": "2020-10-13T23:52:39.000000Z",
+                "updated_at": "2021-07-25T20:38:43.000000Z",
+                "pivot": {
+                    "anime_id": 1471,
+                    "genre_id": 15
+                }
+            }, {
+                "id": 11,
+                "slug": "School",
+                "name": "School",
+                "summary": "Anime which are mainly set in a school environment.",
+                "created_at": "2020-10-13T23:52:29.000000Z",
+                "updated_at": "2021-07-25T20:38:43.000000Z",
+                "pivot": {
+                    "anime_id": 1471,
+                    "genre_id": 11
+                }
+            }, {
+                "id": 8,
+                "slug": "Shounen",
+                "name": "Shounen",
+                "summary": "In the context of manga and associated media, the word shounen refers to a male audience roughly between the ages of 10 and 18. In Japanese, the word means simply 'young male', and has no anime\/manga-related connotations at all. It does not comprise a style or a genre per se, but rather indicates the publisher`s intended target demographic. Still, while not mandatory, some easily identifiable traits are generally common to shounen works, such as: high-action, often humorous plots featuring male protagonists; camaraderie between male friends; sports teams and fighting squads (usually coupled with the aforementioned camaraderie); unrealistically attractive female characters (see fanservice). Additionally, the art style of shounen tends to be less flowery than that of shoujo and the plots tend to be less complex than seinen, but neither of those is a requirement.",
+                "created_at": "2020-10-13T23:52:18.000000Z",
+                "updated_at": "2021-07-25T20:44:24.000000Z",
+                "pivot": {
+                    "anime_id": 1471,
+                    "genre_id": 8
+                }
+            }],
+            "alt_title": [{
+                "id": 23902,
+                "anime_id": 1471,
+                "title": "Your Lie in April",
+                "created_at": "2021-06-30T09:49:00.000000Z",
+                "updated_at": "2021-06-30T09:49:00.000000Z",
+                "deleted_at": null,
+                "query": "your lie in april"
+            }, {
+                "id": 23903,
+                "anime_id": 1471,
+                "title": "\u56db\u6708\u306f\u541b\u306e\u5618",
+                "created_at": "2021-06-30T09:49:00.000000Z",
+                "updated_at": "2021-06-30T09:49:00.000000Z",
+                "deleted_at": null,
+                "query": "\u56db\u6708\u306f\u541b\u306e\u5618"
+            }],
+            "latest_episode": {
+                "id": 29970,
+                "slug": "Episode-022",
+                "anime_id": 1471,
+                "prefix": null,
+                "name": "Episode 022",
+                "created_at": "2020-10-14T00:28:01.000000Z",
+                "updated_at": "2021-07-01T21:18:16.000000Z",
+                "deleted_at": null,
+                "order": 22
+            }
+        }],
+        "first_page_url": "https:\/\/kimanime.com\/api\/anime\/get\/list?page=1",
+        "from": 1,
+        "last_page": 1,
+        "last_page_url": "https:\/\/kimanime.com\/api\/anime\/get\/list?page=1",
+        "next_page_url": null,
+        "path": "https:\/\/kimanime.com\/api\/anime\/get\/list",
+        "per_page": 20,
+        "prev_page_url": null,
+        "to": 2,
+        "total": 2
+    }
+}
