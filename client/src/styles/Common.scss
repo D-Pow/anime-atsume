@@ -1,3 +1,6 @@
+@use "sass:math";
+@use "utils/json";
+
 @import "~bootstrap/scss/functions";
 @import "~bootstrap/scss/variables";
 @import "~bootstrap/scss/mixins";
@@ -160,7 +163,7 @@ $container-max-widths: (
 
   @each $colorName, $color in $theme-colors {
     @for $opacity from 0 through 9 {
-      $opacityVal: $opacity/10;
+      $opacityVal: math.div($opacity, 10);
       &.border-#{$colorName}-opacity-#{$opacity} {
         border-color: rgba($color, $opacityVal) !important;
       }
@@ -205,5 +208,6 @@ input.text-white::placeholder, textarea.text-white::placeholder {
 @import "~bootstrap/scss/bootstrap";
 
 :export {
-  gridBreakpoints: #{$grid-breakpoints};
+  themeColors: json.json-stringify($theme-colors);
+  gridBreakpoints: json.json-stringify($grid-breakpoints);
 }
