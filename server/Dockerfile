@@ -8,6 +8,8 @@ RUN apt-get clean && \
 ARG WAR_FILE=./build/libs/*.war
 ARG DB_FILE=./build/libs/*.db
 
+ARG BUILD_RUN_CMD="java ${JAVA_OPTS} -Dglass.platform=Monocle -Dmonocle.platform=Headless -jar anime-atsume.war --server.port=${PORT:-8080}"
+
 COPY ${WAR_FILE} anime-atsume.war
 COPY ${DB_FILE} anime_atsume.db
 
@@ -15,4 +17,4 @@ RUN chmod a+rwx anime_atsume.db
 
 EXPOSE 8080
 
-CMD java ${JAVA_OPTS} -Dglass.platform=Monocle -Dmonocle.platform=Headless -jar anime-atsume.war --server.port=${PORT:-8080}
+RUN "$BUILD_RUN_CMD"
