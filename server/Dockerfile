@@ -19,4 +19,4 @@ RUN chmod a+rwx anime_atsume.db
 
 EXPOSE 8080
 
-RUN "$BUILD_RUN_CMD"
+CMD bash -c "$BUILD_RUN_CMD"
