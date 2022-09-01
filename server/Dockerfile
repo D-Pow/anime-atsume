@@ -10,7 +10,7 @@ ARG DB_FILE=./build/libs/*.db
 
 ARG BUILD_RUN_CMD="java ${JAVA_OPTS} -Dglass.platform=Monocle -Dmonocle.platform=Headless -jar anime-atsume.war --server.port=${PORT:-8080}"
 
-RUN gradle clean build
+RUN ./gradlew clean build
 
 COPY ${WAR_FILE} anime-atsume.war
 COPY ${DB_FILE} anime_atsume.db
