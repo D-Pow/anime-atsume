@@ -1,5 +1,25 @@
 FROM ubuntu:18.04
 
+ENV SHELL="${SHELL:-"$(
+    declare IFS=$'\n'
+    declare shellToUse="$(which "${SHELL:-bash}")"
+    declare longestPathLength=0
+    declare shellOption
+
+    for shellOption in $(cat /etc/shells | grep -i bash); do
+        declare shellPathLength="$(echo "$shellOption" | wc -m)"
+
+        if (( shellPathLength > longestPathLength )); then
+            longestPathLength="$shellPathLength"
+            shellToUse="$shellOption"
+        fi
+    done
+
+    echo "$shellToUse"
+)"}"
+
+RUN chsh -s "$SHELL"
+
 RUN apt-get clean && \
     apt-get update && \
     apt-get install -y sqlite3 openjdk-8-jre openjfx=8u161-b12-1ubuntu2 libopenjfx-jni=8u161-b12-1ubuntu2 libopenjfx-java=8u161-b12-1ubuntu2 && \
