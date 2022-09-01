@@ -1,6 +1,6 @@
 FROM ubuntu:18.04
 
-SHELL [ "/bin/bash" ]
+SHELL [ "/bin/bash", "-c" ]
 
 RUN apt-get clean && \
     apt-get update && \
