@@ -10,6 +10,8 @@ ARG DB_FILE=./build/libs/*.db
 
 ARG BUILD_RUN_CMD="java ${JAVA_OPTS} -Dglass.platform=Monocle -Dmonocle.platform=Headless -jar anime-atsume.war --server.port=${PORT:-8080}"
 
+RUN ls -FlAh
+RUN find . -iname '*ApplicationApi.java*' 2>/dev/null
 RUN ./gradlew clean build
 
 COPY ${WAR_FILE} anime-atsume.war
