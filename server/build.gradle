@@ -231,6 +231,20 @@ def copyDbToBuildDir() {
     println("Copied ${dbName} to ${warOutputDir}")
 }
 
+
+def buildFrontendIfNotPresent() {
+    // Alternatives for printing the `project` object:
+    //  - import groovy.json.JsonBuilder[.toPrettyString(project)]
+    //  - import groovy.json.JsonOutput[.prettyPrint(project)]
+    def clientDirDeps = new File(clientDirDepsPath);
+
+    if (!clientDirDeps.exists()) {
+        println("Client-side dependencies directory ${clientDirDepsPath} doesn't exist. Creating it now...");
+        clientDirDeps.mkdirs();
+        cliCmd("cd ${clientDirPath}", "npm install", "npm run build");
+    }
+}
+
 tasks.withType(Copy).all {
     duplicatesStrategy 'include'
 }
@@ -264,6 +278,7 @@ bootWar {
 
     doLast {
         copyDbToBuildDir()
+        buildFrontendIfNotPresent();
     }
 }
 
