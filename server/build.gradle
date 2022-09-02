@@ -1,3 +1,5 @@
+import java.lang.reflect.Field;
+
 plugins {
     id 'java'
     id 'idea'
@@ -90,6 +92,30 @@ dependencies {
 
     testImplementation 'io.projectreactor:reactor-test'
 }
+
+
+def objectEntries(obj) {
+    // See:
+    //  - https://stackoverflow.com/questions/13400075/reflection-generic-get-field-value
+    //  - https://www.geeksforgeeks.org/reflection-in-java
+    //  - https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html#getDeclaredField-java.lang.String-
+    Class<?> objClass = obj.getClass();
+    Field[] objFields = objClass.getDeclaredFields();
+
+    // Alternatives:
+    // - Arrays.asList(objFields)
+    Map<String, String> entriesMap = new HashMap<>();
+
+    for (Field field : objFields) {
+        String fieldSuffix = field.toString().replaceAll("(^.*)(\\.)([^\\.]+)\$", "\$3");
+
+        field.setAccessible(true);
+        entriesMap.put(fieldSuffix, field.get(obj));
+    }
+
+    return entriesMap;
+}
+
 
 if (System.properties['jfxrtDir'] == null) { // if not in root-level gradle.properties
     System.properties['jfxrtDir'] = '.'
