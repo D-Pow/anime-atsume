@@ -16,6 +16,22 @@ version '1.0'
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
+// Adds relevant directories for the app to the global scope.
+//
+// `ext` is more-or-less equivalent to global vars.
+//
+// See:
+//  - https://stackoverflow.com/questions/61842857/passing-environment-variables-from-build-gradle-to-custom-plugin/61853116#61853116
+//  - https://docs.gradle.org/current/dsl/org.gradle.api.Project.html#org.gradle.api.Project.extraproperties
+//  - https://docs.gradle.org/current/dsl/org.gradle.api.Project.html#N14E9A)
+ext {
+    rootDirPath = "git rev-parse --show-toplevel".execute().getText();
+    serverDirPath = "${projectDir}";
+    clientDirPath = "${serverDirPath}/../client";
+    clientDirDepsPath = "${clientDirPath}/node_modules";
+    serverWebAssetDirPath = "${serverDirPath}/src/main/resources/public";
+}
+
 task printVersion {
     println rootProject.artifacts
 }
