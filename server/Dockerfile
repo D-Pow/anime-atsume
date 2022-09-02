@@ -22,10 +22,15 @@ ARG DB_FILE=./build/libs/*.db
 # Copy the entire app (server/client) from the local filesystem to the Docker image
 COPY .. .
 
+# Build the whole app
+RUN ./client/npm install \
+    && ./client/npm run build \
+    && ./server/gradlew clean build
+
 # In particular (and probably not necessary) copy the build's main artifacts (`.war`/`.db`) to
 # the Docker image
-COPY ${WAR_FILE} anime-atsume.war
-COPY ${DB_FILE} anime_atsume.db
+COPY ${WAR_FILE} ./server/build/libs/anime-atsume.war
+COPY ${DB_FILE} ./server/build/libs/anime_atsume.db
 
 RUN chmod a+rwx anime_atsume.db
 
