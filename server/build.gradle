@@ -97,6 +97,15 @@ dependencies {
 
     providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
 
+    // Not sure exactly why but occasionally `java/lib/tools.jar` won't be loaded (at least on Mac).
+    // Thus, load it dynamically via the native Java API.
+    // Likely due to certain features used in this `build.gradle` file, but still obviously necessary.
+    // See:
+    //  - https://stackoverflow.com/questions/25626757/correct-way-of-referencing-tools-jar-in-a-cross-platform-way/25628156#25628156
+    // Alternatives:
+    //  - compile files("${javaLibDir}/tools.jar")
+    compile files(((URLClassLoader) ToolProvider.getSystemToolClassLoader()).getURLs())
+
     annotationProcessor 'org.projectlombok:lombok:1.18.24'
 
     testImplementation('org.springframework.boot:spring-boot-starter-test') {
