@@ -1,4 +1,5 @@
 import java.lang.reflect.Field;
+import java.util.stream.Collectors;
 
 plugins {
     id 'java'
@@ -114,6 +115,34 @@ def objectEntries(obj) {
     }
 
     return entriesMap;
+}
+
+def cliCmd(String[] commandAndArgs) {
+    // Alternatives:
+    //  - org.apache.commons.lang.StringUtils.join()
+    //
+    // See:
+    //  - https://stackoverflow.com/questions/159148/groovy-executing-shell-commands
+    //  - https://stackoverflow.com/questions/52389713/execute-bash-command-in-a-gradle-function
+    String cmd = Arrays.stream(commandAndArgs)
+        .map(String::valueOf)
+        .collect(Collectors.joining(" "))
+    ;
+
+    // Alternatives:
+    //  - commandLine(cmd)
+    //  - executeCommand(cmd)
+    //  - (Below with or without `.waitFor()`)
+    //  - new String(cmd.execute()[.getOutputStream()|.toByteArray()][.toByteArray()])
+    //  - They may or may not require:
+    //      + .text.trim()
+    //      + .consumeProcessOutput(stdOut, stdErr) // Assuming the args are instances of StringBuilder
+    //      + .waitForProcessOutput(stdOut, stdErr)
+    //      + new OutputStreamWriter(subProcess.[functionFromAbove]()).toString()
+    def subProcess = cmd.execute();
+    def subProcessStdOut = subProcess.getText();
+
+    return subProcessStdOut;
 }
 
 
