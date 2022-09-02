@@ -28,6 +28,18 @@ targetCompatibility = 1.8
 //  - https://docs.gradle.org/current/dsl/org.gradle.api.Project.html#org.gradle.api.Project.extraproperties
 //  - https://docs.gradle.org/current/dsl/org.gradle.api.Project.html#N14E9A)
 ext {
+    javaHome = "${System.properties['java.home']}"
+
+    if (!new File(javaHome).exists()) {
+        javaHome = "${JAVA_HOME}" || System.getenv('JAVA_HOME');
+    }
+
+    javaLibDir = "${javaHome}/lib";
+
+    if (!new File(javaLibDir).exists()) {
+        javaLibDir = "${javaHome}/../lib";
+    }
+
     rootDirPath = "git rev-parse --show-toplevel".execute().getText();
     serverDirPath = "${projectDir}";
     clientDirPath = "${serverDirPath}/../client";
