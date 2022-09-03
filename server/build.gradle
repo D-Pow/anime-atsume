@@ -261,12 +261,27 @@ def buildFrontendIfNotPresent() {
     // Alternatives for printing the `project` object:
     //  - import groovy.json.JsonBuilder[.toPrettyString(project)]
     //  - import groovy.json.JsonOutput[.prettyPrint(project)]
-    def clientDirDeps = new File(clientDirDepsPath);
+    def serverWebAssetDir = new File(serverWebAssetDirPath);
 
-    if (!clientDirDeps.exists()) {
-        println("Client-side dependencies directory ${clientDirDepsPath} doesn't exist. Creating it now...");
-        clientDirDeps.mkdirs();
-        cliCmd("cd ${clientDirPath}", "npm install", "npm run build");
+    if (!serverWebAssetDir.exists()) {
+        println("Client build output directory ${serverWebAssetDirPath} doesn't exist. Building the front-end now...");
+
+        serverWebAssetDir.mkdirs();
+
+        def clientDirDeps = new File(clientDirDepsPath);
+
+        if (!clientDirDeps.exists()) {
+            println("Client-side dependencies directory ${clientDirDepsPath} doesn't exist. Creating it now...");
+
+            clientDirDeps.mkdirs();
+            cliCmd(
+                "cd ${rootDirPath}",
+                "which node &>/dev/null || ./install-nvm.sh",
+                "cd ${clientDirPath}",
+                "npm install",
+                "npm run build"
+            );
+        }
     }
 }
 
