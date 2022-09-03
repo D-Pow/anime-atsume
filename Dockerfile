@@ -10,7 +10,9 @@ FROM ubuntu:18.04
 #   - https://stackoverflow.com/questions/24537340/docker-adding-a-file-from-a-parent-directory
 
 
+# Change default shell to Bash for better feature support/easier usage
 SHELL [ "/bin/bash", "-c" ]
+# Change CWD from <root> to $HOME
 WORKDIR "/home"
 
 # `docker` flags useful for debugging:
