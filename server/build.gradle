@@ -1,4 +1,5 @@
 import java.lang.reflect.Field;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 plugins {
@@ -102,9 +103,11 @@ dependencies {
     // Likely due to certain features used in this `build.gradle` file, but still obviously necessary.
     // See:
     //  - https://stackoverflow.com/questions/25626757/correct-way-of-referencing-tools-jar-in-a-cross-platform-way/25628156#25628156
-    // Alternatives:
-    //  - compile files("${javaLibDir}/tools.jar")
-    compile files(((URLClassLoader) ToolProvider.getSystemToolClassLoader()).getURLs())
+    compileOnly files(Optional
+        .ofNullable((URLClassLoader) ToolProvider.getSystemToolClassLoader())
+        .map(urlClassLoader -> urlClassLoader.getURLs()) // `.ifPresent()` doesn't work since it returns void
+        .orElse(new String[] { "${javaLibDir}/tools.jar" })
+    )
 
     annotationProcessor 'org.projectlombok:lombok:1.18.24'
 
