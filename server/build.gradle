@@ -263,14 +263,14 @@ def buildFrontendIfNotPresent() {
     //  - import groovy.json.JsonOutput[.prettyPrint(project)]
     def serverWebAssetDir = new File(serverWebAssetDirPath);
 
-    if (!serverWebAssetDir.exists()) {
+    if (!serverWebAssetDir.exists() || serverWebAssetDir.list().size() == 0) {
         println("Client build output directory ${serverWebAssetDirPath} doesn't exist. Building the front-end now...");
 
         serverWebAssetDir.mkdirs();
 
         def clientDirDeps = new File(clientDirDepsPath);
 
-        if (!clientDirDeps.exists()) {
+        if (!clientDirDeps.exists() || clientDirDeps.list().size() == 0) {
             println("Client-side dependencies directory ${clientDirDepsPath} doesn't exist. Creating it now...");
 
             clientDirDeps.mkdirs();
