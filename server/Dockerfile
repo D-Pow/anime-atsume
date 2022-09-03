@@ -30,7 +30,7 @@ RUN ./server/gradlew clean build
 COPY ${WAR_FILE} ./server/build/libs/anime-atsume.war
 COPY ${DB_FILE} ./server/build/libs/anime_atsume.db
 
-RUN chmod a+rwx anime_atsume.db
+RUN chmod a+rwx anime-atsume.war anime_atsume.db
 
 EXPOSE 8080
 
