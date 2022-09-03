@@ -26,6 +26,7 @@ WORKDIR "/home"
 RUN apt-get clean && \
     apt-get update && \
     apt-get install -y \
+        curl \
         git \
         sqlite3 \
         openjdk-8-jdk \
