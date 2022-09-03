@@ -62,6 +62,7 @@ ext {
  *
  * @see <a href="https://stackoverflow.com/questions/53654190/what-is-the-difference-between-registering-and-creating-in-gradle-kotlin-dsl">StackOverflow post.</a>
  * @see <a href="https://docs.gradle.org/current/userguide/task_configuration_avoidance.html#sec:how_do_i_defer_creation">Gradle docs for {@code tasks.register()}</a>
+ * @see <a href="https://discuss.gradle.org/t/closure-vs-action/37806/2">Tasks ({@code Closures}) vs Actions</a>
  */
 
 tasks.register("printVersion") {
