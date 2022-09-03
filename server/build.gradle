@@ -43,7 +43,7 @@ ext {
         javaLibDir = "${javaHome}/../lib";
     }
 
-    rootDirPath = "git rev-parse --show-toplevel".execute().getText();
+    rootDirPath = cliCmd("git rev-parse --show-toplevel");
     serverDirPath = "${projectDir}";
     clientDirPath = "${serverDirPath}/../client";
     clientDirDepsPath = "${clientDirPath}/node_modules";
@@ -65,7 +65,7 @@ task printCommands {
     //  - https://stackoverflow.com/questions/38362977/how-to-list-all-tasks-for-the-master-project-only-in-gradle/40188539#40188539
     //  - https://stackoverflow.com/questions/41173616/how-can-i-get-a-list-of-all-configurations-for-a-gradle-project
     doLast {
-        println("./gradlew -q tasks --all".execute().getText());
+        println(cliCmd("./gradlew -q tasks --all"));
     }
 }
 
