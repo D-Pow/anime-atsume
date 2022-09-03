@@ -48,6 +48,8 @@ ext {
     clientDirPath = "${serverDirPath}/../client";
     clientDirDepsPath = "${clientDirPath}/node_modules";
     serverWebAssetDirPath = "${serverDirPath}/src/main/resources/public";
+    warOutputDir = "${project.buildDir}/${project.libsDirName}";
+    dbName = 'anime_atsume.db';
 }
 
 task printVersion {
@@ -246,9 +248,6 @@ def getJavaFxJarPath() {
 }
 
 def copyDbToBuildDir() {
-    def warOutputDir = "${project.buildDir}/${project.libsDirName}"
-    def dbName = 'anime_atsume.db'
-
     copy {
         from dbName
         into warOutputDir
