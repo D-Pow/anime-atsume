@@ -318,9 +318,12 @@ bootWar {
         println("Injected JavaFX .jar file to dependencies from ${javaFxAbsolutePath}")
     }
 
-    doLast {
-        copyDbToBuildDir()
+    doFirst {
         buildFrontendIfNotPresent();
+    }
+
+    doLast {
+        copyDbToBuildDir();
     }
 }
 
