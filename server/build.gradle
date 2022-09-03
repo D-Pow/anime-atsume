@@ -168,7 +168,7 @@ def cliCmd(String[] commandAndArgs) {
     //      + .waitForProcessOutput(stdOut, stdErr)
     //      + new OutputStreamWriter(subProcess.[functionFromAbove]()).toString()
     def subProcess = cmd.execute();
-    def subProcessStdOut = subProcess.getText();
+    def subProcessStdOut = subProcess.getText().trim();
 
     return subProcessStdOut;
 }
