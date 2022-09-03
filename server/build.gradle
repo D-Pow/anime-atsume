@@ -253,8 +253,6 @@ def copyDbToBuildDir() {
         into warOutputDir
     }
 
-    cliCmd("cd ${warOutputDir}", "chmod a+rwx *")
-
     println("Copied ${dbName} to ${warOutputDir}")
 }
 
@@ -324,6 +322,8 @@ bootWar {
 
     doLast {
         copyDbToBuildDir();
+
+        cliCmd("chmod a+rwx ${warOutputDir}/*")
     }
 }
 
