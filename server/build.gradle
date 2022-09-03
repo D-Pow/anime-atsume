@@ -18,18 +18,19 @@ plugins {
 group 'org.animeatsume'
 version '1.0'
 
-// Code was originally written for Java v8 so ensure it can run with these configs
+/* Code was originally written for Java v8 so ensure it can run with these configs */
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-// Adds relevant directories for the app to the global scope.
-//
-// `ext` is more-or-less equivalent to global vars.
-//
-// See:
-//  - https://stackoverflow.com/questions/61842857/passing-environment-variables-from-build-gradle-to-custom-plugin/61853116#61853116
-//  - https://docs.gradle.org/current/dsl/org.gradle.api.Project.html#org.gradle.api.Project.extraproperties
-//  - https://docs.gradle.org/current/dsl/org.gradle.api.Project.html#N14E9A)
+/**
+ * Adds relevant directories for the app to the global scope.
+ *
+ * `ext` is more-or-less equivalent to global vars.
+ *
+ * @see <a href="https://stackoverflow.com/questions/61842857/passing-environment-variables-from-build-gradle-to-custom-plugin/61853116#61853116"></a>
+ * @see <a href="https://docs.gradle.org/current/dsl/org.gradle.api.Project.html#org.gradle.api.Project.extraproperties"></a>
+ * @see <a href="https://docs.gradle.org/current/dsl/org.gradle.api.Project.html#N14E9A)"></a>
+ */
 ext {
     javaHome = "${System.properties['java.home']}"
 
@@ -68,13 +69,14 @@ tasks.register("printVersion") {
 }
 
 tasks.register("printCommands") {
-    // Alternatives:
-    //  - configurations.forEach(config -> { println(config.name); });
-    //  - ./gradlew --console plain dependencies 2>/dev/null | grep -Eio '^[a-z]+ - .*'
-    //
-    // See:
-    //  - https://stackoverflow.com/questions/38362977/how-to-list-all-tasks-for-the-master-project-only-in-gradle/40188539#40188539
-    //  - https://stackoverflow.com/questions/41173616/how-can-i-get-a-list-of-all-configurations-for-a-gradle-project
+    /**
+     * Alternatives:
+     *  - {@code configurations.forEach(config -> { println(config.name); });}
+     *  - {@code ./gradlew --console plain dependencies 2>/dev/null | grep -Eio '^[a-z]+ - .*'}
+     *
+     * @see <a href="https://stackoverflow.com/questions/38362977/how-to-list-all-tasks-for-the-master-project-only-in-gradle/40188539#40188539">List all Gradle tasks</a>
+     * @see <a href="https://stackoverflow.com/questions/41173616/how-can-i-get-a-list-of-all-configurations-for-a-gradle-project">List all Gradle configurations</a>
+     */
     doLast {
         println(cliCmd("./gradlew -q tasks --all"));
     }
@@ -113,11 +115,13 @@ dependencies {
 
     providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
 
-    // Not sure exactly why but occasionally `java/lib/tools.jar` won't be loaded (at least on Mac).
-    // Thus, load it dynamically via the native Java API.
-    // Likely due to certain features used in this `build.gradle` file, but still obviously necessary.
-    // See:
-    //  - https://stackoverflow.com/questions/25626757/correct-way-of-referencing-tools-jar-in-a-cross-platform-way/25628156#25628156
+    /**
+     * Not sure exactly why but occasionally `java/lib/tools.jar` won't be loaded (at least on Mac).
+     * Thus, load it dynamically via the native Java API.
+     * Likely due to certain features used in this `build.gradle` file, but still obviously necessary.
+     *
+     * @see <a href="https://stackoverflow.com/questions/25626757/correct-way-of-referencing-tools-jar-in-a-cross-platform-way/25628156#25628156">Handling {@code Cannot find "tools.jar"} errors.</a>
+     */
     compileOnly files(Optional
         .ofNullable((URLClassLoader) ToolProvider.getSystemToolClassLoader())
         .map(urlClassLoader -> urlClassLoader.getURLs()) // `.ifPresent()` doesn't work since it returns void
@@ -135,10 +139,11 @@ dependencies {
 
 
 def objectEntries(obj) {
-    // See:
-    //  - https://stackoverflow.com/questions/13400075/reflection-generic-get-field-value
-    //  - https://www.geeksforgeeks.org/reflection-in-java
-    //  - https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html#getDeclaredField-java.lang.String-
+    /**
+     * @see <a href="https://stackoverflow.com/questions/13400075/reflection-generic-get-field-value"></a>
+     * @see <a href="https://www.geeksforgeeks.org/reflection-in-java"></a>
+     * @see <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html#getDeclaredField-java.lang.String-"></a>
+     */
     Class<?> objClass = obj.getClass();
     Field[] objFields = objClass.getDeclaredFields();
 
@@ -157,27 +162,30 @@ def objectEntries(obj) {
 }
 
 def cliCmd(String[] commandAndArgs) {
-    // Alternatives:
-    //  - org.apache.commons.lang.StringUtils.join()
-    //
-    // See:
-    //  - https://stackoverflow.com/questions/159148/groovy-executing-shell-commands
-    //  - https://stackoverflow.com/questions/52389713/execute-bash-command-in-a-gradle-function
+    /**
+     * Alternatives:
+     *  - {@code org.apache.commons.lang.StringUtils.join()}
+     *
+     * @see <a href="https://stackoverflow.com/questions/159148/groovy-executing-shell-commands">Run terminal commands from Gradle script</a>
+     * @see <a href="https://stackoverflow.com/questions/52389713/execute-bash-command-in-a-gradle-function">Running Bash commands in Gradle</a>
+     */
     String cmd = Arrays.stream(commandAndArgs)
         .map(String::valueOf)
         .collect(Collectors.joining(" "))
     ;
 
-    // Alternatives:
-    //  - commandLine(cmd)
-    //  - executeCommand(cmd)
-    //  - (Below with or without `.waitFor()`)
-    //  - new String(cmd.execute()[.getOutputStream()|.toByteArray()][.toByteArray()])
-    //  - They may or may not require:
-    //      + .text.trim()
-    //      + .consumeProcessOutput(stdOut, stdErr) // Assuming the args are instances of StringBuilder
-    //      + .waitForProcessOutput(stdOut, stdErr)
-    //      + new OutputStreamWriter(subProcess.[functionFromAbove]()).toString()
+    /**
+     * Alternatives:
+     *  - {@code commandLine(cmd)}
+     *  - {@code executeCommand(cmd)}
+     *  - {@code (Below with or without `.waitFor()`)}
+     *  - {@code new String(cmd.execute()[.getOutputStream()|.toByteArray()][.toByteArray()])}
+     *  - They may or may not require:
+     *      + {@code .text.trim()}
+     *      + {@code .consumeProcessOutput(stdOut, stdErr)} // Assuming the args are instances of {@code StringBuilder}
+     *      + {@code .waitForProcessOutput(stdOut, stdErr)}
+     *      + {@code new OutputStreamWriter(subProcess.[functionFromAbove]()).toString()}
+     */
     def subProcess = cmd.execute();
     def subProcessStdOut = subProcess.getText().trim();
 
@@ -269,9 +277,11 @@ def copyDbToBuildDir() {
 
 
 def buildFrontendIfNotPresent() {
-    // Alternatives for printing the `project` object:
-    //  - import groovy.json.JsonBuilder[.toPrettyString(project)]
-    //  - import groovy.json.JsonOutput[.prettyPrint(project)]
+    /**
+     * Alternatives for printing the `project` object:
+     *     - {@code import groovy.json.JsonBuilder[.toPrettyString(project)]}
+     *     - {@code import groovy.json.JsonOutput[.prettyPrint(project)]}
+     */
     def serverWebAssetDir = new File(serverWebAssetDirPath);
 
     if (!serverWebAssetDir.exists() || serverWebAssetDir.list().size() == 0) {
@@ -301,17 +311,22 @@ tasks.withType(Copy).all {
 }
 
 
-// Build, run, etc. all depend on the `compileJava` task.
-// As such, to ensure the front-end was built before attempting to run the server,
-// it needs to be specified as a dependency.
-//
-// Note: This is different than `doFirst` in that `dependsOn` runs before the "configuration"
-// lifecycle method (what's run in the top-level of a task) which is run before the "doFirst"
-// lifecycle method.
-//
-// Also, the syntax here is just the new/recommended syntax rather than just plain name-declarations
-// at the top-level of the file.
+/**
+ * Build, run, etc. all depend on the `compileJava` task.
+ * As such, to ensure the front-end was built before attempting to run the server,
+ * it needs to be specified as a dependency.
+ *
+ * Note: This is different than `doFirst` in that `dependsOn` runs before the "configuration"
+ * lifecycle method (what's run in the top-level of a task) which is run before the "doFirst"
+ * lifecycle method.
+ *
+ * Also, the syntax here is just the new/recommended syntax rather than just plain name-declarations
+ * at the top-level of the file.
+ */
 
+/**
+ * {@inheritDoc}
+ */
 tasks.register("preCompile") {
     doFirst {
         buildFrontendIfNotPresent();
@@ -322,15 +337,24 @@ tasks.register("preCompile") {
 tasks.compileJava.dependsOn([ "preCompile" ]);
 
 
-// Note: Allow the Spring tasks to be eagerly-loaded since they they are in Spring itself.
-// Also, `tasks.register()` doesn't allow overriding tasks.
+/**
+ * Note: Allow the Spring tasks to be eagerly-loaded since they they are in Spring itself.
+ * Also, {@code tasks.register()} doesn't allow overriding tasks.
+ */
+
+/**
+ * {@inheritDoc}
+ */
 bootRun {
     // support passing -Dsystem.property=value to bootRun task
     systemProperties = System.properties
 }
 
-// WAR is needed because JAR doesn't include resources/public/
-// Spring disables `war` task and replaces it with `bootWar`
+/**
+ * {@inheritDoc}
+ * WAR is needed because JAR doesn't include {@link resources.public resources/public/}
+ * Spring disables {@code war} task and replaces it with {@code bootWar}
+ */
 bootWar {
     archiveBaseName = project.name
     archiveVersion = project.version
@@ -358,11 +382,17 @@ bootWar {
     }
 }
 
-// Creates a JAR that can run by itself instead of a WAR that requires running in a Tomcat container
-//bootJar {
-//    archiveBaseName = project.name
-//    archiveVersion = project.version
-//}
+/**
+ * Not used, but this code would create a JAR file instead of a WAR file.
+ * JAR files can run by themselves whereas WAR files require running in a Tomcat container.
+ *
+ * <pre>
+ * bootJar {
+ *     archiveBaseName = project.name
+ *     archiveVersion = project.version
+ * }
+ * </pre>
+ */
 
 sourceSets {
     main {
@@ -380,7 +410,10 @@ sourceSets {
     }
 }
 
-//Run specific test using `gradle test --tests <TestClassName, e.g. _11_>`
+/**
+ * {@inheritDoc}
+ * Run specific test using {@code gradle test --tests <TestClassName, e.g. _11_>}
+ */
 test {
     // use JUnit
     useJUnitPlatform()
