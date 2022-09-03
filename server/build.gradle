@@ -52,11 +52,22 @@ ext {
     dbName = 'anime_atsume.db';
 }
 
-task printVersion {
+/**
+ * Use `tasks.register("myTaskName")` to lazy-load the tasks that aren't needed for global app
+ * functionality.
+ * i.e. don't run the lifecycle scripts -- including the tasks' top-level configuration information
+ * (which is usually always run by default as the Gradle process itself starts, regardless of the
+ * specified task) -- until the task is actually needed/called.
+ *
+ * @see <a href="https://stackoverflow.com/questions/53654190/what-is-the-difference-between-registering-and-creating-in-gradle-kotlin-dsl">StackOverflow post.</a>
+ * @see <a href="https://docs.gradle.org/current/userguide/task_configuration_avoidance.html#sec:how_do_i_defer_creation">Gradle docs for {@code tasks.register()}</a>
+ */
+
+tasks.register("printVersion") {
     println rootProject.artifacts
 }
 
-task printCommands {
+tasks.register("printCommands") {
     // Alternatives:
     //  - configurations.forEach(config -> { println(config.name); });
     //  - ./gradlew --console plain dependencies 2>/dev/null | grep -Eio '^[a-z]+ - .*'
@@ -311,6 +322,8 @@ tasks.register("preCompile") {
 tasks.compileJava.dependsOn([ "preCompile" ]);
 
 
+// Note: Allow the Spring tasks to be eagerly-loaded since they they are in Spring itself.
+// Also, `tasks.register()` doesn't allow overriding tasks.
 bootRun {
     // support passing -Dsystem.property=value to bootRun task
     systemProperties = System.properties
