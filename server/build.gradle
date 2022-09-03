@@ -253,6 +253,8 @@ def copyDbToBuildDir() {
         into warOutputDir
     }
 
+    cliCmd("cd ${warOutputDir}", "chmod a+rwx *")
+
     println("Copied ${dbName} to ${warOutputDir}")
 }
 
