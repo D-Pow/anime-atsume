@@ -1,5 +1,15 @@
 FROM ubuntu:18.04
 
+
+# Note: Ensure the Dockerfile is in the same dir or above of all files meant to be copied into
+# the image because Docker doesn't allow accessing any files outside of the same/child dir of
+# where the Dockerfile is due to how the context of the build logic is needed before running
+# any Docker commands.
+#
+# See:
+#   - https://stackoverflow.com/questions/24537340/docker-adding-a-file-from-a-parent-directory
+
+
 SHELL [ "/bin/bash", "-c" ]
 WORKDIR "/home"
 
@@ -20,7 +30,7 @@ ARG WAR_FILE=./build/libs/*.war
 ARG DB_FILE=./build/libs/*.db
 
 # Copy the entire app (server/client) from the local filesystem to the Docker image
-COPY .. .
+COPY . .
 
 # Build the whole app
 RUN ./server/gradlew clean build
