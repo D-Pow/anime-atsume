@@ -289,6 +289,28 @@ tasks.withType(Copy).all {
     duplicatesStrategy 'include'
 }
 
+
+// Build, run, etc. all depend on the `compileJava` task.
+// As such, to ensure the front-end was built before attempting to run the server,
+// it needs to be specified as a dependency.
+//
+// Note: This is different than `doFirst` in that `dependsOn` runs before the "configuration"
+// lifecycle method (what's run in the top-level of a task) which is run before the "doFirst"
+// lifecycle method.
+//
+// Also, the syntax here is just the new/recommended syntax rather than just plain name-declarations
+// at the top-level of the file.
+
+tasks.register("preCompile") {
+    doFirst {
+        buildFrontendIfNotPresent();
+    }
+    buildFrontendIfNotPresent();
+}
+
+tasks.compileJava.dependsOn([ "preCompile" ]);
+
+
 bootRun {
     // support passing -Dsystem.property=value to bootRun task
     systemProperties = System.properties
@@ -314,10 +336,6 @@ bootWar {
         def javaFxAbsolutePath = getJavaFxJarPath()
         classpath(javaFxAbsolutePath)
         println("Injected JavaFX .jar file to dependencies from ${javaFxAbsolutePath}")
-    }
-
-    doFirst {
-        buildFrontendIfNotPresent();
     }
 
     doLast {
