@@ -1,4 +1,7 @@
 .gradle/
+gradle/
+!gradle/wrapper/gradle-wrapper.jar
+!gradle/wrapper/gradle-wrapper.properties
 build/
 videos/
 src/main/resources/public/
