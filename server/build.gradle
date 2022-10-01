@@ -197,27 +197,103 @@ dependencies {
 }
 
 
-def objectEntries(obj) {
-    /**
-     * @see <a href="https://stackoverflow.com/questions/13400075/reflection-generic-get-field-value"></a>
-     * @see <a href="https://www.geeksforgeeks.org/reflection-in-java"></a>
-     * @see <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html#getDeclaredField-java.lang.String-"></a>
-     */
+def getObjectProperties(Object obj) {
+    return getObjectProperties(obj, false, false);
+}
+def getObjectProperties(Object obj, boolean asString) {
+    return getObjectProperties(obj, asString, false);
+}
+/**
+ * @see {@link ./src/main/java/org/animeatsume/api/utils/ObjectUtils.java#toString() GetObjectProperties}
+ */
+def getObjectProperties(Object obj, boolean asString, boolean recurseNestedObjects) {
     Class<?> objClass = obj.getClass();
     Field[] objFields = objClass.getDeclaredFields();
 
-    // Alternatives:
-    // - Arrays.asList(objFields)
-    Map<String, String> entriesMap = new HashMap<>();
+    StringBuilder sb = new StringBuilder(objClass.getName() + " {");
 
-    for (Field field : objFields) {
-        String fieldSuffix = field.toString().replaceAll("(^.*)(\\.)([^\\.]+)\$", "\$3");
+    Map<String, ?> objEntries = Arrays.asList(objFields).parallelStream()
+        .reduce(new HashMap<>(), (map, field) -> {
+            String fieldName = field.getName();
 
-        field.setAccessible(true);
-        entriesMap.put(fieldSuffix, field.get(obj));
+            sb.append(fieldName).append("=");
+
+            Object fieldValue = "Unparsed";
+
+            try {
+                field.setAccessible(true); // Make private fields readable
+                fieldValue = field.get(obj);
+
+                // Recurse if field is a dependency/non-primitive class
+                // i.e. when `Class::toString()` returns something akin to "com.company.SomeClass@a1b2c3d4"
+                if (recurseNestedObjects && fieldValue.toString().matches("^(org|com)[^@]*\\.\\w+@[a-z0-9]{8}\$")) {  // Note: `\\$` (Java) needs to be replaced with `\$` (Gradle)
+                    fieldValue = getObjectProperties(fieldValue, asString, recurseNestedObjects);
+                }
+            } catch (IllegalAccessException ignored) {}
+
+            sb.append("(")
+                .append(fieldValue)
+                .append(")");
+
+            sb.append(", ");
+
+            map.put(fieldName, fieldValue);
+
+            return map;
+        }, (mapIterationA, mapIterationB) -> {
+            Map<Object, Object> partiallyCombined = new HashMap<>(mapIterationA);
+
+            partiallyCombined.putAll(mapIterationB);
+
+            return partiallyCombined;
+        });
+
+    sb.delete(sb.length() - 2, sb.length()); // Remove last comma+space
+    sb.append("}");
+
+    if (asString) {
+        return sb.toString();
     }
 
-    return entriesMap;
+    return objEntries;
+}
+
+def getGradlePropertiesAndSettings() {
+    // Not sure why, but `.each { it ->` fails, thus it's omitted
+    rootProject.properties.each {
+        // Note: `$it.someField` is only for strings, `it.someField` is for normal code
+        def isNull = it.value == null;
+
+        def blah = it.value;
+
+        // TODO - Add this List logic to `ObjectUtils.getObjectProperties()`
+        if (
+            !isNull
+                && (
+                it.value.getClass().isArray()
+                    || it.value instanceof List
+                    || it.value instanceof Map
+                    || it.value instanceof Set
+                    || it.value instanceof Collection
+            )
+        ) {
+            println "$it.key -> ["
+
+            if (it.value instanceof Map) {
+                it.value.each { k, v ->
+                    println "    ${k} -> ${v}"
+                }
+            } else {
+                it.value.each { propertyValue ->
+                    println "    ${propertyValue}"
+                }
+            }
+
+            println "]"
+        } else {
+            println "$it.key -> $it.value\n"
+        }
+    }
 }
 
 def cliCmd(String[] commandAndArgs) {
