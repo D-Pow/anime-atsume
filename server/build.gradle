@@ -480,22 +480,43 @@ def buildFrontendIfNotPresent() {
 
         serverWebAssetDir.mkdirs();
 
-        def clientDirDeps = new File(clientDirDepsPath);
+        File clientDirDeps = new File(clientDirDepsPath);
+        boolean clientDepsInstalled = clientDirDeps.exists() && clientDirDeps.list().size() > 0;
 
-        if (!clientDirDeps.exists() || clientDirDeps.list().size() == 0) {
-            println("Client-side dependencies directory ${clientDirDepsPath} doesn't exist. Creating it now...");
+        if (!clientDepsInstalled) {
+            println("Client-side dependencies directory ${clientDirDepsPath} doesn't exist. Running front-end install now...");
 
             clientDirDeps.mkdirs();
-            cliCmd(
-                "cd ${repoRootDirPath}",
-                "which node &>/dev/null || ./install-nvm.sh",
-                "cd ${clientDirPath}",
-                "npm install",
-                "npm run build"
-            );
+
+            // Native Bash command: ( ( command -v 'node' || [[ -n "${!1}" ]] ) &> /dev/null; if (( $? == 0 )); then echo 'NodeJS is installed'; fi; )
+            String nodeJsIsInstalledStdOut = cliCmd("command -v node");
+            boolean nodeJsIsInstalled = nodeJsIsInstalledStdOut != null && nodeJsIsInstalledStdOut.length() > 0;
+
+            if (!nodeJsIsInstalled) {
+                println "Installing NodeJS version ${nodeVersion} using `nvm` via `${repoRootDirPath}/install-nvm.sh`..."
+
+                cliCmd("${repoRootDirPath}/install-nvm.sh ${nodeVersion}");
+
+                println "NodeJS installation successful!"
+            }
+
+            println("Running `npm install && npm build` in `${clientDirPath}`...");
+
+            // Alternative (if async were required): `gradle.taskGraph.afterTask { Task task, TaskState state -> {}}`
+            String npmInstallAndBuildStdOut = cliCmd("npm install; npm run build", "${clientDirPath}");;
+
+            println("${npmInstallAndBuildStdOut}");
+            println("Client build ran succcessfully!");
         }
     }
 }
+
+tasks.register("buildFrontend") {
+    doFirst {
+        buildFrontendIfNotPresent();
+    }
+}
+
 
 tasks.withType(Copy).all {
     duplicatesStrategy 'include'
@@ -519,10 +540,7 @@ tasks.withType(Copy).all {
  * {@inheritDoc}
  */
 tasks.register("preCompile") {
-    doFirst {
-        buildFrontendIfNotPresent();
-    }
-    buildFrontendIfNotPresent();
+    dependsOn "buildFrontend";  // Same as `tasks.<my-task>.dependsOn([ "someTask" ])`
 }
 
 tasks.compileJava.dependsOn([ "preCompile" ]);
