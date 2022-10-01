@@ -1,6 +1,6 @@
 #!/usr/bin/env -S bash
 
-declare _nvmNodeVersion='16'
+declare _nvmNodeVersion="${1:---lts}"
 
 # Install NVM
 
