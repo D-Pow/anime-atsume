@@ -271,12 +271,12 @@ def getGradlePropertiesAndSettings() {
         // TODO - Add this List logic to `ObjectUtils.getObjectProperties()`
         if (
             !isNull
-                && (
+            && (
                 it.value.getClass().isArray()
-                    || it.value instanceof List
-                    || it.value instanceof Map
-                    || it.value instanceof Set
-                    || it.value instanceof Collection
+                || it.value instanceof List
+                || it.value instanceof Map
+                || it.value instanceof Set
+                || it.value instanceof Collection
             )
         ) {
             println "$it.key -> ["
