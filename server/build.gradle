@@ -559,6 +559,8 @@ bootRun {
     systemProperties = System.properties
 }
 
+tasks.run.dependsOn([ "bootRun" ]);
+
 /**
  * {@inheritDoc}
  * WAR is needed because JAR doesn't include {@link resources.public resources/public/}
