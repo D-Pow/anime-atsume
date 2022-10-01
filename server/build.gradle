@@ -15,9 +15,6 @@ plugins {
     // id 'org.openjfx.javafxplugin' version '0.0.10'
 }
 
-group 'org.animeatsume'
-version '1.0'
-
 /* Code was originally written for Java v8 so ensure it can run with these configs */
 sourceCompatibility = 1.8
 targetCompatibility = 1.8

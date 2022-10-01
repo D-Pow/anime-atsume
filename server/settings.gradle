@@ -1,1 +1,18 @@
 rootProject.name = 'anime-atsume'
+
+/**
+ * `group` and `version` usually have to be defined in `build.gradle`.
+ * However, we can collect all these settings together here by adding a hook
+ * to inject them right before `build.gradle` is executed and still maintain the
+ * same behavior.
+ * This fixes Gradle's "bug" of violating the principle of separation of concerns
+ * and helps keep code nice and clean.
+ *
+ * @see <a href="https://www.baeldung.com/gradle-build-settings-properties#the-build-in-a-nutshell">Gradle project execution lifecycle (TL;DR)</a>
+ * @see <a href="https://stackoverflow.com/questions/17262856/how-to-set-the-project-name-group-version-plus-source-target-compatibility-in/17263028#17263028">StackOverflow: Assign all settings in one file</a>
+ * @see <a href="https://docs.gradle.org/current/dsl/org.gradle.api.Project.html#Lifecycle:~:text=of%20Gradle%27s%20features.-,Lifecycle,-There%20is%20a">Gradle project execution lifecycle (docs)</a>
+ */
+gradle.beforeProject {
+    gradle.rootProject.setGroup("org.animeatsume")
+    gradle.rootProject.setVersion("1.0");
+}
