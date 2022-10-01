@@ -589,7 +589,7 @@ bootWar {
     doLast {
         copyDbToBuildDir();
 
-        cliCmd("chmod a+rwx ${warOutputDir}/*")
+        cliCmd("chmod 777 ${warOutputDir}/*")
     }
 }
 
