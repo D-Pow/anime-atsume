@@ -395,29 +395,43 @@ if (System.properties['jfxrtDir'] == null) { // if not in root-level gradle.prop
 
 def searchFile(Map<String, Closure> places, List<String> searchPaths, String searchID) {
     File result = null;
-    places.each { k, v ->
-        if (result != null) return;
-        project.logger.debug("Looking for $searchID in $k")
-        def dir = v()
+
+    places.each { keyDescription, filePathMaybe ->
+        if (result != null) {
+            return;
+        }
+
+        project.logger.debug("Looking for $searchID in $keyDescription");
+
+        def dir = filePathMaybe();
+
         if (dir == null) {
-            project.logger.debug("$k not set")
+            project.logger.debug("$keyDescription not set");
         } else {
-            project.logger.debug("$k is $dir")
-            searchPaths.each { s ->
-                if (result != null) return;
-                File f = new File(dir, s);
-                project.logger.debug("Trying $f.path")
-                if (f.exists() && f.file) {
-                    project.logger.debug("found $searchID as $result")
-                    result = f;
+            project.logger.debug("$keyDescription is $dir");
+
+            searchPaths.each { parentDirOfFileMaybePath ->
+                if (result != null) {
+                    return;
+                }
+
+                File parentDirOfFileMaybe = new File(dir, parentDirOfFileMaybePath);
+
+                project.logger.debug("Trying $parentDirOfFileMaybe.path");
+
+                if (parentDirOfFileMaybe.exists() && parentDirOfFileMaybe.file) {
+                    project.logger.debug("found $searchID as $result");
+                    result = parentDirOfFileMaybe;
                 }
             }
         }
     }
+
     if (!result?.file) {
         throw new GradleException("Could not find $searchID, please set one of ${places.keySet()}");
     } else {
-        project.logger.info("$searchID: ${result}")
+        project.logger.info("$searchID: ${result}");
+
         return result
     }
 }
