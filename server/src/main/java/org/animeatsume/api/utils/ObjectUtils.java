@@ -9,12 +9,15 @@ import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Field;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.function.BiConsumer;
@@ -130,21 +133,41 @@ public class ObjectUtils {
         return null;
     }
 
-    public static String toString(Object obj) {
-        StringBuilder sb = new StringBuilder(obj.getClass().getName() + " {");
+    public static Map<String, ?> getObjectProperties(Object obj) {
+        return (Map<String, ?>) getObjectProperties(obj, false, false);
+    }
+    public static Object getObjectProperties(Object obj, boolean asString) {
+        return getObjectProperties(obj, asString, false);
+    }
+    /**
+     * @see <a href="https://stackoverflow.com/questions/13400075/reflection-generic-get-field-value">Getting fields via reflection</a>
+     * @see <a href="https://www.geeksforgeeks.org/reflection-in-java">Reflection overview</a>
+     * @see <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html#getDeclaredField-java.lang.String-">Reflection - calling {@code getDeclaredField()} on objects</a>
+     * @see <a href="https://stackoverflow.com/questions/60542367/how-exactly-does-the-java-reduce-function-with-3-parameters-work/60554907#60554907">{@code .reduce()} third argument for return-type conversion</a>
+     */
+    private static Object getObjectProperties(Object obj, boolean asString, boolean recurseNestedObjects) {
+        Class<?> objClass = obj.getClass();
+        Field[] objFields = objClass.getDeclaredFields();
 
-        Arrays.stream(obj.getClass().getDeclaredFields())
-            .forEach(field -> {
+        StringBuilder sb = new StringBuilder(objClass.getName() + " {");
+
+        Map<String, ?> objEntries = Arrays.asList(objFields).parallelStream()
+            .reduce(new HashMap<>(), (map, field) -> {
                 String fieldName = field.getName();
 
-                sb.append(fieldName)
-                    .append("=");
+                sb.append(fieldName).append("=");
 
                 Object fieldValue = "Unparsed";
 
                 try {
                     field.setAccessible(true); // Make private fields readable
                     fieldValue = field.get(obj);
+
+                    // Recurse if field is a dependency/non-primitive class
+                    // i.e. when `Class::toString()` returns something akin to "com.company.SomeClass@a1b2c3d4"
+                    if (recurseNestedObjects && fieldValue.toString().matches("^(org|com)[^@]*\\.\\w+@[a-z0-9]{8}\\$")) {
+                        fieldValue = getObjectProperties(fieldValue, asString, recurseNestedObjects);
+                    }
                 } catch (IllegalAccessException ignored) {}
 
                 sb.append("(")
@@ -152,11 +175,27 @@ public class ObjectUtils {
                     .append(")");
 
                 sb.append(", ");
+
+                map.put(fieldName, fieldValue);
+
+                return map;
+            }, (mapIterationA, mapIterationB) -> {
+                mapIterationA.putAll(mapIterationB);
+
+                return mapIterationA;
             });
 
         sb.delete(sb.length() - 2, sb.length()); // Remove last comma+space
         sb.append("}");
 
-        return sb.toString();
+        if (asString) {
+            return sb.toString();
+        }
+
+        return objEntries;
+    }
+
+    public static String toString(Object obj) {
+        return (String) getObjectProperties(obj, true);
     }
 }
