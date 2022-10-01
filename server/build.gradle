@@ -2,7 +2,16 @@ import java.lang.reflect.Field;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import javax.tools.ToolProvider
+import javax.tools.ToolProvider;
+
+import groovy.json.JsonBuilder;
+
+/**
+ * To use CLI args in a task/function, append the CLI arg/flag to `-D` or `-P` accordingly:
+ *   - System.getProperty()  == ./gradlew myTask -DmyCliArgName='myCliArgValue'
+ *   - project.getProperty() == ./gradlew myTask -PmyCliArgName='myCliArgValue'
+ * Note: `System.getProperty()` doesn't require a `.hasProperty()` check.
+ */
 
 plugins {
     id 'java'
@@ -72,8 +81,24 @@ ext {
  * @see <a href="https://discuss.gradle.org/t/closure-vs-action/37806/2">Tasks ({@code Closures}) vs Actions</a>
  */
 
-tasks.register("printVersion") {
-    println rootProject.artifacts
+tasks.register("printSrcInfo") {
+    doLast {
+        /**
+         * Alternatives for printing objects:
+         *     - {@code new groovy.json.JsonBuilder(obj).toPrettyString()}
+         *     - {@code groovy.json.JsonOutput.prettyPrint(objJsonString)}
+         */
+        println("project.files:\n${new JsonBuilder(project.files("src", "buildSrc")).toPrettyString()}\n\n");
+
+        println("files:\n${new JsonBuilder(files("src", "buildSrc")).toPrettyString()}\n\n");
+
+        // Note: `rootProject.artifacts` has changed over the years, so get the source code files via `sourceSets`
+        if (project.hasProperty("s") || System.hasProperty("s")) {
+            // Show source code files, but only upon request b/c it can easily be a ridiculously long list
+            println(getSourceFiles());
+            println();
+        }
+    }
 }
 
 tasks.register("printCommands") {
@@ -88,6 +113,32 @@ tasks.register("printCommands") {
     doLast {
         println(cliCmd("./gradlew -q tasks --all"));
     }
+}
+
+tasks.register("printSrcFiles") {
+    doLast {
+        println(getSourceFiles(true));
+    }
+}
+
+def getSourceFiles() {
+    return getSourceFiles(true);
+}
+def getSourceFiles(boolean includeSourceSetNames) {
+    StringBuilder sb = new StringBuilder();
+
+    sourceSets.each {
+        if (includeSourceSetNames) {
+            sb.append("${it}\n");
+        }
+
+        it.allSource.each {
+            // file path/name
+            sb.append("${it}\n");
+        }
+    }
+
+    return sb.toString().trim();
 }
 
 
@@ -285,11 +336,6 @@ def copyDbToBuildDir() {
 
 
 def buildFrontendIfNotPresent() {
-    /**
-     * Alternatives for printing the `project` object:
-     *     - {@code import groovy.json.JsonBuilder[.toPrettyString(project)]}
-     *     - {@code import groovy.json.JsonOutput[.prettyPrint(project)]}
-     */
     def serverWebAssetDir = new File(serverWebAssetDirPath);
 
     if (!serverWebAssetDir.exists() || serverWebAssetDir.list().size() == 0) {
