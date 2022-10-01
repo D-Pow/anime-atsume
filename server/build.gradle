@@ -614,11 +614,24 @@ sourceSets {
             srcDir 'src/main/resources'
         }
     }
+
     test {
         java {
             srcDir 'src/test/java'
         }
     }
+}
+
+
+/**
+ * {@inheritDoc}
+ * Configures JavaDoc generation by specifying the main class and the app's {@code classpath}.
+ *
+ * @see <a href="https://stackoverflow.com/questions/45997976/how-generate-javadoc-with-gradle">StackOverflow post</a>
+ */
+javadoc {
+    source = sourceSets.main.allJava
+    // classpath = configurations.compile
 }
 
 /**
