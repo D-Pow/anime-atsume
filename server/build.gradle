@@ -159,7 +159,7 @@ dependencies {
     implementation 'com.github.gwenn:sqlite-dialect:0.1.0'
 
     // HTML parser
-    implementation 'org.jsoup:jsoup:1.13.1'
+    implementation 'org.jsoup:jsoup:1.15.3'
 
     /*
      * Need a webdriver library to load and scrape Kissanime pages.
