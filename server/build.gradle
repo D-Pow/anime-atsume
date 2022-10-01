@@ -665,3 +665,23 @@ test {
 wrapper {
     distributionType = Wrapper.DistributionType.ALL
 }
+
+tasks.register("wrapperVersion") {
+    doLast {
+        String allGradleVersionsResponse = cliCmd("curl -fsSL 'https://gradle.org/releases' | grep -Eo 'v([0-9]+\\.){1,3}[0-9]*\\W' | sed -E 's/^v([0-9\\.]*).?\$/\\1/' | sort -Vur");
+        List<String> allGradleVersions = allGradleVersionsResponse.split("\n");
+        println("allGradleVersionsResponse: ${allGradleVersionsResponse}")
+
+        String wrapperVersionNumber = allGradleVersions.get(0);
+
+        if (project.hasProperty("v")) {
+            wrapperVersionNumber = project.getProperty("v");
+        } else if (System.hasProperty("v")) {
+            wrapperVersionNumber = System.getProperty("v");
+        }
+
+        println("Upgrading Gradle wrapper to v${wrapperVersionNumber}");
+        // See: https://gradle.org/install#with-the-gradle-wrapper
+        cliCmd("./gradlew wrapper --distribution-type=bin --gradle-version=${wrapperVersionNumber}")
+    }
+}
