@@ -1,4 +1,4 @@
-rootProject.name = 'anime-atsume'
+rootProject.name = "anime-atsume"
 
 /**
  * `group` and `version` usually have to be defined in `build.gradle`.
