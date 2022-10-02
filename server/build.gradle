@@ -191,6 +191,10 @@ dependencies {
 }
 
 
+def objToJson(Object obj) {
+    return new JsonBuilder(obj).toPrettyString();
+}
+
 def getObjectProperties(Object obj) {
     return getObjectProperties(obj, false, false);
 }
