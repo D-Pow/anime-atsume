@@ -114,6 +114,17 @@ public class ObjectUtils {
         return null;
     }
 
+    /**
+     * Parses a JSON string to the specified object.
+     * Removes all non-ASCII, control, and non-printable characters, to ensure the JSON string is parsable.
+     *
+     * @param <T> Class type.
+     * @param json JSON string to parse.
+     * @param parseToClass Class that the JSON represents.
+     * @return Instance of the specified class.
+     *
+     * @see <a href="https://www.baeldung.com/java-json">Overview of JSON (de)serialization libraries</a>
+     */
     public static <T> T sanitizeAndParseJsonToClass(String json, Class<T> parseToClass) {
         ObjectMapper objectMapper = Jackson2ObjectMapperBuilder.json().build();
 
@@ -128,6 +139,16 @@ public class ObjectUtils {
             return objectMapper.readValue(sanitizedJson, parseToClass);
         } catch (JsonProcessingException e) {
             log.error("Could not parse json to class ({}). Error = {}", parseToClass, e.getMessage());
+        }
+
+        return null;
+    }
+
+    public static String classToJson(Object obj) {
+        try {
+            return Jackson2ObjectMapperBuilder.json().build().writeValueAsString(obj);
+        } catch (JsonProcessingException e) {
+            log.error("Could not serialize Object ({}) to JSON string. Error = {}", obj, e.getMessage());
         }
 
         return null;
