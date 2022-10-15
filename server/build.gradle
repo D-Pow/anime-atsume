@@ -300,7 +300,10 @@ def getGradlePropertiesAndSettings() {
 
 
 def cliCmd(String commandAndArgs) {
-    return cliCmd(commandAndArgs, null, false);
+    return cliCmd(commandAndArgs, null);
+}
+def cliCmd(String commandAndArgs, String dir) {
+    return cliCmd(commandAndArgs, dir, false);
 }
 /**
  * See:
