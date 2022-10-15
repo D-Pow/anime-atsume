@@ -19,11 +19,31 @@ plugins {
     id 'application'  // Docs: https://docs.gradle.org/current/userguide/application_plugin.html#sec:application_tasks
     id 'java-library'  // Provides enum for Java versions. Example: https://docs.gradle.org/current/userguide/custom_plugins.html#:~:text=Example%209.%20Creating%20a%20simple%20script%20plugin
     id 'idea'
+
     // adding plugins here removes the need to declare them in buildscript {}
     id 'org.springframework.boot' version '2.3.0.RELEASE'
     id 'io.spring.dependency-management' version '1.0.9.RELEASE'
     // If running as a standalone JavaFX app with Java >= v11, add this plugin
     // id 'org.openjfx.javafxplugin' version '0.0.10'
+
+/**
+ * Make all (root + sub-) projects use the same dependency registries via `allprojects`.
+ * Alternatively, only the sub-projects can be targeted with `subprojects`.
+ *
+ * Note: If trying to run your own custom plugin in all sub-projects, you must use the
+ * old fashioned `apply from` since `plugins` isn't ready quite yet for handling both
+ * the root project and sub-projects.
+ *
+ * @see <a href="https://stackoverflow.com/questions/12077083/what-is-the-difference-between-allprojects-and-subprojects/12077290#12077290">{@code allprojects} vs {@code subprojects}</a>
+ * @see <a href="https://stackoverflow.com/questions/32352816/what-the-difference-in-applying-gradle-plugin/32353244#32353244">{@code plugins} vs {@code apply from}</a>
+ */
+allprojects {
+    repositories {
+        mavenCentral()
+        jcenter()
+        google()
+        gradlePluginPortal()  // For writing our own Gradle plugins
+    }
 }
 
 /* Code was originally written for Java v8 so ensure it can run with these configs */
@@ -135,10 +155,6 @@ def getSourceFiles(boolean includeSourceSetNames) {
     return sb.toString().trim();
 }
 
-
-repositories {
-    mavenCentral()
-}
 
 dependencies {
     // JavaFX was removed in Java 11 so ensure it's installed (uses OpenJDK)

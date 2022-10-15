@@ -1,3 +1,14 @@
+// Must be defined here instead of build.gradle since settings are loaded first
+// See: https://docs.gradle.org/current/userguide/build_lifecycle.html
+pluginManagement {
+    repositories {
+        mavenCentral()
+        jcenter()
+        gradlePluginPortal()
+    }
+}
+
+
 rootProject.name = "anime-atsume"
 
 /**
