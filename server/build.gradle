@@ -6,6 +6,8 @@ import javax.tools.ToolProvider;
 
 import groovy.json.JsonBuilder;
 
+import org.animeatsume.gradleutils.*;
+
 /**
  * To use CLI args in a task/function, append the CLI arg/flag to `-D` or `-P` accordingly:
  *   - System.getProperty()  == ./gradlew myTask -DmyCliArgName='myCliArgValue'
@@ -25,6 +27,26 @@ plugins {
     id 'io.spring.dependency-management' version '1.0.9.RELEASE'
     // If running as a standalone JavaFX app with Java >= v11, add this plugin
     // id 'org.openjfx.javafxplugin' version '0.0.10'
+
+    /*
+     * Custom utils for Gradle - Necessary if a sub-project is used within Gradle files.
+     *
+     * Requires:
+     *  - Import statement in file.
+     *  - Applying your own custom plugin (even if it's a no-op); otherwise, even code
+     *    unrelated to the plugin can't be used in Gradle.
+     *  - Adding Gradle's plugin-portal repository for plugin API usage.
+     *  - To run sub-projects' tasks, add `dependsOn gradle.includedBuild("sub-project-dir").task(":my-task");` to `tasks.preCompile`
+     *
+     * If running into issues with discovering/importing sub-project code, try:
+     *  - Add `compileClasspath += files('sub-project-dir')` to `sourceSets.main`
+     *  - Add `compileOnly project.files('sub-project-dir')` to `dependencies`
+     *    Alternatives:
+     *      - `compileOnly fileTree('sub-project-dir')`
+     *      - `compileOnly 'org.myapp:packagename'`
+     */
+    id 'anime-atsume-build-utils'
+}
 
 /**
  * Make all (root + sub-) projects use the same dependency registries via `allprojects`.

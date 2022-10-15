@@ -1,0 +1,76 @@
+/**
+ * Akin to a sub-project for splitting out/simplifying logic from the root `build.gradle` file into separate files,
+ * except it's available to all sub-projects vs only those that import it.
+ * Contains dependencies, scripts, etc. specifically for the build logic, not source code.
+ *
+ * Note that the code contains both plugins and non-plugins because a plugin is required in order to use any
+ * classes/functions regardless of file type/purpose.
+ *
+ * An alternative for code that's <i>only</i> used in build.gradle would be moving the source code to `root/buildSrc/`
+ * and (probably) removing this directory's build.gradle, settings.gradle, etc.
+ * However, for the sake of illustrating how to setup/use both sub-projects and custom Gradle plugins as well
+ * as allowing the code to be used elsewhere besides build.gradle, we leave this as a sub-project.
+ *
+ * @see <a href="https://medium.com/bumble-tech/how-to-use-composite-builds-as-a-replacement-of-buildsrc-in-gradle-64ff99344b58">How to create Composite builds in Gradle</a>
+ * @see <a href="https://www.baeldung.com/gradle-create-plugin">How to create Composite builds in Gradle (2)</a>
+ * @see <a href="https://docs.gradle.org/current/userguide/organizing_gradle_projects.html">Gradle build-specific files docs</a>
+ * @see <a href="https://stackoverflow.com/questions/60464719/gradle-includebuild-vs-implementation-project/68351234#68351234">StackOverflow: Composite vs Project Builds</a>
+ * @see <a href="https://www.jrebel.com/blog/using-buildsrc-custom-logic-gradle-builds">Blog with {@code buildSrc} example</a>
+ * @see <a href="https://proandroiddev.com/stop-using-gradle-buildsrc-use-composite-builds-instead-3c38ac7a2ab3">Blog comparing {@code buildSrc} to composit builds</a>
+ * @see <a href="https://stackoverflow.com/questions/15930646/is-it-possible-to-use-classes-compiled-by-gradle-buildsrc-in-main-groovy-project/36647629#36647629">StackOverflow: Use local .jar files as dependencies</a>
+ * @see <a href="https://discuss.gradle.org/t/how-to-import-just-compiled-classes-in-build-gradle/30425/3">Load file as dependency manually via {@code ClassLoader}</a>
+ * @see <a href="https://stackoverflow.com/questions/53219106/share-code-between-gradle-buildsrc-and-project">Share code between src/ and buildSrc/</a>
+ * @see <a href="https://docs.gradle.org/current/userguide/organizing_gradle_projects.html#sec:build_sources">{@code buildSrc/} overview</a>
+ * @see <a href="https://docs.gradle.org/current/userguide/composite_builds.html#composite_build_intro:~:text=Example%203.%20Depending%20on%20task%20from%20included%20build">Depending on tasks from another build</a>
+ * @see <a href="https://docs.gradle.org/current/userguide/multi_project_builds.html">Multi-project Gradle builds</a>
+ */
+
+
+/**
+ * If using `buildscript` and possibly `buildSrc`, you'll likely need to use the legacy (yet more
+ * flexible) `apply plugin:` syntax since `plugins {}` isn't allowed in certain contexts.
+ *
+ * @see <a href="https://docs.gradle.org/current/userguide/plugins.html#sec:old_plugin_application">Gradle docs</a>
+ * @see <a href="https://github.com/gradle/gradle/issues/2528#issuecomment-443318586">GitHub issue</a>
+ */
+plugins {
+    id 'java'
+    id 'java-library'
+    id 'groovy'
+    id 'idea'
+    id 'java-gradle-plugin'  // Add Gradle internal classes to classpath; Necessary to expose classes as `public` classes to the parent/build.gradle files importing this
+}
+
+gradlePlugin {
+    // Alternatively (but more verbose), you could write the code below for each individual plugin, i.e.
+    //   plugins.register("my-custom-plugin") {...}
+    plugins {
+        "anime-atsume-build-utils" {
+            id = "anime-atsume-build-utils"
+            implementationClass = "org.animeatsume.gradleutils.AnimeAtsumeBuildUtils"
+        }
+    }
+}
+
+
+/**
+ * Using multiple languages (Java, Kotlin, Groovy, etc.) is easier if they're all passed
+ * through the same compiler. Gradle/Groovy is essentially a Java pre-compiler, so we can
+ * send all the Java code through the Groovy compiler instead of `javac`.
+ *
+ * @see <a href="https://medium.com/@jonashavers/how-to-use-groovy-sources-from-java-in-gradle-projects-9c722876846e">Guide on multi-project sourceSets</a>
+ * @see <a href="https://docs.gradle.org/current/dsl/org.gradle.api.tasks.SourceSet.html">{@code sourceSets} docs</a>
+ */
+sourceSets {
+    main {
+        java {
+            // Don't send any Java files through `javac`
+            srcDirs = []
+        }
+
+        groovy {
+            // Send all Java files through Groovy compiler
+            srcDirs += ['src']
+        }
+    }
+}

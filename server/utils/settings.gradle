@@ -1,0 +1,23 @@
+rootProject.name = "anime-atsume-build-utils"
+
+gradle.beforeProject {
+    gradle.rootProject.setGroup("org.animeatsume")
+    gradle.rootProject.setVersion("1.0");
+}
+
+/**
+ * Including this entire directory makes all files in the (sub)directories
+ * able to be added as dependencies via Composite Builds.
+ *
+ * Composite Builds are virtually the same as Project Builds except
+ * that Composite Builds include whole builds instead of just projects,
+ * i.e. sub-projects that would usually require independent development
+ * can now be combined and worked on both independently and as a whole,
+ * sort of like how <a href="https://docs.npmjs.com/cli/v7/using-npm/workspaces">npm workspaces</a>
+ * can combine multiple sub-projects such that you can work on one by itself
+ * or work on all at once.
+ *
+ * @see <a href="https://docs.gradle.org/current/userguide/composite_builds.html#included_build_declaring_substitutions">Composite: Making it possible to add sub-dir as a dependency in its build.gradle</a>
+ * @see <a href="https://docs.gradle.org/current/userguide/declaring_dependencies_between_subprojects.html#sec:project_jar_dependencies">Project Builds/dependencies on sub-dirs</a>
+ */
+includeBuild(".");

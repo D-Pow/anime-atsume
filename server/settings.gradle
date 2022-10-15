@@ -27,3 +27,6 @@ gradle.beforeProject {
     gradle.rootProject.setGroup("org.animeatsume")
     gradle.rootProject.setVersion("1.0");
 }
+
+// Add sub-projects (use directory names, not package names)
+includeBuild("utils");
