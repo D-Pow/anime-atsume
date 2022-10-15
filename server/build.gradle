@@ -143,6 +143,9 @@ tasks.register("printCommands") {
      *  - {@code configurations.forEach(config -> { println(config.name); });}
      *  - {@code ./gradlew --console plain dependencies 2>/dev/null | grep -Eio '^[a-z]+ - .*'}
      *
+     * Related:
+     *  - {@code ./gradlew -q help --task <myTask>}
+     *
      * @see <a href="https://stackoverflow.com/questions/38362977/how-to-list-all-tasks-for-the-master-project-only-in-gradle/40188539#40188539">List all Gradle tasks</a>
      * @see <a href="https://stackoverflow.com/questions/41173616/how-can-i-get-a-list-of-all-configurations-for-a-gradle-project">List all Gradle configurations</a>
      */
