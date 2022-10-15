@@ -526,7 +526,7 @@ def buildFrontendIfNotPresent() {
 }
 
 tasks.register("buildFrontend") {
-    doFirst {
+    doLast {
         buildFrontendIfNotPresent();
     }
 }
