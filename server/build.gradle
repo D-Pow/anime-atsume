@@ -48,6 +48,32 @@ plugins {
     id 'anime-atsume-build-utils'
 }
 
+/*
+ * Custom utils for Gradle (though as an import/file rather than as a plugin) - Necessary if
+ *     a sub-project is used within Gradle files.
+ *
+ * Requires:
+ *  - Import statement in file.
+ *  - Applying your own custom plugin (even if it's a no-op); otherwise, even code
+ *    unrelated to the plugin can't be used in Gradle.
+ *  - Adding Gradle's plugin-portal repository for plugin API usage.
+ *  - To run sub-projects' tasks, add `dependsOn gradle.includedBuild("sub-project-dir").task(":my-task");` to `tasks.preCompile`
+ *
+ * If running into issues with discovering/importing sub-project code, try:
+ *  - Add `compileClasspath += files('sub-project-dir')` to `sourceSets.main`
+ *  - Add `compileOnly project.files('sub-project-dir')` to `dependencies`
+ *    Alternatives:
+ *      - `compileOnly fileTree('sub-project-dir')`
+ *      - `compileOnly 'org.myapp:packagename'`
+ */
+apply from: "utils/build.gradle"
+
+
+/* Code was originally written for Java v8 so ensure it can run with these configs */
+sourceCompatibility = JavaVersion.VERSION_1_8;
+targetCompatibility = JavaVersion.VERSION_1_8;
+
+
 /**
  * Make all (root + sub-) projects use the same dependency registries via `allprojects`.
  * Alternatively, only the sub-projects can be targeted with `subprojects`.
@@ -62,15 +88,11 @@ plugins {
 allprojects {
     repositories {
         mavenCentral()
-        jcenter()
         google()
         gradlePluginPortal()  // For writing our own Gradle plugins
     }
 }
 
-/* Code was originally written for Java v8 so ensure it can run with these configs */
-sourceCompatibility = JavaVersion.VERSION_1_8;
-targetCompatibility = JavaVersion.VERSION_1_8;
 
 /**
  * Adds relevant directories for the app to the global scope.
@@ -111,76 +133,43 @@ ext {
     }
 }
 
+
+
+sourceSets {
+    main {
+        java {
+            srcDir 'src/main/java'
+        }
+        resources {
+            srcDir 'src/main/resources'
+        }
+    }
+
+    test {
+        java {
+            srcDir 'src/test/java'
+        }
+    }
+}
+
+
 /**
- * Use `tasks.register("myTaskName")` to lazy-load the tasks that aren't needed for global app
- * functionality.
- * i.e. don't run the lifecycle scripts -- including the tasks' top-level configuration information
- * (which is usually always run by default as the Gradle process itself starts, regardless of the
- * specified task) -- until the task is actually needed/called.
+ *  - `implementation` = Adds to build output and classpath. Required to run your code but
+ *      isn't needed during compilation. Try to use this most of the time.
+ *  - `compileOnly` = Doesn't add to build output but does add to classpath. Only needed to
+ *      compile your code. e.g. Decorators, JavaFX, etc.
+ *  - `api` = Somewhat of a middle-ground between `implementation` and `compileOnly` (replaced `compile`).
+ *      Usually only used in library modules. Exposes dependency to consumers of the module.
+ *      Try to avoid this as it increases build time significantly when many are specified and consumers
+ *      should specify whatever dependencies they need themselves rather than relying on yours.
+ *  - `runtimeOnly` - Don't even build the dependency, just inject it in the resulting build output.
+ *  - `compile` - Deprecated. Same as thing as `api`.
  *
- * @see <a href="https://stackoverflow.com/questions/53654190/what-is-the-difference-between-registering-and-creating-in-gradle-kotlin-dsl">StackOverflow post.</a>
- * @see <a href="https://docs.gradle.org/current/userguide/task_configuration_avoidance.html#sec:how_do_i_defer_creation">Gradle docs for {@code tasks.register()}</a>
- * @see <a href="https://discuss.gradle.org/t/closure-vs-action/37806/2">Tasks ({@code Closures}) vs Actions</a>
+ * @see <a href="https://stackoverflow.com/questions/47365119/gradle-dependency-configuration-implementation-vs-api-vs-runtimeonly-vs-compil/47365147#47365147">SO post explaining dependency tags</a>
+ * @see <a href="https://docs.gradle.org/current/userguide/java_plugin.html#sec:java_plugin_and_dependency_management">Gradle "Dependency management" docs</a>
+ * @see <a href="https://docs.gradle.org/current/userguide/java_library_plugin.html#sec:java_library_configurations_graph">Gradle illustration of dependencies</a>
+ * @see <a href="https://docs.gradle.org/current/userguide/declaring_dependencies.html#sec:dependency-types">Gradle explanation of types dependencies</a>
  */
-
-tasks.register("printSrcInfo") {
-    doLast {
-        println("project.files:\n${objToJson(project.files("src", "buildSrc"))}\n\n");
-        println("files:\n${objToJson(files("src", "buildSrc"))}\n\n");
-
-        // Note: `rootProject.artifacts` has changed over the years, so get the source code files via `sourceSets`
-        if (project.hasProperty("s") || System.hasProperty("s")) {
-            // Show source code files, but only upon request b/c it can easily be a ridiculously long list
-            println(getSourceFiles());
-            println();
-        }
-    }
-}
-
-tasks.register("printCommands") {
-    /**
-     * Alternatives:
-     *  - {@code configurations.forEach(config -> { println(config.name); });}
-     *  - {@code ./gradlew --console plain dependencies 2>/dev/null | grep -Eio '^[a-z]+ - .*'}
-     *
-     * Related:
-     *  - {@code ./gradlew -q help --task <myTask>}
-     *
-     * @see <a href="https://stackoverflow.com/questions/38362977/how-to-list-all-tasks-for-the-master-project-only-in-gradle/40188539#40188539">List all Gradle tasks</a>
-     * @see <a href="https://stackoverflow.com/questions/41173616/how-can-i-get-a-list-of-all-configurations-for-a-gradle-project">List all Gradle configurations</a>
-     */
-    doLast {
-        println(cliCmd("./gradlew -q tasks --all"));
-    }
-}
-
-tasks.register("printSrcFiles") {
-    doLast {
-        println(getSourceFiles(true));
-    }
-}
-
-def getSourceFiles() {
-    return getSourceFiles(true);
-}
-def getSourceFiles(boolean includeSourceSetNames) {
-    StringBuilder sb = new StringBuilder();
-
-    sourceSets.each {
-        if (includeSourceSetNames) {
-            sb.append("${it}\n");
-        }
-
-        it.allSource.each {
-            // file path/name
-            sb.append("${it}\n");
-        }
-    }
-
-    return sb.toString().trim();
-}
-
-
 dependencies {
     // JavaFX was removed in Java 11 so ensure it's installed (uses OpenJDK)
     implementation 'org.openjfx:javafx:18.0.2'
@@ -232,355 +221,10 @@ dependencies {
 }
 
 
-def objToJson(Object obj) {
-    return new JsonBuilder(obj).toPrettyString();
-}
-
-def getObjectProperties(Object obj) {
-    return getObjectProperties(obj, false, false);
-}
-def getObjectProperties(Object obj, boolean asString) {
-    return getObjectProperties(obj, asString, false);
-}
-/**
- * Alternatives for printing objects:
- *     - {@code new groovy.json.JsonBuilder(obj).toPrettyString()}
- *     - {@code groovy.json.JsonOutput.prettyPrint(objJsonString)}
- *
- * @see {@link ./src/main/java/org/animeatsume/api/utils/ObjectUtils.java#toString() GetObjectProperties}
- */
-def getObjectProperties(Object obj, boolean asString, boolean recurseNestedObjects) {
-    Class<?> objClass = obj.getClass();
-    Field[] objFields = objClass.getDeclaredFields();
-
-    StringBuilder sb = new StringBuilder(objClass.getName() + " {");
-
-    Map<String, ?> objEntries = Arrays.asList(objFields).parallelStream()
-        .reduce(new HashMap<>(), (map, field) -> {
-            String fieldName = field.getName();
-
-            sb.append(fieldName).append("=");
-
-            Object fieldValue = "Unparsed";
-
-            try {
-                field.setAccessible(true); // Make private fields readable
-                fieldValue = field.get(obj);
-
-                // Recurse if field is a dependency/non-primitive class
-                // i.e. when `Class::toString()` returns something akin to "com.company.SomeClass@a1b2c3d4"
-                if (recurseNestedObjects && fieldValue.toString().matches("^(org|com)[^@]*\\.\\w+@[a-z0-9]{8}\$")) {  // Note: `\\$` (Java) needs to be replaced with `\$` (Gradle)
-                    fieldValue = getObjectProperties(fieldValue, asString, recurseNestedObjects);
-                }
-            } catch (IllegalAccessException ignored) {}
-
-            sb.append("(")
-                .append(fieldValue)
-                .append(")");
-
-            sb.append(", ");
-
-            map.put(fieldName, fieldValue);
-
-            return map;
-        }, (mapIterationA, mapIterationB) -> {
-            Map<Object, Object> partiallyCombined = new HashMap<>(mapIterationA);
-
-            partiallyCombined.putAll(mapIterationB);
-
-            return partiallyCombined;
-        });
-
-    sb.delete(sb.length() - 2, sb.length()); // Remove last comma+space
-    sb.append("}");
-
-    if (asString) {
-        return sb.toString();
-    }
-
-    return objEntries;
-}
-
-def getGradlePropertiesAndSettings() {
-    // Not sure why, but `.each { it ->` fails, thus it's omitted
-    rootProject.properties.each {
-        // Note: `$it.someField` is only for strings, `it.someField` is for normal code
-        def isNull = it.value == null;
-
-        def blah = it.value;
-
-        // TODO - Add this List logic to `ObjectUtils.getObjectProperties()`
-        if (
-            !isNull
-            && (
-                it.value.getClass().isArray()
-                || it.value instanceof List
-                || it.value instanceof Map
-                || it.value instanceof Set
-                || it.value instanceof Collection
-            )
-        ) {
-            println "$it.key -> ["
-
-            if (it.value instanceof Map) {
-                it.value.each { k, v ->
-                    println "    ${k} -> ${v}"
-                }
-            } else {
-                it.value.each { propertyValue ->
-                    println "    ${propertyValue}"
-                }
-            }
-
-            println "]"
-        } else {
-            println "$it.key -> $it.value\n"
-        }
-    }
-}
-
-
-def cliCmd(String commandAndArgs) {
-    return cliCmd(commandAndArgs, null);
-}
-def cliCmd(String commandAndArgs, String dir) {
-    return cliCmd(commandAndArgs, dir, false);
-}
-/**
- * See:
- *  - Gradle `exec` task docs: https://docs.gradle.org/current/dsl/org.gradle.api.tasks.Exec.html
- *  - Running a CLI command with pipes, `&&`, `||`, etc.: https://discuss.gradle.org/t/how-to-achive-bash-like-functionality-e-g-ls-grep-mystuff-with-gradle-project-exec/5516/4
- *  - Support Unix and Windows: https://stackoverflow.com/questions/27406054/how-do-you-support-a-gradle-exec-task-for-both-mac-and-pc
- *  - Spread lists (or simply pass arrays) in spread-operator functions: https://stackoverflow.com/questions/9863742/how-to-pass-an-arraylist-to-a-varargs-method-parameter/9863752#9863752
- *  - Get STD(IN|OUT|ERR) from Gradle terminal executions:
- *      + https://stackoverflow.com/questions/38071178/executing-shell-script-and-using-its-output-as-input-to-next-gradle-task/38072449#38072449
- *      + https://stackoverflow.com/questions/32198697/how-to-run-shell-script-from-gradle-and-wait-for-it-to-finish
- *  - Pass initial CLI args to nested terminal command: https://www.baeldung.com/gradle-command-line-arguments
- *  - Run terminal commands from Gradle script: https://stackoverflow.com/questions/159148/groovy-executing-shell-commands
- *  - Running Bash commands in Gradle: https://stackoverflow.com/questions/52389713/execute-bash-command-in-a-gradle-function
- *
- * Alternatives:
- *  - {@code "my command".execute().toString()}
- *      + Likely will require {@code cmd.execute().consumeProcessOutput(stdOut, stdErr)}
- *  - {@code executeCommand(cmd)}
- *  - {@code (Below with or without `.waitFor()`)}
- *  - {@code new String(cmd.execute()[.getOutputStream()|.toByteArray()][.toByteArray()])}
- *  - They may or may not require:
- *      + {@code .text.trim()}
- *      + {@code .consumeProcessOutput(stdOut, stdErr)} // Assuming the args are instances of {@code StringBuilder}
- *      + {@code .waitForProcessOutput(stdOut, stdErr)}
- *      + {@code new OutputStreamWriter(subProcess.[functionFromAbove]()).toString()}
- *  - Something akin to:
- *  <pre>
- *      public class StreamGobbler implements Runnable {
- *          private final InputStream inputStream;
- *          private final Consumer<String> consumer;
- *
- *          public StreamGobbler(InputStream inputStream, Consumer<String> consumer) {
- *              this.inputStream = inputStream;
- *              this.consumer = consumer;
- *          }
- *
- *          @Override
- *          public void run() {
- *              new BufferedReader(new InputStreamReader(inputStream)).lines()
- *                  .forEach(consumer);
- *          }
- *      }
- *      process = Runtime.getRuntime().exec(String.format("bash -c \"cd '%s'; %s\"", directory, command));
- *      StreamGobbler streamGobbler = new StreamGobbler(process.getInputStream(), System.out::println);
- *      Future<?> future = Executors.newSingleThreadExecutor().submit(streamGobbler);
- *      int exitCode = process.waitFor();
- *      assert exitCode == 0;
- *      return future.get(); // wait for command to finish
- *  </pre>
- */
-def cliCmd(String commandAndArgs, String dir, boolean returnAllStd) {
-    String[] shellCommand = isWindows
-        ? new String[]{ "cmd", "/c" }
-        : new String[]{ "bash", "-c" };
-
-    List<String> commandLineEntries = ((List<String>) Arrays.asList(shellCommand, commandAndArgs)).flatten();
-
-    ByteArrayInputStream stdIn = new ByteArrayInputStream();
-    ByteArrayOutputStream stdOut = new ByteArrayOutputStream();
-    ByteArrayOutputStream stdErr = new ByteArrayOutputStream();
-
-    project.exec {
-        if (dir != null) {
-            workingDir = dir;
-        }
-
-        standardInput(stdIn);
-        standardOutput(stdOut);
-        errorOutput(stdErr);
-
-        ExecSpec processExitInfo = commandLine(commandLineEntries.toArray());
-    }
-
-    String stdInStr = stdIn.toString().trim();
-    String stdOutStr = stdOut.toString().trim();
-    String stdErrStr = stdErr.toString().trim();
-
-    if (returnAllStd) {
-        // Extract entries via `def (ret1, ret2, ret3) = myFunc();`
-        //   See: https://stackoverflow.com/questions/24617348/multiple-return-syntax/24617510#24617510
-        // TODO - Get exit code from cmd and return it here
-        return [ stdInStr, stdOutStr, stdErrStr ];
-    }
-
-    return stdOutStr;
-}
 
 
 if (System.properties['jfxrtDir'] == null) { // if not in root-level gradle.properties
     System.properties['jfxrtDir'] = '.'
-}
-
-def searchFile(Map<String, Closure> places, List<String> searchPaths, String searchID) {
-    File result = null;
-
-    places.each { keyDescription, filePathMaybe ->
-        if (result != null) {
-            return;
-        }
-
-        project.logger.debug("Looking for $searchID in $keyDescription");
-
-        def dir = filePathMaybe();
-
-        if (dir == null) {
-            project.logger.debug("$keyDescription not set");
-        } else {
-            project.logger.debug("$keyDescription is $dir");
-
-            searchPaths.each { parentDirOfFileMaybePath ->
-                if (result != null) {
-                    return;
-                }
-
-                File parentDirOfFileMaybe = new File(dir, parentDirOfFileMaybePath);
-
-                project.logger.debug("Trying $parentDirOfFileMaybe.path");
-
-                if (parentDirOfFileMaybe.exists() && parentDirOfFileMaybe.file) {
-                    project.logger.debug("found $searchID as $result");
-                    result = parentDirOfFileMaybe;
-                }
-            }
-        }
-    }
-
-    if (!result?.file) {
-        throw new GradleException("Could not find $searchID, please set one of ${places.keySet()}");
-    } else {
-        project.logger.info("$searchID: ${result}");
-
-        return result
-    }
-}
-
-def findJavaFxJar() {
-    return searchFile(
-        [
-            'jfxrtDir in Gradle Properties': { System.properties['jfxrtDir'] },
-            'JFXRT_HOME in System Environment': { System.getenv('JFXRT_HOME') },
-            'JAVA_HOME in System Environment': { System.getenv('JAVA_HOME') },
-            'java.home in JVM properties': { System.properties['java.home'] }
-        ],
-        [
-            'jfxrt.jar',
-            'lib/jfxrt.jar',
-            'lib/ext/jfxrt.jar',
-            'jre/lib/jfxrt.jar',
-            'jre/lib/ext/jfxrt.jar'
-        ],
-        'JavaFX Runtime Jar'
-    )
-}
-
-def findAntJavaFxJar() {
-    return searchFile(
-        [
-            'jfxrtDir in Gradle Properties': { System.properties['jfxrtDir'] },
-            'JFXRT_HOME in System Environment': { System.getenv('JFXRT_HOME') },
-            'JAVA_HOME in System Environment': { System.getenv('JAVA_HOME') },
-            'java.home in JVM properties': { System.properties['java.home'] }
-        ],
-        [
-            'ant-javafx.jar',
-            'lib/ant-javafx.jar',
-            '../lib/ant-javafx.jar'
-        ],
-        'JavaFX Packager Tools'
-    )
-}
-
-def getJavaFxJarPath() {
-    return file(findJavaFxJar()).absolutePath
-}
-
-def copyDbToBuildDir() {
-    copy {
-        from dbName
-        into warOutputDir
-    }
-
-    println("Copied ${dbName} to ${warOutputDir}")
-}
-
-
-def buildFrontendIfNotPresent() {
-    def serverWebAssetDir = new File(serverWebAssetDirPath);
-
-    if (serverWebAssetDir.exists() && serverWebAssetDir.list().size() > 0) {
-        return;
-    }
-
-    println("Client build output directory ${serverWebAssetDirPath} doesn't exist. Building the front-end now...");
-
-    // Native Bash command: ( ( command -v 'node' || [[ -n "${!1}" ]] ) &> /dev/null; if (( $? == 0 )); then echo 'NodeJS is installed'; fi; )
-    String nodeJsIsInstalledStdOut = cliCmd("command -v node");
-    boolean nodeJsIsInstalled = nodeJsIsInstalledStdOut != null && nodeJsIsInstalledStdOut.length() > 0;
-
-    if (!nodeJsIsInstalled) {
-        println "Installing NodeJS version ${nodeVersion} using `nvm` via `${repoRootDirPath}/install-nvm.sh`..."
-
-        cliCmd("${repoRootDirPath}/install-nvm.sh ${nodeVersion}");
-
-        println "NodeJS installation successful!"
-    }
-
-    File clientDirDeps = new File(clientDirDepsPath);
-    boolean clientDepsInstalled = clientDirDeps.exists() && clientDirDeps.list().size() > 0;
-
-    if (!clientDepsInstalled) {
-        println("Client-side dependencies directory ${clientDirDepsPath} doesn't exist. Running front-end install now...");
-
-        // Alternative (if async were required): `gradle.taskGraph.afterTask { Task task, TaskState state -> {}}`
-        // See:
-        //     - Change dir for CLI command: https://discuss.gradle.org/t/change-gradle-working-directory-in-a-standard-operating-system-way-where-gradle-is-launched-and-not-where-the-build-gradle-is-located/7153/10
-        String npmInstallStdOut = cliCmd("npm install", "${clientDirPath}");
-
-        println("${npmInstallStdOut}\n");
-        println("Front-end install successful!");
-    }
-
-    String npmBuildStdOut = cliCmd("npm run build", "${clientDirPath}");;
-
-    println("${npmBuildStdOut}\n");
-    println("Front-end build completed successful!");
-}
-
-tasks.register("buildFrontend") {
-    doLast {
-        buildFrontendIfNotPresent();
-    }
-}
-
-
-tasks.withType(Copy).all {
-    duplicatesStrategy 'include'
 }
 
 
