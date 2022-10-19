@@ -23,8 +23,8 @@ plugins {
     id 'idea'
 
     // adding plugins here removes the need to declare them in buildscript {}
-    id 'org.springframework.boot' version '2.3.0.RELEASE'
-    id 'io.spring.dependency-management' version '1.0.9.RELEASE'
+    id 'org.springframework.boot' version '2.7.4'  // See: https://docs.spring.io/spring-boot/docs/current/gradle-plugin/reference/htmlsingle
+    id 'io.spring.dependency-management' version '1.0.14.RELEASE'
     // If running as a standalone JavaFX app with Java >= v11, add this plugin
     // id 'org.openjfx.javafxplugin' version '0.0.10'
 
@@ -228,6 +228,76 @@ if (System.properties['jfxrtDir'] == null) { // if not in root-level gradle.prop
 }
 
 
+configurations.all {
+    /*
+     * At some point
+     *
+     * Alternatives:
+     *   - exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
+     *   - exclude group: 'org.apache.logging.log4j', module: 'log4j-to-slf4j'
+     *   - exclude module: 'slf4j-log4j14'
+     *
+     * @see <a href="https://discuss.gradle.org/t/gradle-7-fail-for-duplicates-in-copy-specs-has-no-duplicates-in-project/39834"></a>
+     * @see <a href="https://stackoverflow.com/questions/12926899/java-lang-noclassdeffounderror-org-slf4j-loggerfactory">{@code NoClassDefFoundError: org.slf4j.LoggerFactory} error</a>
+     * @see <a href="https://stackoverflow.com/questions/44111973/slf4j-loggerfactory-class-definition-not-found-with-gradle">SO: Similar question</a>
+     * @see <a href="https://stackoverflow.com/questions/42531127/gradle-exception-in-thread-main-java-lang-noclassdeffounderror-org-slf4j-logg">SO: Similar question</a>
+     * @see <a href="https://stackoverflow.com/questions/40033235/how-to-properly-configure-gradle-build-to-avoid-including-log4j-and-slf4j-from-t">SO: Possible solution</a>
+     * @see <a href="https://discuss.gradle.org/t/gradle-7-fail-for-duplicates-in-copy-specs-has-no-duplicates-in-project/39834">Gradle discussion</a>
+     * @see <a href="https://github.com/gradle/gradle/issues/17236">GitHub issue</a>
+     */
+    exclude group: 'ch.qos.logback', module: 'logback-classic'
+}
+
+gradle.taskGraph.whenReady {
+    allprojects {
+        tasks.forEach(task -> {
+            // Only change `duplicatesStrategy` for dependency-copying task types
+            // See: https://stackoverflow.com/questions/50401813/how-to-find-type-of-gradle-task
+            [ Copy, Jar, War, Tar, Zip ].forEach(taskType -> {
+                if (task.hasProperty("duplicatesStrategy")) {
+                    task.setProperty("duplicatesStrategy", DuplicatesStrategy.INCLUDE);
+                }
+            });
+        });
+    }
+}
+
+/**
+ * Not used, but this code would create a JAR file instead of a WAR file.
+ * JAR files can run by themselves whereas WAR files require running in a Tomcat container.
+ *
+ * <pre>
+ * bootJar {
+ *     archiveBaseName = project.name
+ *     archiveVersion = project.version
+ * }
+ * </pre>
+ */
+
+/**
+ * Also not used, but `jar` causes a .jar file to be generated instead of a .war file.
+ *
+ * However, with the code changes made to spit Gradle utils into a separate sub-project,
+ * this resulted in a `X-plain.jar` (and sometimes a `X-plain.war` file as well) to be
+ * generated even though we only care about the "normal" .war file.
+ *
+ * Disabling these tasks solves that issue.
+ *
+ * @see <a href="https://stackoverflow.com/questions/71060229/after-upgrading-to-gradle-7-x-generating-two-war-files/71074994#71074994">SO post solving the issue</a>
+ * @see <a href="https://stackoverflow.com/questions/30728533/gradle-override-transitive-dependency-by-version-classifier">Alternative: Forcing {@code slf4j} version</a>
+ * @see <a href="https://discuss.gradle.org/t/forcing-a-dependency-still-takes-latest-version/2050/3">Docs: Forcing {@code slf4j} version</a>
+ * @see <a href="https://stackoverflow.com/questions/67663728/spring-boot-2-5-0-generates-plain-jar-file-can-i-remove-it/67663956#67663956">Solution</a>
+ */
+jar {
+    enabled = false
+    // archiveClassifier = ""  // Occasionally necessary
+}
+
+war {
+    enabled = false
+}
+
+
 /**
  * Build, run, etc. all depend on the `compileJava` task.
  * As such, to ensure the front-end was built before attempting to run the server,
@@ -272,8 +342,12 @@ tasks.run.dependsOn([ "bootRun" ]);
  * Spring disables {@code war} task and replaces it with {@code bootWar}
  */
 bootWar {
-    archiveBaseName = project.name
-    archiveVersion = project.version
+    enabled = true;  // Required due to above deactivation of the `war` task
+
+    doFirst {  // Run in `doFirst` rather than config step to avoid race conditions with `gradle.rootProject.setVersion()`
+        archiveBaseName = project.name
+        // archiveVersion = project.version  // Don't add `project.version` to output .war file name
+    }
 
     if (injectJavaFxJar.toBoolean()) {
         /*
@@ -297,18 +371,6 @@ bootWar {
         cliCmd("chmod 777 ${warOutputDir}/*")
     }
 }
-
-/**
- * Not used, but this code would create a JAR file instead of a WAR file.
- * JAR files can run by themselves whereas WAR files require running in a Tomcat container.
- *
- * <pre>
- * bootJar {
- *     archiveBaseName = project.name
- *     archiveVersion = project.version
- * }
- * </pre>
- */
 
 sourceSets {
     main {
