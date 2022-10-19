@@ -27,19 +27,32 @@
 
 
 /**
- * If using `buildscript` and possibly `buildSrc`, you'll likely need to use the legacy (yet more
+ * Best way to get the path of the actual file containing the code rather than the original
+ * parent file that calls said child (which is the default behavior) is:
+ *
+ * {@code buildscript.sourceFile}
+ *
+ * @see <a href="https://stackoverflow.com/questions/24528242/how-can-i-find-the-path-of-the-current-gradle-script/36527087#36527087">SO: (Only) Answer to said problem</a>
+ */
+
+
+/**
+ * Often in sub-projects, `buildscript`, and `buildSrc`, you'll likely need to use the legacy (yet more
  * flexible) `apply plugin:` syntax since `plugins {}` isn't allowed in certain contexts.
  *
  * @see <a href="https://docs.gradle.org/current/userguide/plugins.html#sec:old_plugin_application">Gradle docs</a>
  * @see <a href="https://github.com/gradle/gradle/issues/2528#issuecomment-443318586">GitHub issue</a>
  */
-plugins {
-    id 'java'
-    id 'java-library'
-    id 'groovy'
-    id 'idea'
-    id 'java-gradle-plugin'  // Add Gradle internal classes to classpath; Necessary to expose classes as `public` classes to the parent/build.gradle files importing this
-}
+apply plugin: 'java'
+apply plugin: 'java-library'
+apply plugin: 'groovy'
+apply plugin: 'java-gradle-plugin'  // Add Gradle internal classes to classpath; Necessary to expose classes as `public` classes to the parent/build.gradle files importing this
+apply plugin: 'idea'
+
+
+String currentFile = buildscript.sourceFile;
+String currentDir = new File("${currentFile}").getParent().toString().replaceAll("(?<=/|^)\\.(?=/|\$)", "");
+
 
 gradlePlugin {
     // Alternatively (but more verbose), you could write the code below for each individual plugin, i.e.
@@ -51,6 +64,9 @@ gradlePlugin {
         }
     }
 }
+
+
+apply from: "${currentDir}/src/org/animeatsume/gradleutils/index.groovy"
 
 
 /**
