@@ -8,6 +8,7 @@ import groovy.json.JsonBuilder;
 
 import org.animeatsume.gradleutils.*;
 
+
 /**
  * To use CLI args in a task/function, append the CLI arg/flag to `-D` or `-P` accordingly:
  *   - System.getProperty()  == ./gradlew myTask -DmyCliArgName='myCliArgValue'
@@ -15,11 +16,26 @@ import org.animeatsume.gradleutils.*;
  * Note: `System.getProperty()` doesn't require a `.hasProperty()` check.
  */
 
+/**
+ * Use `tasks.register("myTaskName")` to lazy-load the tasks that aren't needed for global app
+ * functionality.
+ * i.e. don't run the lifecycle scripts -- including the tasks' top-level configuration information
+ * (which is usually always run by default as the Gradle process itself starts, regardless of the
+ * specified task) -- until the task is actually needed/called.
+ *
+ * @see <a href="https://stackoverflow.com/questions/53654190/what-is-the-difference-between-registering-and-creating-in-gradle-kotlin-dsl">StackOverflow post.</a>
+ * @see <a href="https://docs.gradle.org/current/userguide/task_configuration_avoidance.html#sec:how_do_i_defer_creation">Gradle docs for {@code tasks.register()}</a>
+ * @see <a href="https://discuss.gradle.org/t/closure-vs-action/37806/2">Tasks ({@code Closures}) vs Actions</a>
+ */
+
+
 plugins {
     id 'java'
     id 'war'
-    id 'application'  // Docs: https://docs.gradle.org/current/userguide/application_plugin.html#sec:application_tasks
     id 'java-library'  // Provides enum for Java versions. Example: https://docs.gradle.org/current/userguide/custom_plugins.html#:~:text=Example%209.%20Creating%20a%20simple%20script%20plugin
+    id 'java-gradle-plugin'  // Add Gradle internal classes to classpath; Necessary to expose classes as `public` classes to the parent/build.gradle files importing this
+    id 'groovy'
+    id 'application'  // Docs: https://docs.gradle.org/current/userguide/application_plugin.html#sec:application_tasks
     id 'idea'
 
     // adding plugins here removes the need to declare them in buildscript {}
@@ -98,14 +114,12 @@ ext {
     isWindows = System.getProperty("os.name")
         .toLowerCase()
         .startsWith("windows");
-
-    javaHome = "${System.properties['java.home']}"
+    javaHome = "${System.properties['java.home']}";
+    javaLibDir = "${javaHome}/lib";
 
     if (!new File(javaHome).exists()) {
         javaHome = "${JAVA_HOME}" || System.getenv('JAVA_HOME');
     }
-
-    javaLibDir = "${javaHome}/lib";
 
     if (!new File(javaLibDir).exists()) {
         javaLibDir = "${javaHome}/../lib";
@@ -118,12 +132,13 @@ ext {
     serverWebAssetDirPath = "${serverDirPath}/src/main/resources/public";
     warOutputDir = "${project.buildDir}/${project.libsDirName}";  // `currentDir/build/libs/` by default
     dbName = 'anime_atsume.db';
-    buildSrcJars = fileTree("${serverDirPath}/buildSrc/build/libs") {  // `buildSrc/` is a Gradle-reserved dir for (multi-)project-wide configs
+    buildUtilsDir = "${serverDirPath}/utils";
+    buildUtilsGradleConfig = "${buildUtilsDir}/build.gradle";
+    buildUtilsJars = fileTree("${buildUtilsDir}/build/libs") {
         include("*.jar");
         exclude("*sources.jar");
     }
 }
-
 
 
 sourceSets {
@@ -212,10 +227,15 @@ dependencies {
 }
 
 
-
-
 if (System.properties['jfxrtDir'] == null) { // if not in root-level gradle.properties
     System.properties['jfxrtDir'] = '.'
+}
+
+
+tasks.register("buildFrontend") {
+    doLast {
+        buildFrontendIfNotPresent();
+    }
 }
 
 
@@ -363,34 +383,6 @@ bootWar {
     }
 }
 
-sourceSets {
-    main {
-        java {
-            srcDir 'src/main/java'
-        }
-        resources {
-            srcDir 'src/main/resources'
-        }
-    }
-
-    test {
-        java {
-            srcDir 'src/test/java'
-        }
-    }
-}
-
-
-/**
- * {@inheritDoc}
- * Configures JavaDoc generation by specifying the main class and the app's {@code classpath}.
- *
- * @see <a href="https://stackoverflow.com/questions/45997976/how-generate-javadoc-with-gradle">StackOverflow post</a>
- */
-javadoc {
-    source = sourceSets.main.allJava
-    // classpath = configurations.compile
-}
 
 /**
  * {@inheritDoc}
@@ -420,7 +412,41 @@ test {
     }
 }
 
-wrapper {
+
+/**
+ * {@inheritDoc}
+ * Configures JavaDoc generation by specifying the main class and the app's {@code classpath}.
+ *
+ * @see <a href="https://stackoverflow.com/questions/45997976/how-generate-javadoc-with-gradle">StackOverflow post</a>
+ */
+javadoc {
+    source = sourceSets.main.allJava
+    // classpath = configurations.compile
+}
+
+
+/**
+ * Ensure sub-projects maintain their own name and version vs being overwritten by this
+ * super-project's name and version.
+ *
+ * @see <a href="https://stackoverflow.com/questions/53185588/gradle-get-subporject-name-version/53185758#53185758">SO: Post discussing this</a>
+ */
+gradle.projectsEvaluated {
+    subprojects { subproject ->
+        jar {
+            manifest {
+                attributes(
+                    Name: subproject.archivesBaseName,
+                    Version: subproject.version,
+                    // '<package.mainClass>',
+                )
+            }
+        }
+    }
+}
+
+
+wrapper { // TODO - Move to files.groovy
     distributionType = Wrapper.DistributionType.ALL
 }
 
@@ -437,6 +463,8 @@ tasks.register("wrapperVersion") {
         } else if (System.hasProperty("v")) {
             wrapperVersionNumber = System.getProperty("v");
         }
+
+        // TODO - Only upgrade if `-Pu` is passed
 
         println("Upgrading Gradle wrapper to v${wrapperVersionNumber}");
         // See: https://gradle.org/install#with-the-gradle-wrapper

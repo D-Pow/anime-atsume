@@ -86,7 +86,7 @@ sourceSets {
 
         groovy {
             // Send all Java files through Groovy compiler
-            srcDirs += ['src']
+            srcDirs += [ './src' ]
         }
     }
 }

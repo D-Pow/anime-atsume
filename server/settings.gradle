@@ -3,7 +3,6 @@
 pluginManagement {
     repositories {
         mavenCentral()
-        jcenter()
         gradlePluginPortal()
     }
 }
@@ -22,10 +21,18 @@ rootProject.name = "anime-atsume"
  * @see <a href="https://www.baeldung.com/gradle-build-settings-properties#the-build-in-a-nutshell">Gradle project execution lifecycle (TL;DR)</a>
  * @see <a href="https://stackoverflow.com/questions/17262856/how-to-set-the-project-name-group-version-plus-source-target-compatibility-in/17263028#17263028">StackOverflow: Assign all settings in one file</a>
  * @see <a href="https://docs.gradle.org/current/dsl/org.gradle.api.Project.html#Lifecycle:~:text=of%20Gradle%27s%20features.-,Lifecycle,-There%20is%20a">Gradle project execution lifecycle (docs)</a>
+ * @see <a href="https://docs.gradle.org/current/userguide/build_environment.html">Gradle properties (System, Environment, and Project)</a>
  */
 gradle.beforeProject {
     gradle.rootProject.setGroup("org.animeatsume")
-    gradle.rootProject.setVersion("1.0");
+    gradle.rootProject.setVersion(
+        // Use `getProperties()` instead of `getProperty(String)` so we can default the value.
+        // Equivalent of ternary operators except simpler/cleaner.
+        gradle.rootProject.getProperties().getOrDefault(
+            "version",
+            System.getProperty("version", "1.0.0") // Custom method that equates to `getOrDefault(String, String)`
+        )
+    );
 }
 
 // Add sub-projects (use directory names, not package names)

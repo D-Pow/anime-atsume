@@ -114,12 +114,15 @@ tasks.register("printSrcFiles") {
 
 /**
  * @see <a href="https://docs.gradle.org/current/userguide/userguide_single.html#sec:listing_dependencies">Gradle docs</a>
+ * @see <a href="https://stackoverflow.com/questions/21645071/using-gradle-to-find-dependency-tree">SO: Listing Gradle dependency tree</a>
  */
 tasks.register("printDependencies") {
     doLast {
         cliCmd("./gradlew dependencies");
     }
 }
+
+// TODO: https://stackoverflow.com/questions/50401813/how-to-find-type-of-gradle-task
 
 
 ext {
