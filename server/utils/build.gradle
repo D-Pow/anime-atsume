@@ -54,6 +54,21 @@ String currentFile = buildscript.sourceFile;
 String currentDir = new File("${currentFile}").getParent().toString().replaceAll("(?<=/|^)\\.(?=/|\$)", "");
 
 
+gradle.taskGraph.whenReady {
+    allprojects {
+        tasks.forEach(task -> {
+            // Only change `duplicatesStrategy` for dependency-copying task types
+            // See: https://stackoverflow.com/questions/50401813/how-to-find-type-of-gradle-task
+            [ Copy, Jar, War, Tar, Zip ].forEach(taskType -> {
+                if (task.hasProperty("duplicatesStrategy")) {
+                    task.setProperty("duplicatesStrategy", DuplicatesStrategy.INCLUDE);
+                }
+            });
+        });
+    }
+}
+
+
 gradlePlugin {
     // Alternatively (but more verbose), you could write the code below for each individual plugin, i.e.
     //   plugins.register("my-custom-plugin") {...}
