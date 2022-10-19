@@ -29,28 +29,19 @@ plugins {
     // id 'org.openjfx.javafxplugin' version '0.0.10'
 
     /*
-     * Custom utils for Gradle - Necessary if a sub-project is used within Gradle files.
-     *
-     * Requires:
-     *  - Import statement in file.
-     *  - Applying your own custom plugin (even if it's a no-op); otherwise, even code
-     *    unrelated to the plugin can't be used in Gradle.
-     *  - Adding Gradle's plugin-portal repository for plugin API usage.
-     *  - To run sub-projects' tasks, add `dependsOn gradle.includedBuild("sub-project-dir").task(":my-task");` to `tasks.preCompile`
-     *
-     * If running into issues with discovering/importing sub-project code, try:
-     *  - Add `compileClasspath += files('sub-project-dir')` to `sourceSets.main`
-     *  - Add `compileOnly project.files('sub-project-dir')` to `dependencies`
-     *    Alternatives:
-     *      - `compileOnly fileTree('sub-project-dir')`
-     *      - `compileOnly 'org.myapp:packagename'`
+     * Similar to the below `apply from:` statement, we could write our own custom plugin in
+     * a sub-project and apply it here so it's available for use within this Gradle file
+     * automatically without us having to specify additional configs.
      */
-    id 'anime-atsume-build-utils'
+    // id 'anime-atsume-build-utils'
 }
 
 /*
- * Custom utils for Gradle (though as an import/file rather than as a plugin) - Necessary if
- *     a sub-project is used within Gradle files.
+ * Custom utils for Gradle, though as an import/file rather than as a plugin.
+ * Necessary if a sub-project's code is used within Gradle files.
+ *
+ * Alternatively, `buildSrc/` is a reserved dir for (multi-)project-wide configs
+ * for use in Gradle.
  *
  * Requires:
  *  - Import statement in file.
