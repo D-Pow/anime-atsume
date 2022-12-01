@@ -13,7 +13,7 @@ FROM ubuntu:18.04
 # Change default shell to Bash for better feature support/easier usage
 SHELL [ "/bin/bash", "-c" ]
 # Change CWD from <root> to $HOME
-WORKDIR "/home"
+# WORKDIR "/home"
 
 # `docker` flags useful for debugging:
 #   `--progress=plain`: show STDOUT/STDERR.
@@ -43,7 +43,7 @@ ARG DB_FILE=./build/libs/*.db
 COPY . .
 
 # Build the whole app
-RUN ./server/gradlew clean build
+# RUN ./server/gradlew clean build
 
 # In particular (and probably not necessary) copy the build's main artifacts (`.war`/`.db`) to
 # the Docker image
