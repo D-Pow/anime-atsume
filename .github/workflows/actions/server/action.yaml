@@ -1,0 +1,18 @@
+name: Server - Verify and Build
+description: Installs, tests, and builds the back-end
+
+
+# This is for a sample Python back-end but it could easily be modified for any back-end system
+
+runs:
+  using: composite
+
+  steps:
+    - uses: actions/checkout@v2
+
+    - name: Server Install
+      id: server-install
+      shell: bash
+      working-directory: ./server/
+      run: |
+        echo "TODO"
