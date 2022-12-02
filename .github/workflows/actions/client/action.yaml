@@ -32,7 +32,9 @@ description: Installs, tests, and builds the front-end
 
 
 runs:
-  # Allows the YAML file to be run from other workflows/actions. See: https://docs.github.com/en/actions/creating-actions/metadata-syntax-for-github-actions#runsusing-1
+  # Allows the YAML file to be run from other workflows/actions.
+  # See:
+  #   - https://docs.github.com/en/actions/creating-actions/metadata-syntax-for-github-actions#runsusing-1
   using: composite
 
   # Steps represent a sequence of tasks that will be executed as part of the job
