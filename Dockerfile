@@ -52,8 +52,6 @@ COPY . .
 COPY ${WAR_FILE} ./server/build/libs/anime-atsume.war
 COPY ${DB_FILE} ./server/build/libs/anime_atsume.db
 
-RUN chmod a+rwx anime-atsume.war anime_atsume.db
-
 EXPOSE 8080
 
 CMD java ${JAVA_OPTS} -Dglass.platform=Monocle -Dmonocle.platform=Headless -jar anime-atsume.war --server.port=${PORT:-8080}
