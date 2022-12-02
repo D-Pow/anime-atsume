@@ -37,7 +37,7 @@ def buildFrontendIfNotPresent() {
     String npmBuildStdOut = cliCmd("npm run build", "${clientDirPath}");;
 
     println("${npmBuildStdOut}\n");
-    println("Front-end build completed successful!");
+    println("Front-end build completed successfully!");
 }
 
 
