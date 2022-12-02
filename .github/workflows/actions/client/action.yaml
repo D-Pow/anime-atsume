@@ -76,4 +76,5 @@ runs:
       with:
         name: client-build-output
         path: |
+          ./client/node_modules
           ./server/src/main/resources/public
