@@ -81,6 +81,6 @@ jobs:
         working-directory: ./
     needs: [ ci-client-verify, ci-server-verify ]
     steps:
-      - name: Client Verify
+      - name: CI Verify
         run: |
           :
