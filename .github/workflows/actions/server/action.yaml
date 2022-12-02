@@ -6,10 +6,6 @@ description: Installs, tests, and builds the back-end
 
 runs:
   using: composite
-  runs-on: ubuntu-latest
-  defaults:
-    run:
-      working-directory: ./server/
   steps:
     - name: Checkout repository branch
       uses: actions/checkout@v3
@@ -18,6 +14,7 @@ runs:
       id: server-build
       shell: bash
       run: |
+        cd ./server
         ./gradlew clean build
 
     - name: Server build output cache
@@ -25,4 +22,4 @@ runs:
       with:
         name: ci-server-build-output
         path: |
-          ./build/libs
+          ./server/build/libs
