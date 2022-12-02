@@ -49,17 +49,17 @@ jobs:
         # Import pipeline logic via `uses`
         uses: ./.github/workflows/actions/client
 
-      # Force this step to use separate job in the same `jobs` block via
+      # Force this step to use separate job in the same `jobs` block via below
       - name: Client Build
-        id: client-build
         shell: bash
         run: |
           npm run build
 
-      - name: Client build output cache
+      - name: Client cache build output
         uses: actions/upload-artifact@v3
+        id: client-build
         with:
-          name: ci-client-build-output
+          name: client-build-output
           path: |
             ./dist
 
