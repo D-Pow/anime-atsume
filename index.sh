@@ -35,7 +35,23 @@ build() (
 
 
 dockerBuild() (
-    docker build -t anime-atsume .
+    declare _dockerBuildVerbose=
+    declare OPTIND=1
+
+    while getopts ":v" opt; do
+        case "$opt" in
+            v)
+                _dockerBuildVerbose=true
+                ;;
+            # *)
+            #     echo $OPTIND  # Forward options to `docker` command
+            #     ;;
+        esac
+    done
+
+    shift $(( OPTIND - 1 ))
+
+    docker build ${_dockerBuildVerbose:+--progress=plain} -t anime-atsume $@ .
 )
 
 
