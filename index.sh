@@ -70,8 +70,8 @@ main() {
     Commands:
 $(
     declare -f \
-        | egrep -i '^[^_][^ \t]+ \(\)' \
-        | egrep -iv 'main' \
+        | _egrep -i '^[^_][^ \t]+ \(\)' \
+        | _egrep -iv 'main' \
         | sed -E 's/ \(\)//' \
         | sed -E 's/^/        /'
 )
