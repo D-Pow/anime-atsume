@@ -10,6 +10,15 @@ runs:
     - name: Checkout repository branch
       uses: actions/checkout@v3
 
+    - name: Download client cache
+      id: server-download-client-artifacts
+      uses: actions/download-artifact@v3
+      with:
+        name: client-build-output
+        path: |
+          ./client/node_modules
+          ./server/src/main/resources/public
+
     - name: Server Build
       id: server-build
       shell: bash
