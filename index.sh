@@ -43,9 +43,10 @@ dockerBuild() (
             v)
                 _dockerBuildVerbose=true
                 ;;
-            # *)
-            #     echo $OPTIND  # Forward options to `docker` command
-            #     ;;
+            *)
+                # Forward options to `docker` command
+                break
+                ;;
         esac
     done
 
@@ -56,9 +57,9 @@ dockerBuild() (
 
 
 deploy() (
-    clean
-    build
-    dockerBuild
+    clean "$@"
+    build "$@"
+    dockerBuild "$@"
 )
 
 
