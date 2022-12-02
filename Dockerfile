@@ -36,6 +36,8 @@ RUN apt-get clean && \
         && \
     apt-mark hold openjfx libopenjfx-jni libopenjfx-java
 
+WORKDIR /home
+
 ARG WAR_FILE=./build/libs/*.war
 ARG DB_FILE=./build/libs/*.db
 
