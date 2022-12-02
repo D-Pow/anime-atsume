@@ -56,6 +56,13 @@ jobs:
         run: |
           npm run build
 
+      - name: Client build output cache
+        uses: actions/upload-artifact@v3
+        with:
+          name: ci-client-build-output
+          path: |
+            ./client/dist
+
   ci-server-verify:
     runs-on: ubuntu-latest
     defaults:
@@ -71,6 +78,12 @@ jobs:
         shell: bash
         run: |
           ./gradlew clean build
+      - name: Server build output cache
+        uses: actions/upload-artifact@v3
+        with:
+          name: ci-server-build-output
+          path: |
+            ./server/build/libs
 
   ci-verify:
     runs-on: ubuntu-latest
@@ -82,27 +95,3 @@ jobs:
       - name: Client Verify
         run: |
           :
-
-  ci-build-and-upload-artifacts:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./client/
-    needs: [ ci-verify ]
-    # outputs:
-    #   ci-build-output:
-    #     description: "CI - Cache build output"
-    #     # value:
-    steps:
-      - name: Client Build Output
-        uses: actions/upload-artifact@v3
-        with:
-          name: ci-client-build-output
-          path: |
-            ./client/dist
-      - name: Server Build Output
-        uses: actions/upload-artifact@v3
-        with:
-          name: ci-server-build-output
-          path: |
-            ./server/build/libs
