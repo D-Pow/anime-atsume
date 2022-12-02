@@ -60,8 +60,7 @@ jobs:
         id: client-build
         with:
           name: client-build-output
-          path: |
-            ./dist
+          path: ./server/src/main/resources/public
 
   ci-server-verify:
     runs-on: ubuntu-latest
