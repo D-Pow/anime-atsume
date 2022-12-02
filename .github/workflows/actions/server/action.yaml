@@ -25,4 +25,4 @@ runs:
       with:
         name: ci-server-build-output
         path: |
-          ./server/build/libs
+          ./build/libs

@@ -61,7 +61,7 @@ jobs:
         with:
           name: ci-client-build-output
           path: |
-            ./client/dist
+            ./dist
 
   ci-server-verify:
     runs-on: ubuntu-latest
