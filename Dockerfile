@@ -53,8 +53,8 @@ COPY . .
 
 # In particular (and probably not necessary) copy the build's main artifacts (`.war`/`.db`) to
 # the Docker image
-COPY ${WAR_FILE} ./server/build/libs/anime-atsume.war
-COPY ${DB_FILE} ./server/build/libs/anime_atsume.db
+COPY ${WAR_FILE} ./anime-atsume.war
+COPY ${DB_FILE} ./anime_atsume.db
 
 EXPOSE 8080
 
