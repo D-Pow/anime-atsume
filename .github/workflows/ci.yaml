@@ -68,6 +68,7 @@ jobs:
     defaults:
       run:
         working-directory: ./server/
+    needs: [ ci-client-verify ]
     steps:
       - name: Checkout repository branch
         uses: actions/checkout@v3

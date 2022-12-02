@@ -13,14 +13,12 @@ runs:
     - name: Server Build
       id: server-build
       shell: bash
-      needs: [ client-build ]
       run: |
         cd ./server
         ./gradlew clean build
 
     - name: Server build output cache
       uses: actions/upload-artifact@v3
-      needs: [ server-build ]
       with:
         name: ci-server-build-output
         path: |
