@@ -62,3 +62,18 @@ runs:
     #   working-directory: ./
     #   run: |
     #     npm run verify
+
+    - name: Client Build
+      shell: bash
+      working-directory: ./client/
+      run: |
+        npm run build
+
+    - name: Client cache build output
+      uses: actions/upload-artifact@v3
+      id: client-build
+      # Note: `path` is relative to root dir, not working dir
+      with:
+        name: client-build-output
+        path: |
+          ./server/src/main/resources/public
