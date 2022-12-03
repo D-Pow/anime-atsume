@@ -119,6 +119,19 @@ deploy() (
     clean "$@"
     build "$@"
     dockerBuild "$@"
+
+    # See:
+    #   - https://render.com/docs/deploy-a-commit#deploying-a-commit-via-webhook
+    #   - https://api-docs.render.com/reference/create-deploy
+    declare _renderDotComServiceId="${_renderDotComServiceId}"
+    declare _renderDotComApiKey="${_renderDotComApiKey}"
+
+    curl \
+         --url "https://api.render.com/v1/services/${_renderDotComServiceId}/deploys" \
+         --request 'POST' \
+         --header 'Accept: application/json' \
+         --header 'Content-Type: application/json' \
+         --header "Authorization: Bearer ${_renderDotComApiKey}"
 )
 
 
