@@ -1,4 +1,4 @@
-#!/usr/bin/env -S bash
+#!/usr/bin/env bash
 
 declare rootDir="$(realpath -se "$(dirname "${BASH_SOURCE[@]}")")"
 declare clientDir="${rootDir}/client"
