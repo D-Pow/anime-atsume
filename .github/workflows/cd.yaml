@@ -59,7 +59,7 @@ defaults:
 jobs:
   cd-build:
     runs-on: ubuntu-latest
-    uses: ./.github/workflows/actions/client
+    needs: [ ci-verify ]
     steps:
       - name: Checkout repository branch
         uses: actions/checkout@v3
