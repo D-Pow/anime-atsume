@@ -95,7 +95,13 @@ dockerBuild() (
 
     shift $(( OPTIND - 1 ))
 
-    docker build ${_dockerBuildVerbose:+--progress=plain} -t anime-atsume $@ .
+    clean
+    build
+
+    (
+        command -v docker &>/dev/null && \
+            docker build ${_dockerBuildVerbose:+--progress=plain} -t anime-atsume $@ .
+    )
 )
 
 dockerRemoveOldContainers() (
