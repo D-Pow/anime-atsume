@@ -50,9 +50,6 @@ ARG DB_FILE=${BUILD_DIR}/*.db
 # Copy the entire app (server/client) from the local filesystem to the Docker image
 COPY . .
 
-# Build the whole app if not already built
-RUN ./index.sh checkBuildOutputDir
-
 # In particular (and probably not necessary) copy the build's main artifacts (`.war`/`.db`) to
 # the Docker image
 COPY ${WAR_FILE} ./anime-atsume.war
