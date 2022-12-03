@@ -16,7 +16,7 @@ runs:
       with:
         name: client-build-output
         path: |
-          ./client/node_modules
+          # ./client/node_modules
           ./server/src/main/resources/public
 
     - name: Server Build
