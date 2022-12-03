@@ -67,6 +67,16 @@ build() (
 )
 
 
+checkBuildOutputDir() (
+    cd "${serverDir}"
+
+    if ! [[ -d "${buildDir}" ]]; then
+        clean
+        build "$@"
+    fi
+)
+
+
 dockerBuild() (
     declare _dockerBuildVerbose=
     declare OPTIND=1

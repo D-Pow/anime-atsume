@@ -51,7 +51,7 @@ ARG DB_FILE=${BUILD_DIR}/*.db
 COPY . .
 
 # Build the whole app if not already built
-RUN if ! [[ -d "${BUILD_DIR}" ]]; then cd ${SERVER_DIR}; ./gradlew clean build; else : ; fi
+RUN ./index.sh checkBuildOutputDir
 
 # In particular (and probably not necessary) copy the build's main artifacts (`.war`/`.db`) to
 # the Docker image
