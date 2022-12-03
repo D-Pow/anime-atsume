@@ -41,16 +41,12 @@ ENV SHELL=/bin/bash
 
 WORKDIR /home
 
-RUN echo ${WORKDIR}
-RUN ls -FlAh
-
 ARG CLIENT_DIR=./client
 ARG SERVER_DIR=./server
 ARG BUILD_DIR=${SERVER_DIR}/build/libs
 ARG WAR_FILE=${BUILD_DIR}/*.war
 ARG DB_FILE=${BUILD_DIR}/*.db
 
-RUN ls -FlAh
 RUN ./index.sh deploy
 
 # Copy the entire app (server/client) from the local filesystem to the Docker image
