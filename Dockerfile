@@ -12,6 +12,9 @@ FROM ubuntu:18.04
 
 # Change default shell to Bash for better feature support/easier usage
 SHELL [ "/bin/bash", "-c" ]
+
+ENV SHELL=/bin/bash
+
 # Change CWD from <root> to $HOME
 # WORKDIR "/home"
 
@@ -22,6 +25,15 @@ SHELL [ "/bin/bash", "-c" ]
 # Passing flags to `ARG` entries for customizing `Dockerfile` run:
 #   `--build-arg myArg=myValue`
 #       From: https://stackoverflow.com/questions/34254200/how-to-pass-arguments-to-a-dockerfile/34254700#34254700
+
+# Activate CLI logging during `docker build` via `--build-arg BUILD_VERBOSE=true`
+#
+# See:
+#   - https://stackoverflow.com/questions/64804749/why-is-docker-build-not-showing-any-output-from-commands/67682576#67682576
+#   - https://vsupalov.com/docker-build-time-env-values/#here-s-how
+#   - https://vsupalov.com/docker-arg-vs-env
+ARG BUILD_VERBOSE=
+ENV BUILDKIT_PROGRESS=${BUILD_VERBOSE:+plain}
 
 RUN apt-get clean && \
     apt-get update && \
@@ -36,8 +48,6 @@ RUN apt-get clean && \
         jq \
         && \
     apt-mark hold openjfx libopenjfx-jni libopenjfx-java
-
-ENV SHELL=/bin/bash
 
 WORKDIR /home
 
