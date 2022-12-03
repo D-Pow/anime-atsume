@@ -125,9 +125,13 @@ ext {
         javaLibDir = "${javaHome}/../lib";
     }
 
-    // Ideal, but errors out sometimes when run in `Dockerfile`
-    // repoRootDirPath = cliCmd("git rev-parse --show-toplevel").toString().trim();
-    repoRootDirPath = "${project.projectDir.toString().trim()}/..";
+    repoRootDirPath = "";
+    try {
+        repoRootDirPath = cliCmd("git rev-parse --show-toplevel").toString().trim();
+    } catch (e) {
+        repoRootDirPath = "${project.projectDir.toString().trim()}/..";
+    }
+
     clientDirPath = "${repoRootDirPath}/client";
     clientDirDepsPath = "${clientDirPath}/node_modules";
     serverDirPath = "${projectDir}";
