@@ -77,6 +77,8 @@ def cliCmd(String commandAndArgs, String dir, boolean returnAllStd) {
     ByteArrayOutputStream stdOut = new ByteArrayOutputStream();
     ByteArrayOutputStream stdErr = new ByteArrayOutputStream();
 
+    println("cliCmd: " + commandAndArgs)
+
     project.exec {
         if (dir != null) {
             workingDir = dir;

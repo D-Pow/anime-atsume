@@ -32,7 +32,7 @@ ENV SHELL=/bin/bash
 #   - https://stackoverflow.com/questions/64804749/why-is-docker-build-not-showing-any-output-from-commands/67682576#67682576
 #   - https://vsupalov.com/docker-build-time-env-values/#here-s-how
 #   - https://vsupalov.com/docker-arg-vs-env
-ARG BUILD_VERBOSE=
+ARG BUILD_VERBOSE=true
 ENV BUILDKIT_PROGRESS=${BUILD_VERBOSE:+plain}
 
 RUN apt-get clean && \
@@ -57,15 +57,29 @@ ARG BUILD_DIR=${SERVER_DIR}/build/libs
 ARG WAR_FILE=${BUILD_DIR}/*.war
 ARG DB_FILE=${BUILD_DIR}/*.db
 
-RUN ./index.sh deploy
+RUN echo "alias lah='ls -FlAh' >> ~/.bashrc"
 
 # Copy the entire app (server/client) from the local filesystem to the Docker image
 COPY . .
 
+# RUN ls -FlAh
+# RUN ls -FlAh server
+RUN ./index.sh clean
+RUN ./index.sh build
+# RUN ./index.sh deploy
+
 # In particular (and probably not necessary) copy the build's main artifacts (`.war`/`.db`) to
 # the Docker image
-COPY ${WAR_FILE} ./anime-atsume.war
-COPY ${DB_FILE} ./anime_atsume.db
+# COPY ${WAR_FILE} ./anime-atsume.war
+# COPY ${DB_FILE} ./anime_atsume.db
+
+RUN ls -FlAh .
+RUN ls -FlAh ./client
+RUN ls -FlAh ./server
+# RUN index.sh dockerBuild
+RUN find / -iname anime-atsume.war 2>/dev/null
+RUN find /home -iname anime-atsume.war 2>/dev/null
+RUN find . -iname anime-atsume.war 2>/dev/null
 
 EXPOSE 8080
 

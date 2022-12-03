@@ -63,7 +63,7 @@ build() (
 
     declare _buildGradleOpts="${_buildCleanFirst:+clean} ${_buildVerbose:+--console plain}"
 
-    ./gradlew ${_buildGradleOpts} build
+    ./gradlew --console plain ${_buildGradleOpts} build
 )
 
 
@@ -98,6 +98,8 @@ dockerBuild() (
     clean
     build
 
+    cp -R "${buildDir}/*" "${rootDir}"
+
     (
         command -v docker &>/dev/null && \
             docker build ${_dockerBuildVerbose:+--progress=plain} -t anime-atsume $@ .
@@ -124,13 +126,15 @@ dockerRun() (
 deploy() (
     clean "$@"
     build "$@"
-    dockerBuild "$@"
 
     # See:
     #   - https://render.com/docs/deploy-a-commit#deploying-a-commit-via-webhook
     #   - https://api-docs.render.com/reference/create-deploy
     declare _renderDotComServiceId="${_renderDotComServiceId}"
     declare _renderDotComApiKey="${_renderDotComApiKey}"
+
+    dockerBuild "$@"
+
 
     curl \
          --url "https://api.render.com/v1/services/${_renderDotComServiceId}/deploys" \

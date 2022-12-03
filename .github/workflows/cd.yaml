@@ -62,10 +62,9 @@ jobs:
     steps:
       - name: Checkout repository branch
         uses: actions/checkout@v3
+      - uses: valeriangalliat/action-sshd-cloudflared@v1
       - name: Deploy
         run: |
-          ./index.sh clean
-          ./index.sh build
           ./index.sh dockerBuild
 
   cd-deploy:
@@ -89,4 +88,5 @@ jobs:
 
       - name: Deploy application to Render.com
         run: |
+          ls -FlAh
           ./index.sh deploy
