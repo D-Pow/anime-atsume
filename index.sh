@@ -30,7 +30,40 @@ clean() (
 build() (
     cd "${serverDir}"
 
-    ./gradlew build
+    declare _buildCleanFirst=
+    declare _buildVerbose=
+    declare OPTIND=1
+
+    while getopts ":cvh" opt; do
+        case "$opt" in
+            c)
+                _buildCleanFirst=true
+                ;;
+            v)
+                _buildVerbose=true
+
+                ./gradlew printSrcInfo
+                ./gradlew printSrcFiles
+                ./gradlew printDependencies
+                ;;
+            h)
+                ./gradlew printCommands
+
+                return
+                ;;
+
+            *)
+                # Forward options to underlying command
+                break
+                ;;
+        esac
+    done
+
+    shift $(( OPTIND - 1 ))
+
+    declare _buildGradleOpts="${_buildCleanFirst:+clean} ${_buildVerbose:+--console plain}"
+
+    ./gradlew ${_buildGradleOpts} build
 )
 
 
