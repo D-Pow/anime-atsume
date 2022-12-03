@@ -55,6 +55,22 @@ dockerBuild() (
     docker build ${_dockerBuildVerbose:+--progress=plain} -t anime-atsume $@ .
 )
 
+dockerRemoveOldContainers() (
+    declare _dockerImageId=
+
+    for _dockerImageId in $(
+        docker images -a \
+            | tail -n "+2" \
+            | awk '{ print $3 }'
+    ); do
+        docker image rm "$_dockerImageId"
+    done
+)
+
+dockerRunContainer() (
+    docker run -it --rm anime-atsume bash
+)
+
 
 deploy() (
     clean "$@"
