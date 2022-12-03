@@ -83,4 +83,4 @@ jobs:
 
       - name: Deploy application to Render.com
         run: |
-          curl https://api.render.com/deploy/srv-cc7c769a6gdvc1qk7ts0?key=34nA7fzccys
+          ./index.sh deploy
