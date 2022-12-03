@@ -81,7 +81,7 @@ jobs:
         id: cd-download-artifacts
         uses: actions/download-artifact@v3
         with:
-          name: ci-verify
+          name: client-build-output
           path: |
             ./
 
