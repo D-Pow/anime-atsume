@@ -37,6 +37,8 @@ RUN apt-get clean && \
         && \
     apt-mark hold openjfx libopenjfx-jni libopenjfx-java
 
+ENV SHELL=/bin/bash
+
 WORKDIR /home
 
 ARG CLIENT_DIR=./client
