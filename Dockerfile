@@ -51,7 +51,7 @@ ARG WAR_FILE=${BUILD_DIR}/*.war
 ARG DB_FILE=${BUILD_DIR}/*.db
 
 RUN ls -FlAh
-RUN cd "${SERVER_DIR}"; ./gradlew build; cp "${BUILD_DIR}/*" .
+RUN ./index.sh deploy
 
 # Copy the entire app (server/client) from the local filesystem to the Docker image
 COPY . .
