@@ -110,7 +110,7 @@ dockerRemoveOldContainers() (
     done
 )
 
-dockerRunContainer() (
+dockerRun() (
     docker run -it --rm anime-atsume bash
 )
 
