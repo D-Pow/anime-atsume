@@ -62,6 +62,9 @@ RUN echo "alias lah='ls -FlAh' >> ~/.bashrc"
 # Copy the entire app (server/client) from the local filesystem to the Docker image
 COPY . .
 
+# Copy build-output files to root dir for ease of use
+COPY ${BUILD_DIR}/* .
+
 # RUN ls -FlAh
 # RUN ls -FlAh server
 RUN ./index.sh clean
