@@ -105,16 +105,28 @@ dockerBuild() (
     )
 )
 
-dockerRemoveOldContainers() (
-    declare _dockerImageId=
+dockerClean() (
+    declare _dockerId=
 
-    for _dockerImageId in $(
+    for _dockerId in $(
+        docker ps -a \
+            | tail -n "+2" \
+            | _egrep -i 'anime|none' \
+            | awk '{ print $1 }'
+    ); do
+        docker rm "$_dockerId"
+    done
+
+    for _dockerId in $(
         docker images -a \
             | tail -n "+2" \
+            | _egrep -i 'anime|none' \
             | awk '{ print $3 }'
     ); do
-        docker image rm "$_dockerImageId"
+        docker image rm "$_dockerId"
     done
+
+    clean "$@"
 )
 
 dockerRun() (
