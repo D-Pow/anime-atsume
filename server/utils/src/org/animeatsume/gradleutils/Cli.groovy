@@ -80,6 +80,9 @@ def cliCmd(String commandAndArgs, String dir, boolean returnAllStd) {
     println("cliCmd: " + commandAndArgs)
 
     project.exec {
+        // Allow exit codes > 0
+        ignoreExitValue = true
+
         if (dir != null) {
             workingDir = dir;
         }
