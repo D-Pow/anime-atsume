@@ -68,6 +68,9 @@ jobs:
         working-directory: ./
     needs: [ ci-client-verify, ci-server-verify ]
     steps:
+      # Placeholder command just to allow this step to solely be a aggregate command such that
+      # other commands wanting to depend on client/server build completion can have one dependency
+      # instead of multiple
       - name: CI Verify
         run: |
           :
