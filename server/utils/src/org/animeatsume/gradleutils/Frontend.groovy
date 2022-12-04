@@ -1,12 +1,4 @@
-def buildFrontendIfNotPresent() {
-    def serverWebAssetDir = new File(serverWebAssetDirPath);
-
-    if (serverWebAssetDir.exists() && serverWebAssetDir.list().size() > 0) {
-        return;
-    }
-
-    println("Client build output directory ${serverWebAssetDirPath} doesn't exist. Building the front-end now...");
-
+def installNvmAndNodeJsIfNotPresent() {
     // Native Bash command: ( ( command -v 'node' || [[ -n "${!1}" ]] ) &> /dev/null; if (( $? == 0 )); then echo 'NodeJS is installed'; fi; )
     String nodeJsIsInstalledStdOut = cliCmd("command -v node");
     boolean nodeJsIsInstalled = nodeJsIsInstalledStdOut != null && nodeJsIsInstalledStdOut.length() > 0;
@@ -18,8 +10,10 @@ def buildFrontendIfNotPresent() {
 
         println "NodeJS installation successful!"
     }
+}
 
-    File clientDirDeps = new File(clientDirDepsPath);
+def installFrontendDeps() {
+    File clientDirDeps = new File(clientDirDepsPath);  // Defined in build.gradle
     boolean clientDepsInstalled = clientDirDeps.exists() && clientDirDeps.list().size() > 0;
 
     if (!clientDepsInstalled) {
@@ -33,6 +27,19 @@ def buildFrontendIfNotPresent() {
         println("${npmInstallStdOut}\n");
         println("Front-end install successful!");
     }
+}
+
+def buildFrontendIfNotPresent() {
+    def serverWebAssetDir = new File(serverWebAssetDirPath);
+
+    if (serverWebAssetDir.exists() && serverWebAssetDir.list().size() > 0) {
+        return;
+    }
+
+    println("Client build output directory ${serverWebAssetDirPath} doesn't exist. Building the front-end now...");
+
+    installNvmAndNodeJsIfNotPresent();
+    installFrontendDeps();
 
     String npmBuildStdOut = cliCmd("npm run build", "${clientDirPath}");;
 
@@ -42,5 +49,7 @@ def buildFrontendIfNotPresent() {
 
 
 ext {
+    installNvmAndNodeJsIfNotPresent = this.&installNvmAndNodeJsIfNotPresent;
+    installFrontendDeps = this.&installFrontendDeps;
     buildFrontendIfNotPresent = this.&buildFrontendIfNotPresent;
 }
