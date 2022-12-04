@@ -147,8 +147,11 @@ deploy() (
     declare _renderDotComServiceId="${_renderDotComServiceId}"
     declare _renderDotComApiKey="${_renderDotComApiKey}"
 
-    dockerClean
-    dockerBuild "$@"
+    # Only attempt building Docker image if `docker` exists
+    if command -v docker &>/dev/null; then
+        dockerClean
+        dockerBuild "$@"
+    fi
 
     curl \
          --url "https://api.render.com/v1/services/${_renderDotComServiceId}/deploys" \
