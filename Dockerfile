@@ -62,6 +62,9 @@ RUN echo "alias lah='ls -FlAh' >> ~/.bashrc"
 # Copy the entire app (server/client) from the local filesystem to the Docker image
 COPY . .
 
+# Build the app if not already done before attempting Docker image generation
+RUN if ! [[ -d "${BUILD_DIR}" ]]; then ./index.sh dockerBuild; fi
+
 # Copy build-output files to root dir for ease of use
 COPY ${BUILD_DIR}/* .
 
