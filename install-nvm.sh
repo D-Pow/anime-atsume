@@ -1,6 +1,10 @@
 #!/usr/bin/env -S bash
 
 
+if command -v node &>/dev/null; then
+    exit
+fi
+
 # Use LatestStableVersion of NodeJS if a version isn't specified
 
 declare _nvmNodeVersion="${1:---lts}"
