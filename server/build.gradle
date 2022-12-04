@@ -125,12 +125,15 @@ ext {
         javaLibDir = "${javaHome}/../lib";
     }
 
-    repoRootDirPath = "";
+    repoRootDirPath = new File("${project.projectDir.toString().trim()}/..").getCanonicalPath();
+
     try {
-        repoRootDirPath = cliCmd("git rev-parse --show-toplevel").toString().trim();
-    } catch (e) {
-        repoRootDirPath = "${project.projectDir.toString().trim()}/..";
-    }
+        _repoRootDirPathViaGit = cliCmd("git rev-parse --show-toplevel").toString().trim();
+
+        if (_repoRootDirPathViaGit != null && _repoRootDirPathViaGit.length > 0) {
+            repoRootDirPath = _repoRootDirPathViaGit;
+        }
+    } catch (e) {}
 
     clientDirPath = "${repoRootDirPath}/client";
     clientDirDepsPath = "${clientDirPath}/node_modules";
