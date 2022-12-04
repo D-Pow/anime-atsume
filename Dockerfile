@@ -15,9 +15,6 @@ SHELL [ "/bin/bash", "-c" ]
 
 ENV SHELL=/bin/bash
 
-# Change CWD from <root> to $HOME
-# WORKDIR "/home"
-
 # `docker` flags useful for debugging:
 #   `--progress=plain`: show STDOUT/STDERR.
 #   `--no-cache`: force rebuilding all dependencies, packages, etc. that would usually be cached.
@@ -49,6 +46,7 @@ RUN apt-get clean && \
         && \
     apt-mark hold openjfx libopenjfx-jni libopenjfx-java
 
+# Change CWD from <root> to $HOME
 WORKDIR /home
 
 ARG CLIENT_DIR=./client
