@@ -65,17 +65,6 @@ COPY . .
 # Copy build-output files to root dir for ease of use
 COPY ${BUILD_DIR}/* .
 
-# RUN ls -FlAh
-# RUN ls -FlAh server
-RUN ./index.sh clean
-RUN ./index.sh build
-# RUN ./index.sh deploy
-
-# In particular (and probably not necessary) copy the build's main artifacts (`.war`/`.db`) to
-# the Docker image
-# COPY ${WAR_FILE} ./anime-atsume.war
-# COPY ${DB_FILE} ./anime_atsume.db
-
 RUN ls -FlAh .
 RUN ls -FlAh ./client
 RUN ls -FlAh ./server
