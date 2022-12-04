@@ -157,6 +157,10 @@ main() {
     declare USAGE="${rootDir}/${BASH_SOURCE[0]} [OPTIONS...] <cmd>
     Run commands for both Anime Atsume's client and server directories.
 
+    Options:
+        -i  |   Install build-script dependencies if not present (e.g. \`nvm\`).
+        -h  |   Print this help message and exit.
+
     Commands:
 $(
     declare -f \
@@ -169,11 +173,14 @@ $(
 
     declare OPTIND=1
 
-    while getopts ":h" opt; do
+    while getopts ":ih" opt; do
         case "$opt" in
             h)
                 echo -e "$USAGE"
                 return 1
+                ;;
+            i)
+                "${rootDir}/install-nvm.sh"
                 ;;
             *)
                 :  # Unknown flag - Forward to desired command
