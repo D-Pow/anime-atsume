@@ -31,6 +31,7 @@ build() (
     cd "${serverDir}"
 
     declare _buildCleanFirst=
+    declare _buildCopyFilesToRootDir=
     declare _buildVerbose=
     declare OPTIND=1
 
@@ -38,6 +39,9 @@ build() (
         case "$opt" in
             c)
                 _buildCleanFirst=true
+                ;;
+            r)
+                _buildCopyFilesToRootDir=true
                 ;;
             v)
                 _buildVerbose=true
@@ -63,7 +67,11 @@ build() (
 
     declare _buildGradleOpts="${_buildCleanFirst:+clean} ${_buildVerbose:+--console plain}"
 
-    ./gradlew --console plain ${_buildGradleOpts} build
+    ./gradlew ${_buildGradleOpts} build
+
+    if [[ -n "$_buildCopyFilesToRootDir" ]]; then
+        cp -R "${buildDir}/*" "${rootDir}"
+    fi
 )
 
 
@@ -95,9 +103,7 @@ dockerBuild() (
 
     shift $(( OPTIND - 1 ))
 
-    build
-
-    cp -R "${buildDir}/*" "${rootDir}"
+    build -r
 
     (
         command -v docker &>/dev/null && \
