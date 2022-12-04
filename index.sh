@@ -95,7 +95,6 @@ dockerBuild() (
 
     shift $(( OPTIND - 1 ))
 
-    clean
     build
 
     cp -R "${buildDir}/*" "${rootDir}"
@@ -124,17 +123,14 @@ dockerRun() (
 
 
 deploy() (
-    clean "$@"
-    build "$@"
-
     # See:
     #   - https://render.com/docs/deploy-a-commit#deploying-a-commit-via-webhook
     #   - https://api-docs.render.com/reference/create-deploy
     declare _renderDotComServiceId="${_renderDotComServiceId}"
     declare _renderDotComApiKey="${_renderDotComApiKey}"
 
+    dockerClean
     dockerBuild "$@"
-
 
     curl \
          --url "https://api.render.com/v1/services/${_renderDotComServiceId}/deploys" \
