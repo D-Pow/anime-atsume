@@ -55,22 +55,12 @@ ARG BUILD_DIR=${SERVER_DIR}/build/libs
 ARG WAR_FILE=${BUILD_DIR}/*.war
 ARG DB_FILE=${BUILD_DIR}/*.db
 
-RUN echo "alias lah='ls -FlAh' >> ~/.bashrc"
-
 # Copy the entire app (server/client) from the local filesystem to the Docker image
 COPY . .
 
 # Build the app if not already done before attempting Docker image generation
 # Copy build-output files to root dir for ease of use
 RUN if ! [[ -d "${BUILD_DIR}" ]]; then ./index.sh build -r; fi
-
-RUN ls -FlAh .
-RUN ls -FlAh ./client
-RUN ls -FlAh ./server
-# RUN index.sh dockerBuild
-RUN find / -iname anime-atsume.war 2>/dev/null
-RUN find /home -iname anime-atsume.war 2>/dev/null
-RUN find . -iname anime-atsume.war 2>/dev/null
 
 EXPOSE 8080
 
