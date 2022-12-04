@@ -61,7 +61,7 @@ RUN echo "alias lah='ls -FlAh' >> ~/.bashrc"
 COPY . .
 
 # Build the app if not already done before attempting Docker image generation
-RUN if ! [[ -d "${BUILD_DIR}" ]]; then ./index.sh dockerBuild; fi
+RUN if ! [[ -d "${BUILD_DIR}" ]]; then ./index.sh build; fi
 
 # Copy build-output files to root dir for ease of use
 COPY ${BUILD_DIR}/* .
