@@ -50,11 +50,12 @@ RUN apt-get clean && \
 WORKDIR /home
 
 ENV ROOT_DIR=./
+RUN export ROOT_DIR="$(realpath -se .)"
 ENV CLIENT_DIR="${ROOT_DIR}/client"
 ENV SERVER_DIR="${ROOT_DIR}/server"
 ENV BUILD_DIR="${SERVER_DIR}/build/libs"
-ENV WAR_FILE="${BUILD_DIR}/*.war"
-ENV DB_FILE="${BUILD_DIR}/*.db"
+ENV WAR_FILE="${BUILD_DIR}/anime-atsume.war"
+ENV DB_FILE="${BUILD_DIR}/anime_atsume.db"
 
 # Copy the entire app (server/client) from the local filesystem to the Docker image
 COPY . .
