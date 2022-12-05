@@ -49,11 +49,11 @@ RUN apt-get clean && \
 # Change CWD from <root> to $HOME
 WORKDIR /home
 
-ENV CLIENT_DIR=./client
-ENV SERVER_DIR=./server
-ENV BUILD_DIR=${SERVER_DIR}/build/libs
-ENV WAR_FILE=${BUILD_DIR}/*.war
-ENV DB_FILE=${BUILD_DIR}/*.db
+ENV CLIENT_DIR="$(realpath -se "./client")"
+ENV SERVER_DIR="$(realpath -se "./server")"
+ENV BUILD_DIR="${SERVER_DIR}/build/libs"
+ENV WAR_FILE="${BUILD_DIR}/*.war"
+ENV DB_FILE="${BUILD_DIR}/*.db"
 
 # Copy the entire app (server/client) from the local filesystem to the Docker image
 COPY . .
@@ -64,4 +64,6 @@ RUN if ! [[ -d "${BUILD_DIR}" ]]; then ./index.sh build -r; fi
 
 EXPOSE 8080
 
-CMD java ${JAVA_OPTS} -Dglass.platform=Monocle -Dmonocle.platform=Headless -jar "$(realpath -se "${WAR_FILE}")" --server.port=${PORT:-8080}
+RUN ls -lah "${BUILD_DIR}"
+
+CMD java ${JAVA_OPTS} -Dglass.platform=Monocle -Dmonocle.platform=Headless -jar "${WAR_FILE}" --server.port=${PORT:-8080}
