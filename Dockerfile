@@ -50,7 +50,6 @@ RUN apt-get clean && \
 WORKDIR /home
 
 ENV ROOT_DIR=./
-RUN export ROOT_DIR="$(realpath -se ".")"
 ENV CLIENT_DIR="${ROOT_DIR}/client"
 ENV SERVER_DIR="${ROOT_DIR}/server"
 ENV BUILD_DIR="${SERVER_DIR}/build/libs"
