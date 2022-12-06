@@ -82,10 +82,13 @@ jobs:
         id: cd-download-artifacts
         uses: actions/download-artifact@v3
         with:
-          name: client-build-output
+          name: ci-server-build-output
           path: |
-            # ./client/node_modules
-            ./server/src/main/resources/public
+            ./server/build/libs
+
+      - name: Copy build output to root dir
+        run: |
+          cp ./server/build/libs/* .
 
       # - name: Deploy application to Render.com
       #   run: |
