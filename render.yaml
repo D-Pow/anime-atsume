@@ -17,12 +17,14 @@ services:
     # Expose both HTTP (80) and HTTPS (443) ports since render.com won't do it automatically for some reason
     dockerCommand: docker run -it -p 80:8080 -p 443:8080 anime-atsume
     # healthCheckPath: /
-    # envVars:
-    #   - key: JAVA_OPTS
-    #     value: -Xmx640m
-    #   # - key: REDIS_PORT
-    #   #   fromService:
-    #   #     type: redis
-    #   #     name: lightning
-    #   #     property: port
-    #   # - fromGroup: my-settings
+    envVars:
+      - key: PORT
+        value: 443
+      # - key: JAVA_OPTS
+      #   value: -Xmx640m
+      # - key: REDIS_PORT
+      #   fromService:
+      #     type: redis
+      #     name: lightning
+      #     property: port
+      # - fromGroup: my-settings
