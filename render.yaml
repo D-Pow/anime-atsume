@@ -1,0 +1,26 @@
+# Render.com configuration
+#
+# See:
+#   - https://render.com/docs/blueprint-spec
+services:
+  # A Docker web service
+  - type: web
+    name: anime-atsume
+    env: docker
+    repo: https://github.com/D-Pow/anime-atsume.git
+    region: ohio
+    plan: standard
+    branch: master
+    rootDir: /home
+    numInstances: 3 # optional (defaults to 1)
+    # dockerCommand: ./anime-atsume.sh # Overrides Dockerfile command
+    # healthCheckPath: /
+    # envVars:
+    #   - key: JAVA_OPTS
+    #     value: -Xmx640m
+    #   # - key: REDIS_PORT
+    #   #   fromService:
+    #   #     type: redis
+    #   #     name: lightning
+    #   #     property: port
+    #   # - fromGroup: my-settings
