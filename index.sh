@@ -136,7 +136,7 @@ dockerClean() (
 )
 
 dockerRun() (
-    docker run -it --rm anime-atsume bash
+    docker run -it --rm anime-atsume $@
 )
 
 
