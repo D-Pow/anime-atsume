@@ -139,6 +139,10 @@ dockerRun() (
     docker run -it --rm anime-atsume $@
 )
 
+dockerRunDeployed() (
+    docker run -it -p 80:8080 -p 443:8080 anime-atsume
+)
+
 
 deploy() (
     # See:
