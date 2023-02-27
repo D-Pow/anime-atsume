@@ -32,6 +32,7 @@ on:
   workflow_dispatch:
   # Run after CI. Note that this is done here specifically because this repo doesn't utilize GitHub releases.
   workflow_run:
+    branches: [ master ]
     workflows: [ CI ]
     types: [ completed ]
   # # 1. Publish your release in GitHub and have your pipeline
