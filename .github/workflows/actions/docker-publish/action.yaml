@@ -5,7 +5,6 @@ description: Builds and publishes the Docker image to GitHub
 env:
   imageName: anime-atsume
   registryUrlDomain: ghcr.io
-  registryUrl: ${{ env.registryUrlDomain }}/${{ github.repository }}  # ghcr.io/D-Pow/anime-atsume
 
 
 inputs:
@@ -24,6 +23,12 @@ runs:
 
     - name: Docker - Cache name init
       uses: ./.github/workflows/actions/cache-name
+
+    # Resulting URL: ghcr.io/D-Pow/anime-atsume
+    - name: Docker - Setup env
+      shell: bash
+      run: |
+        echo "registryUrl=${{ env.registryUrlDomain }}/${{ github.repository }}" >> $GITHUB_ENV
 
     # - name: Docker - Build
     #   shell: bash
