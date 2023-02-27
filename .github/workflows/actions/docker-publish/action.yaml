@@ -81,15 +81,15 @@ runs:
     #   uses: docker/metadata-action@v4
     #   with:
     #     images: ${{ env.registryUrlDomain }}/${{ env.imageName }}
-
-    - name: Docker - Build and push image
-      id: docker-build-and-push-image
-      uses: docker/build-push-action@v4
-      with:
-        context: .
-        push: false  # set to `true` to use this nested action's push feature
-        tags: ${{ env.tags }}
-        labels: ${{ env.labels }}
+    #
+    # - name: Docker - Build and push image
+    #   id: docker-build-and-push-image
+    #   uses: docker/build-push-action@v4
+    #   with:
+    #     context: .
+    #     push: false  # set to `true` to use this nested action's push feature
+    #     tags: ${{ env.tags }}
+    #     labels: ${{ env.labels }}
 
     - name: Docker - Upload image as GitHub artifact
       id: docker-upload-image-as-github-artifact
