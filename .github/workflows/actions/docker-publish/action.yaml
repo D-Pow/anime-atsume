@@ -7,6 +7,8 @@ env:
   registryUrlDomain: ghcr.io
 
 
+# `secrets` is only available in workflows, not actions, even if actions are called
+# from a workflow where it's defined
 inputs:
   GITHUB_TOKEN:
     description: GitHub token required for modifying branches or artifact publishing.
@@ -45,7 +47,7 @@ runs:
       with:
         registry: ${{ env.registryUrlDomain }}
         username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
+        password: ${{ inputs.GITHUB_TOKEN }}
 
     - name: Docker - Extract metadata (tags, labels)
       id: docker-metadata-extract
