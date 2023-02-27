@@ -14,6 +14,9 @@ outputs:
 runs:
   using: composite
   steps:
+    - name: Checkout repository branch
+      uses: actions/checkout@v3
+
     - name: Client - Set cache ID
       id: client-init-set-cache-id
       shell: bash
