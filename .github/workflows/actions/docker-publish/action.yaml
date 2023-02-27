@@ -54,7 +54,6 @@ runs:
       shell: bash
       run: |
         echo "dockerImageNameAndTag=$(docker inspect ${{ env.imageName }} | jq -r '.[0].RepoTags[0]')" >> $GITHUB_ENV
-        echo "dockerImageNameAndTag=${{ env.dockerImageNameAndTag }}" >> $GITHUB_ENV
         echo "tag=$(echo ${{ env.dockerImageNameAndTag }} | sed -E 's/^[^:]+:(.*)/\1/')" >> $GITHUB_OUTPUT
         echo "tags=${{ env.dockerImageNameAndTag }}" >> $GITHUB_OUTPUT
         echo "labels=${{ env.imageName }}" >> $GITHUB_OUTPUT
