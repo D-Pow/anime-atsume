@@ -16,6 +16,10 @@ inputs:
     description: Docker registry URL's domain.
     required: false
     default: ghcr.io
+  imageRetentionDays:
+    description: How many days to keep the Docker image artifact in GitHub artifacts.
+    required: false
+    default: 30
 
 
 outputs:
@@ -83,3 +87,4 @@ runs:
       uses: ishworkh/docker-image-artifact-upload@v1
       with:
         image: "${{ steps.docker-metadata-extract.outputs.dockerImageNameAndTag }}"
+        retention_days: ${{ inputs.imageRetentionDays }}
