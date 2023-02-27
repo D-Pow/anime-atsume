@@ -17,20 +17,21 @@ runs:
     - name: Checkout repository branch
       uses: actions/checkout@v3
 
+    # Can't use `working-directory` here because paths in `hashFiles()` are always relative to root.
+    # See:
+    #   - https://docs.github.com/en/actions/learn-github-actions/expressions#hashfiles
     - name: Client - Set cache ID
       id: client-init-set-cache-id
       shell: bash
-      working-directory: ./client/
       run: |
-        echo "CLIENT_CACHE_ID=client-cache-${{ runner.os }}-${{ hashFiles('./package.json', './src/**', './tests/**', './mocks/**', './config/**', './scripts/**') }}" >> $GITHUB_ENV
+        echo "CLIENT_CACHE_ID=client-cache-${{ runner.os }}-${{ hashFiles('./client/package.json', './client/src/**', './client/tests/**', './client/mocks/**', './client/config/**', './client/scripts/**') }}" >> $GITHUB_ENV
         echo "CLIENT_CACHE_ID=${{ env.CLIENT_CACHE_ID }}" >> $GITHUB_OUTPUT
 
     - name: Server - Set cache ID
       id: server-init-set-cache-id
       shell: bash
-      working-directory: ./server/
       run: |
         ls -FlAh
-        echo "SERVER-HASH: ${{ hashFiles('./build.gradle', './settings.gradle', './src/**', './utils/**') }}"
-        echo "SERVER_CACHE_ID=server-cache-${{ runner.os }}-${{ hashFiles('./build.gradle', './settings.gradle', './src/**', './utils/**') }}" >> $GITHUB_ENV
+        echo "SERVER-HASH: ${{ hashFiles('./server/build.gradle', './server/settings.gradle', './server/src/**', './server/utils/**') }}"
+        echo "SERVER_CACHE_ID=server-cache-${{ runner.os }}-${{ hashFiles('./server/build.gradle', './server/settings.gradle', './server/src/**', './server/utils/**') }}" >> $GITHUB_ENV
         echo "SERVER_CACHE_ID=${{ env.SERVER_CACHE_ID }}" >> $GITHUB_OUTPUT
