@@ -45,6 +45,9 @@ jobs:
       - name: Checkout repository branch
         uses: actions/checkout@v3
 
+      - name: CI:Cache name - Init
+        uses: ./.github/workflows/actions/cache-name
+
       - name: Client Verify
         # Import pipeline logic via `uses`
         uses: ./.github/workflows/actions/client
@@ -58,6 +61,8 @@ jobs:
     steps:
       - name: Checkout repository branch
         uses: actions/checkout@v3
+      - name: CI:Cache name - Init
+        uses: ./.github/workflows/actions/cache-name
       - name: Server Verify
         uses: ./.github/workflows/actions/server
 

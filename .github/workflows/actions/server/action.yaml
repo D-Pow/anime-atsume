@@ -10,25 +10,48 @@ runs:
     - name: Checkout repository branch
       uses: actions/checkout@v3
 
-    - name: Download client cache
-      id: server-download-client-artifacts
-      uses: actions/download-artifact@v3
+    - name: Server:Cache name - Init
+      uses: ./.github/workflows/actions/cache-name
+
+    - name: Server - Download client cache
+      id: server-download-client-cache
+      uses: actions/cache/restore@v3
+      working-directory: ./
+      continue-on-error: true
       with:
-        name: client-build-output
         path: |
-          # ./client/node_modules
+          ./client/node_modules
           ./server/src/main/resources/public
+        key: ${{ env.CLIENT_CACHE_ID }}
+
+    # - name: Download client cache
+    #   id: server-download-client-artifacts
+    #   uses: actions/download-artifact@v3
+    #   with:
+    #     name: client-build-output
+    #     path: |
+    #       # ./client/node_modules
+    #       ./server/src/main/resources/public
 
     - name: Server Build
       id: server-build
       shell: bash
+      working-directory: ./server/
       run: |
-        cd ./server
         ./gradlew clean build
 
-    - name: Server build output cache
-      uses: actions/upload-artifact@v3
+    # - name: Server build output cache
+    #   uses: actions/upload-artifact@v3
+    #   with:
+    #     name: ci-server-build-output
+    #     path: |
+    #       ./server/build/libs
+
+    - name: Server - Cache build artifacts
+      id: server-build-upload-cache
+      working-directory: ./
+      uses: actions/cache/save@v3
       with:
-        name: ci-server-build-output
         path: |
           ./server/build/libs
+        key: ${{ env.SERVER_CACHE_ID }}

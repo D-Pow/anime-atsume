@@ -78,13 +78,25 @@ jobs:
       - name: Checkout repository branch
         uses: actions/checkout@v3
 
-      - name: Client CD - Download CI output
-        id: cd-download-artifacts
-        uses: actions/download-artifact@v3
+      - name: CI:Cache name - Init
+        uses: ./.github/workflows/actions/cache-name
+
+      # - name: CD:Server - Download CI output
+      #   id: cd-server-download-artifacts
+      #   uses: actions/download-artifact@v3
+      #   with:
+      #     name: cd-server-build-output
+      #     path: |
+      #       ./server/build/libs
+
+      - name: CD:Server - Download CI output
+        id: cd-server-download-cache
+        uses: actions/cache/restore@v3
+        continue-on-error: true
         with:
-          name: ci-server-build-output
           path: |
             ./server/build/libs
+          key: ${{ env.SERVER_CACHE_ID }}
 
       - name: Copy build output to root dir
         run: |

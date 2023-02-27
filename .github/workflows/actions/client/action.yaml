@@ -43,6 +43,20 @@ runs:
     - name: Checkout repository branch
       uses: actions/checkout@v3
 
+    - name: Client:Cache name - Init
+      uses: ./.github/workflows/actions/cache-name
+
+    - name: Client - Download cache
+      id: client-build-download-cache
+      uses: actions/cache/restore@v3
+      working-directory: ./
+      continue-on-error: true
+      with:
+        path: |
+          ./client/node_modules
+          ./server/src/main/resources/public
+        key: ${{ env.CLIENT_CACHE_ID }}
+
     - name: Set NodeJS version
       uses: actions/setup-node@v3
       with:
@@ -69,12 +83,22 @@ runs:
       run: |
         npm run build
 
-    - name: Client cache build output
-      uses: actions/upload-artifact@v3
-      id: client-build
-      # Note: `path` is relative to root dir, not working dir
+    # - name: Client cache build output
+    #   uses: actions/upload-artifact@v3
+    #   id: client-build
+    #   # Note: `path` is relative to root dir, not working dir
+    #   with:
+    #     name: client-build-output
+    #     path: |
+    #       # ./client/node_modules
+    #       ./server/src/main/resources/public
+
+    - name: Client - Cache build artifacts
+      id: client-build-upload-cache
+      working-directory: ./
+      uses: actions/cache/save@v3
       with:
-        name: client-build-output
         path: |
-          # ./client/node_modules
+          ./client/node_modules
           ./server/src/main/resources/public
+        key: ${{ env.CLIENT_CACHE_ID }}

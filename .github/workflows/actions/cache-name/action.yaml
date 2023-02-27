@@ -1,0 +1,31 @@
+name: Cache - Initialize names
+description: Initializes the cache names for client and server
+
+
+outputs:
+  CLIENT_CACHE_ID:
+    description: Client cache ID to use for all workflows/actions.
+    value: ${{ steps.client-init-set-cache-id.outputs.CLIENT_CACHE_ID }}
+  SERVER_CACHE_ID:
+    description: Server cache ID to use for all workflows/actions.
+    value: ${{ steps.server-init-set-cache-id.outputs.SERVER_CACHE_ID }}
+
+
+runs:
+  using: composite
+  steps:
+    - name: Client - Set cache ID
+      id: client-init-set-cache-id
+      shell: bash
+      working-directory: ./client/
+      run: |
+        echo "CLIENT_CACHE_ID=client-cache-${{ runner.os }}-${{ hashFiles('./package.json', './src/**', './tests/**', './mocks/**', './config/**', './scripts/**') }}" >> $GITHUB_ENV
+        echo "CLIENT_CACHE_ID=${{ env.CLIENT_CACHE_ID }}" >> $GITHUB_OUTPUT
+
+    - name: Server - Set cache ID
+      id: server-init-set-cache-id
+      shell: bash
+      working-directory: ./server/
+      run: |
+        echo "SERVER_CACHE_ID=server-cache-${{ runner.os }}-${{ hashFiles('./build.gradle', './settings.gradle', './src/**', './utils/**') }}" >> $GITHUB_ENV
+        echo "SERVER_CACHE_ID=${{ env.SERVER_CACHE_ID }}" >> $GITHUB_OUTPUT
