@@ -31,7 +31,5 @@ runs:
       id: server-init-set-cache-id
       shell: bash
       run: |
-        ls -FlAh
-        echo "SERVER-HASH: ${{ hashFiles('./server/build.gradle', './server/settings.gradle', './server/src/**', './server/utils/**') }}"
         echo "SERVER_CACHE_ID=server-cache-${{ runner.os }}-${{ hashFiles('./server/build.gradle', './server/settings.gradle', './server/src/**', './server/utils/**') }}" >> $GITHUB_ENV
         echo "SERVER_CACHE_ID=${{ env.SERVER_CACHE_ID }}" >> $GITHUB_OUTPUT
