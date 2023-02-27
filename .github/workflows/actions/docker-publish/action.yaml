@@ -3,8 +3,8 @@ description: Builds and publishes the Docker image to GitHub
 
 
 env:
-  imageName: anime-atsume
-  registryUrlDomain: ghcr.io
+  imageName: 'anime-atsume'
+  registryUrlDomain: 'ghcr.io'
 
 
 # `secrets` is only available in workflows, not actions, even if actions are called
