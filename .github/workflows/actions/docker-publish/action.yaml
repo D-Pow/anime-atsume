@@ -2,17 +2,21 @@ name: Docker - Build and publish
 description: Builds and publishes the Docker image to GitHub
 
 
-env:
-  imageName: 'anime-atsume'
-  registryUrlDomain: 'ghcr.io'
-
-
 # `secrets` is only available in workflows, not actions, even if actions are called
 # from a workflow where it's defined
 inputs:
   GITHUB_TOKEN:
     description: GitHub token required for modifying branches or artifact publishing.
     required: true
+  imageName:
+    description: Docker image name to use upon build.
+    required: false
+    default: anime-atsume
+  registryUrlDomain:
+    description: Docker registry URL's domain.
+    required: false
+    default: ghcr.io
+
 
 outputs:
   dockerImageNameAndTag:
@@ -36,6 +40,8 @@ runs:
       shell: bash
       run: |
         echo "GITHUB_TOKEN=${{ inputs.GITHUB_TOKEN }}" >> $GITHUB_ENV
+        echo "imageName=${{ inputs.imageName }}" >> $GITHUB_ENV
+        echo "registryUrlDomain=${{ inputs.registryUrlDomain }}" >> $GITHUB_ENV
         echo "registryUrl=${{ env.registryUrlDomain }}/${{ github.repository }}" >> $GITHUB_ENV
 
     - name: Docker - Build
