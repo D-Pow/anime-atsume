@@ -51,7 +51,7 @@ runs:
     - name: Docker - Build
       shell: bash
       run: |
-        docker build --progress=plain -t "${{ env.imageName }}" .
+        docker build -t "${{ env.imageName }}" .
 
     - name: Docker:Get image and tag name
       id: docker-metadata-extract
