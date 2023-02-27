@@ -1,0 +1,57 @@
+name: Docker - Build and publish
+description: Builds and publishes the Docker image to GitHub
+
+
+env:
+  imageName: anime-atsume
+  registryUrlDomain: ghcr.io
+  registryUrl: ${{ env.registryUrlDomain }}/${{ github.repository }}  # ghcr.io/D-Pow/anime-atsume
+
+
+inputs:
+  GITHUB_TOKEN:
+    description: GitHub token required for modifying branches or artifact publishing.
+    required: true
+
+
+# See:
+#   - https://docs.github.com/en/actions/publishing-packages/publishing-docker-images
+runs:
+  using: composite
+  steps:
+    - name: Checkout repository branch
+      uses: actions/checkout@v3
+
+    - name: Docker - Cache name init
+      uses: ./.github/workflows/actions/cache-name
+
+    # - name: Docker - Build
+    #   shell: bash
+    #   run: |
+    #     docker build --progress=plain -t ${{ env.imageName }} .
+    #
+    # - name: Docker:Get image and tag name
+    #   shell: bash
+    #   run: |
+    #     docker inspect ${{ env.imageName }} | jq -r '.[0].RepoTags[0]'
+
+    - name: Docker - Login to container registry
+      uses: docker/login-action@v2
+      with:
+        registry: ${{ env.registryUrlDomain }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Docker - Extract metadata (tags, labels)
+      id: docker-metadata-extract
+      uses: docker/metadata-action@v4
+      with:
+        images: ${{ env.registryUrlDomain }}/${{ env.imageName }}
+
+    - name: Docker - Build and push image
+      uses: docker/build-push-action@v4
+      with:
+        context: .
+        push: true
+        tags: ${{ steps.docker-metadata-extract.outputs.tags }}
+        labels: ${{ steps.docker-metadata-extract.outputs.labels }}

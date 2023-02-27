@@ -57,6 +57,10 @@ defaults:
     shell: bash
 
 
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+
 # Since Render.com isn't configurable and it decides to do whatever it wants, don't (re-)run
 # the build/deploy commands here
 jobs:
@@ -107,9 +111,11 @@ jobs:
             ./server/build/libs
           key: ${{ env.SERVER_CACHE_ID }}
 
-      - name: Copy build output to root dir
-        run: |
-          cp ./server/build/libs/* .
+      - name: CD:Docker - Build image
+        id: cd-docker-build-image
+        uses: ./.github/workflows/actions/docker-publish
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       # - name: Deploy application to Render.com
       #   run: |
