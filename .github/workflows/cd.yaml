@@ -72,7 +72,9 @@ jobs:
 
   cd-deploy:
     runs-on: ubuntu-latest
-    # needs: [ cd-build ]
+    outputs:
+      CLIENT_CACHE_ID: ${{ env.CLIENT_CACHE_ID }}
+      SERVER_CACHE_ID: ${{ env.SERVER_CACHE_ID }}
     # Only run on merge to master: https://github.community/t/depend-on-another-workflow/16311/3
     if: ${{ github.event.pull_request.merged || github.ref == 'refs/heads/master' }}
     steps:
@@ -81,6 +83,12 @@ jobs:
 
       - name: CI:Cache name - Init
         uses: ./.github/workflows/actions/cache-name
+
+      - name: CD - Output cache IDs
+        id: cd-export-cache-id
+        run: |
+          echo "CLIENT_CACHE_ID=${{ env.CLIENT_CACHE_ID }}" >> $GITHUB_OUTPUT
+          echo "SERVER_CACHE_ID=${{ env.SERVER_CACHE_ID }}" >> $GITHUB_OUTPUT
 
       # - name: CD:Server - Download CI output
       #   id: cd-server-download-artifacts

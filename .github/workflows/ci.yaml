@@ -39,6 +39,10 @@ jobs:
         # working-directory: ./client
         working-directory: ./client/
 
+    outputs:
+      CLIENT_CACHE_ID: ${{ env.CLIENT_CACHE_ID }}
+      SERVER_CACHE_ID: ${{ env.SERVER_CACHE_ID }}
+
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
@@ -47,6 +51,12 @@ jobs:
 
       - name: CI:Cache name - Init
         uses: ./.github/workflows/actions/cache-name
+
+      - name: CI - Output cache ID
+        id: ci-export-cache-id
+        run: |
+          echo "CLIENT_CACHE_ID=${{ env.CLIENT_CACHE_ID }}" >> $GITHUB_OUTPUT
+          echo "SERVER_CACHE_ID=${{ env.SERVER_CACHE_ID }}" >> $GITHUB_OUTPUT
 
       - name: Client Verify
         # Import pipeline logic via `uses`
@@ -58,6 +68,9 @@ jobs:
       run:
         working-directory: ./server/
     needs: [ ci-client-verify ]
+    env:
+      CLIENT_CACHE_ID: ${{ needs.ci-client-export-cache-id.outputs.CLIENT_CACHE_ID }}
+      SERVER_CACHE_ID: ${{ needs.ci-client-export-cache-id.outputs.SERVER_CACHE_ID }}
     steps:
       - name: Checkout repository branch
         uses: actions/checkout@v3
@@ -66,16 +79,25 @@ jobs:
       - name: Server Verify
         uses: ./.github/workflows/actions/server
 
-  ci-verify:
+  ci-complete:
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: ./
     needs: [ ci-client-verify, ci-server-verify ]
+    env:
+      CLIENT_CACHE_ID: ${{ needs.ci-client-export-cache-id.outputs.CLIENT_CACHE_ID }}
+      SERVER_CACHE_ID: ${{ needs.ci-client-export-cache-id.outputs.SERVER_CACHE_ID }}
+    outputs:
+      CLIENT_CACHE_ID: ${{ env.CLIENT_CACHE_ID }}
+      SERVER_CACHE_ID: ${{ env.SERVER_CACHE_ID }}
     steps:
       # Placeholder command just to allow this step to solely be a aggregate command such that
       # other commands wanting to depend on client/server build completion can have one dependency
-      # instead of multiple
-      - name: CI Verify
+      # instead of multiple.
+      # Also, re-export env/output vars from other jobs.
+      - name: CI:Completed - Aggregate and wait for jobs
+        id: ci-complete
         run: |
-          :
+          echo "CLIENT_CACHE_ID=$CLIENT_CACHE_ID" >> $GITHUB_OUTPUT
+          echo "SERVER_CACHE_ID=$SERVER_CACHE_ID" >> $GITHUB_OUTPUT
