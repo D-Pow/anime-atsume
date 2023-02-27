@@ -111,11 +111,15 @@ jobs:
             ./server/build/libs
           key: ${{ env.SERVER_CACHE_ID }}
 
-      - name: CD:Docker - Build image
-        id: cd-docker-build-image
-        uses: ./.github/workflows/actions/docker-publish
-        with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # Docker images are relatively large (this simple image is ~2 GB).
+      # Also, publishing them to GitHub saves them in the registry, not
+      # the repo's packages.
+      # Thus, skip Docker build for now.
+      # - name: CD:Docker - Build image
+      #   id: cd-docker-build-image
+      #   uses: ./.github/workflows/actions/docker-publish
+      #   with:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       # - name: Deploy application to Render.com
       #   run: |
