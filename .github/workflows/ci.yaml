@@ -69,8 +69,8 @@ jobs:
         working-directory: ./server/
     needs: [ ci-client-verify ]
     env:
-      CLIENT_CACHE_ID: ${{ needs.ci-client-export-cache-id.outputs.CLIENT_CACHE_ID }}
-      SERVER_CACHE_ID: ${{ needs.ci-client-export-cache-id.outputs.SERVER_CACHE_ID }}
+      CLIENT_CACHE_ID: ${{ needs.ci-client-verify.outputs.CLIENT_CACHE_ID }}
+      SERVER_CACHE_ID: ${{ needs.ci-client-verify.outputs.SERVER_CACHE_ID }}
     steps:
       - name: Checkout repository branch
         uses: actions/checkout@v3
@@ -86,8 +86,8 @@ jobs:
         working-directory: ./
     needs: [ ci-client-verify, ci-server-verify ]
     env:
-      CLIENT_CACHE_ID: ${{ needs.ci-client-export-cache-id.outputs.CLIENT_CACHE_ID }}
-      SERVER_CACHE_ID: ${{ needs.ci-client-export-cache-id.outputs.SERVER_CACHE_ID }}
+      CLIENT_CACHE_ID: ${{ needs.ci-client-verify.outputs.CLIENT_CACHE_ID }}
+      SERVER_CACHE_ID: ${{ needs.ci-client-verify.outputs.SERVER_CACHE_ID }}
     outputs:
       CLIENT_CACHE_ID: ${{ env.CLIENT_CACHE_ID }}
       SERVER_CACHE_ID: ${{ env.SERVER_CACHE_ID }}
