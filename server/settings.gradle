@@ -11,6 +11,8 @@ pluginManagement {
 rootProject.name = "anime-atsume"
 
 /**
+ * Runs before the project is evaluated, i.e. before `build.gradle` is processed.
+ *
  * `group` and `version` usually have to be defined in `build.gradle`.
  * However, we can collect all these settings together here by adding a hook
  * to inject them right before `build.gradle` is executed and still maintain the
@@ -34,6 +36,38 @@ gradle.beforeProject {
         )
     );
 }
+
+/**
+ * Runs after the project is evaluated, i.e. after `build.gradle` is processed
+ * but before it's executed.
+ * Thus, we can modify custom vars, `project.ext` values, etc. before tasks are
+ * run.
+ * This is useful since some tasks have initialization logic that decorates `project`,
+ * e.g. adding new fields that don't exist before plugins are applied.
+ */
+gradle.afterProject {
+    /**
+     * Change desired build-output directories here.
+     *
+     * Build directories we are familiar with are set by the plugins used,
+     * namely `java`, `application`, and `jar`.
+     *
+     * They are as follows:
+     *  - project.buildDir = /abs/path/to/ProjectDir/build
+     *  - (Jar) destinationDir = /abs/path/to/ProjectDir/build/libs
+     *  - (Jar) archivePath = /abs/path/to/ProjectDir/build/libs/MyApp.jar
+     *  - (Jar) archiveName = MyApp.jar
+     *  - libsDirName = libs
+     *  - distsDirName = distributions
+     *  - (Jar) destinationDirectory = <unknown>
+     *  - libsDirectory = <unknown>
+     *
+     * Setting `project.buildDir` can just use the dir name, it doesn't require using the abs path.
+     */
+    // gradle.rootProject.buildDir = "build";
+    // gradle.rootProject.libsDirName = "libs";
+}
+
 
 // Add sub-projects (use directory names, not package names)
 includeBuild("utils");
