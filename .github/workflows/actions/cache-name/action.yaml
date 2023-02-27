@@ -22,6 +22,7 @@ runs:
       shell: bash
       working-directory: ./client/
       run: |
+        ls -FlAh
         echo "CLIENT_CACHE_ID=client-cache-${{ runner.os }}-${{ hashFiles('./package.json', './src/**', './tests/**', './mocks/**', './config/**', './scripts/**') }}" >> $GITHUB_ENV
         echo "CLIENT_CACHE_ID=${{ env.CLIENT_CACHE_ID }}" >> $GITHUB_OUTPUT
 
