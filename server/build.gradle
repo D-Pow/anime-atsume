@@ -250,14 +250,14 @@ tasks.register("buildFrontend") {
 
 configurations.all {
     /*
-     * At some point
+     * Fixes an error where `logback` is considered to have duplicate files.
      *
      * Alternatives:
      *   - exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
      *   - exclude group: 'org.apache.logging.log4j', module: 'log4j-to-slf4j'
      *   - exclude module: 'slf4j-log4j14'
      *
-     * @see <a href="https://discuss.gradle.org/t/gradle-7-fail-for-duplicates-in-copy-specs-has-no-duplicates-in-project/39834"></a>
+     * @see <a href="https://discuss.gradle.org/t/gradle-7-fail-for-duplicates-in-copy-specs-has-no-duplicates-in-project/39834">Fixing Gradle duplicate files issue</a>
      * @see <a href="https://stackoverflow.com/questions/12926899/java-lang-noclassdeffounderror-org-slf4j-loggerfactory">{@code NoClassDefFoundError: org.slf4j.LoggerFactory} error</a>
      * @see <a href="https://stackoverflow.com/questions/44111973/slf4j-loggerfactory-class-definition-not-found-with-gradle">SO: Similar question</a>
      * @see <a href="https://stackoverflow.com/questions/42531127/gradle-exception-in-thread-main-java-lang-noclassdeffounderror-org-slf4j-logg">SO: Similar question</a>
