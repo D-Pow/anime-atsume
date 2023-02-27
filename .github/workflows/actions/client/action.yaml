@@ -49,7 +49,6 @@ runs:
     - name: Client - Download cache
       id: client-build-download-cache
       uses: actions/cache/restore@v3
-      working-directory: ./
       continue-on-error: true
       with:
         path: |
@@ -95,7 +94,6 @@ runs:
 
     - name: Client - Cache build artifacts
       id: client-build-upload-cache
-      working-directory: ./
       uses: actions/cache/save@v3
       with:
         path: |
