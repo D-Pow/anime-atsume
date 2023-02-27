@@ -30,6 +30,7 @@ runs:
     - name: Docker - Setup env
       shell: bash
       run: |
+        echo "GITHUB_TOKEN=${{ inputs.GITHUB_TOKEN }}" >> $GITHUB_ENV
         echo "registryUrl=${{ env.registryUrlDomain }}/${{ github.repository }}" >> $GITHUB_ENV
 
     # - name: Docker - Build
