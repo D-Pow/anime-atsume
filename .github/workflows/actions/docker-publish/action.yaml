@@ -8,10 +8,6 @@ inputs:
   GITHUB_TOKEN:
     description: GitHub token required for modifying branches or artifact publishing.
     required: true
-  imageName:
-    description: Docker image name to use upon build.
-    required: false
-    default: ${{ env.REPO_NAME }}
   registryUrlDomain:
     description: Docker registry URL's domain.
     required: false
@@ -47,7 +43,7 @@ runs:
       shell: bash
       run: |
         echo "GITHUB_TOKEN=${{ inputs.GITHUB_TOKEN }}" >> $GITHUB_ENV
-        echo "imageName=${{ inputs.imageName }}" >> $GITHUB_ENV
+        echo "imageName=${{ env.REPO_NAME }}" >> $GITHUB_ENV
         echo "registryUrlDomain=${{ inputs.registryUrlDomain }}" >> $GITHUB_ENV
         echo "registryUrl=${{ env.registryUrlDomain }}/${{ github.repository }}" >> $GITHUB_ENV
         echo "imageRetentionDays=${{ inputs.imageRetentionDays }}" >> $GITHUB_ENV
