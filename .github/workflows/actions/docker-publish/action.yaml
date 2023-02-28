@@ -53,11 +53,11 @@ runs:
       run: |
         echo "registryUrl=${{ env.registryUrl }}" >> $GITHUB_OUTPUT
 
-    - name: Docker - Build
-      shell: bash
-      run: |
-        docker build -t "${{ env.imageName }}" .
-
+    # - name: Docker - Build
+    #   shell: bash
+    #   run: |
+    #     docker build -t "${{ env.imageName }}" .
+    #
     # Setting GITHUB_ENV works between steps but not within multiple commands within one step
     # - name: Docker - Set image and tag name in env
     #   id: docker-set-env-image-tag-name
