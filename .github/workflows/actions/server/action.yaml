@@ -23,6 +23,8 @@ runs:
           ./server/src/main/resources/public
         key: ${{ env.CLIENT_CACHE_ID }}
 
+    # TODO - Only run below steps if cache-hit == miss
+
     # - name: Download client cache
     #   id: server-download-client-artifacts
     #   uses: actions/download-artifact@v3
