@@ -78,6 +78,7 @@ jobs:
   cd-deploy:
     runs-on: ubuntu-latest
     outputs:
+      REPO_NAME: ${{ env.REPO_NAME }}
       CLIENT_CACHE_ID: ${{ env.CLIENT_CACHE_ID }}
       SERVER_CACHE_ID: ${{ env.SERVER_CACHE_ID }}
     # Only run on merge to master: https://github.community/t/depend-on-another-workflow/16311/3
@@ -92,6 +93,7 @@ jobs:
       - name: CD - Output cache IDs
         id: cd-export-cache-id
         run: |
+          echo "REPO_NAME=${{ env.REPO_NAME }}" >> $GITHUB_OUTPUT
           echo "CLIENT_CACHE_ID=${{ env.CLIENT_CACHE_ID }}" >> $GITHUB_OUTPUT
           echo "SERVER_CACHE_ID=${{ env.SERVER_CACHE_ID }}" >> $GITHUB_OUTPUT
 
