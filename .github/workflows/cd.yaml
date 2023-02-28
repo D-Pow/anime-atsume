@@ -59,6 +59,7 @@ defaults:
 
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
 
 
 # Since Render.com isn't configurable and it decides to do whatever it wants, don't (re-)run
@@ -112,14 +113,21 @@ jobs:
           key: ${{ env.SERVER_CACHE_ID }}
 
       # Docker images are relatively large (this simple image is ~2 GB).
-      # Also, publishing them to GitHub saves them in the registry, not
+      # Publishing them to GitHub saves them in the registry, not
       # the repo's packages.
-      # Thus, skip Docker build for now.
-      # - name: CD:Docker - Build image
-      #   id: cd-docker-build-image
-      #   uses: ./.github/workflows/actions/docker-publish
-      #   with:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: CD:Docker - Build image
+        id: cd-docker-build-image
+        uses: ./.github/workflows/actions/docker-publish
+        with:
+          GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}
+
+      - name: CD:Azure - Deploy
+        id: cd-azure-deploy
+        uses: ./.github/workflows/actions/deploy-azure
+        with:
+          GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}
+          AZURE_CREDENTIALS: ${{ env.AZURE_CREDENTIALS }}
+          registryUrl: ${{ steps.cd-docker-build-image.outputs.registryUrl }}
 
       # - name: Deploy application to Render.com
       #   run: |
