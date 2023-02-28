@@ -11,7 +11,7 @@ inputs:
   imageName:
     description: Docker image name to use upon build.
     required: false
-    default: anime-atsume
+    default: ${{ env.REPO_NAME }}
   registryUrlDomain:
     description: Docker registry URL's domain.
     required: false

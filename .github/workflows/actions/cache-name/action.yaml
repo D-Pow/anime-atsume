@@ -9,6 +9,9 @@ outputs:
   SERVER_CACHE_ID:
     description: Server cache ID to use for all workflows/actions.
     value: ${{ steps.server-init-set-cache-id.outputs.SERVER_CACHE_ID }}
+  REPO_NAME:
+    description: Name of the repository without owner/org or .git injected.
+    value: ${{ steps.set-repo-name.outputs.REPO_NAME }}
 
 
 runs:
@@ -16,6 +19,13 @@ runs:
   steps:
     - name: Checkout repository branch
       uses: actions/checkout@v3
+
+    - name: Set repo name
+      id: set-repo-name
+      shell: bash
+      run: |
+        echo "REPO_NAME=$(basename -s .git $(git config remote.origin.url))" >> $GITHUB_ENV
+        echo "REPO_NAME=$(basename -s .git $(git config remote.origin.url))" >> $GITHUB_OUTPUT
 
     # Can't use `working-directory` here because paths in `hashFiles()` are always relative to root.
     # See:
