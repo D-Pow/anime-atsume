@@ -45,7 +45,7 @@ runs:
         echo "GITHUB_TOKEN=${{ inputs.GITHUB_TOKEN }}" >> $GITHUB_ENV
         echo "imageName=${{ env.REPO_NAME }}" >> $GITHUB_ENV
         echo "registryUrlDomain=${{ inputs.registryUrlDomain }}" >> $GITHUB_ENV
-        echo "registryUrl=${{ env.registryUrlDomain }}/${{ github.repository }}" >> $GITHUB_ENV
+        echo "registryUrl=${{ inputs.registryUrlDomain }}/${{ github.repository }}" >> $GITHUB_ENV
         echo "imageRetentionDays=${{ inputs.imageRetentionDays }}" >> $GITHUB_ENV
 
     - name: Docker - Output vars
