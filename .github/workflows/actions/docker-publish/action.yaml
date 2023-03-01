@@ -25,6 +25,15 @@ outputs:
   registryUrl:
     description: Docker image registry full URL.
     value: ${{ env.registryUrl }}
+  imageid:
+    description: docker/build-push-action output - Image ID
+    value: ${{ steps.docker-build-and-push-image.outputs.imageid }}
+  digest:
+    description: docker/build-push-action output - Image digest
+    value: ${{ steps.docker-build-and-push-image.outputs.digest }}
+  metadata:
+    description: docker/build-push-action output - Build result metadata
+    value: ${{ steps.docker-build-and-push-image.outputs.metadata }}
 
 
 # See:
@@ -129,3 +138,11 @@ runs:
         # See example in: https://github.com/docker/build-push-action#path-context
         tags: ${{ github.repository }}:latest
         # labels: ${{ env.imageName }}
+
+    - name: Docker - Print output image info
+      id: docker-print-output-info
+      shell: bash
+      run: |
+        echo "Image ID: ${{ steps.docker-build-and-push-image.outputs.imageid }}"
+        echo "Image digest: ${{ steps.docker-build-and-push-image.outputs.digest }}"
+        echo "Image metadata: ${{ steps.docker-build-and-push-image.outputs.metadata }}"
