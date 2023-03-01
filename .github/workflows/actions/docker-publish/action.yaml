@@ -141,8 +141,11 @@ runs:
         # Note: GitHub's registry is different than GitHub packages
         push: true
         # Requires format: org-or-user/repo-name:tag-name
-        # See example in: https://github.com/docker/build-push-action#path-context
-        tags: ${{ env.imageNameFull }}:latest
+        # If using GitHub's registry, must include the domain, i.e. domainUrl/org-or-user/repo-name:tag-name
+        # See:
+        #   - Simple example: https://github.com/docker/build-push-action#path-context
+        #   - GitHub registry example: https://docs.docker.com/build/ci/github-actions/push-multi-registries/
+        tags: ${{ env.registryUrl }}:latest
         # labels: ${{ env.imageName }}
 
     - name: Docker - Print output image info
