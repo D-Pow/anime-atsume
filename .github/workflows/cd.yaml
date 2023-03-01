@@ -59,6 +59,9 @@ defaults:
 
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  # See:
+  #   - How to get creds: https://www.techielass.com/create-azure-credentials-for-use-in-github-actions/
+  #   - Alternative GitHub action: https://github.com/marketplace/actions/azure-cli-action
   AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
 
 
@@ -128,7 +131,6 @@ jobs:
         uses: ./.github/workflows/actions/deploy-azure
         with:
           GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}
-          AZURE_CREDENTIALS: ${{ env.AZURE_CREDENTIALS }}
           registryUrl: ${{ steps.cd-docker-build-and-publish-image.outputs.registryUrl }}
 
       # - name: Deploy application to Render.com

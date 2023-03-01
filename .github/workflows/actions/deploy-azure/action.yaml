@@ -11,12 +11,6 @@ inputs:
   GITHUB_TOKEN:
     description: GitHub token required for modifying branches or artifact publishing.
     required: true
-  # See:
-  #   - How to get creds: https://www.techielass.com/create-azure-credentials-for-use-in-github-actions/
-  #   - Alternative GitHub action: https://github.com/marketplace/actions/azure-cli-action
-  AZURE_CREDENTIALS:
-    description: Creds for running Azure CLI commands.
-    required: true
   registryUrl:
     description: Docker image registry full URL.
     required: true
@@ -36,7 +30,6 @@ runs:
       shell: bash
       run: |
         echo "GITHUB_TOKEN=${{ inputs.GITHUB_TOKEN }}" >> $GITHUB_ENV
-        echo "AZURE_CREDENTIALS=\"${{ inputs.AZURE_CREDENTIALS }}\"" >> $GITHUB_ENV
         echo "registryUrl=${{ inputs.registryUrl }}" >> $GITHUB_ENV
 
     - name: Azure - Login
