@@ -80,6 +80,7 @@ runs:
         echo "imageRetentionDays=${{ inputs.imageRetentionDays }}" >> $GITHUB_ENV
 
     - name: Docker - Output vars
+      id: docker-output-vars
       shell: bash
       run: |
         echo "registryUrl=${{ env.registryUrl }}" >> $GITHUB_OUTPUT
