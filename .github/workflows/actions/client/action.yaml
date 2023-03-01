@@ -43,6 +43,11 @@ runs:
     - name: Checkout repository branch
       uses: actions/checkout@v3
 
+    - name: Set NodeJS version
+      uses: actions/setup-node@v3
+      with:
+        node-version: 16
+
     - name: Client:Cache name - Init
       uses: ./.github/workflows/actions/cache-name
 
@@ -56,15 +61,9 @@ runs:
           ./server/src/main/resources/public
         key: ${{ env.CLIENT_CACHE_ID }}
 
-    - name: Set NodeJS version
-      uses: actions/setup-node@v3
-      with:
-        node-version: 16
-
-    # TODO - Only run below steps if cache-hit == miss
-
     - name: Client Install
       id: client-install
+      if: ${{ failure() || steps.client-build-download-cache.outputs.cache-hit != 'true' }}
       shell: bash
       working-directory: ./client/
       run: |
@@ -79,6 +78,9 @@ runs:
     #     npm run verify
 
     - name: Client Build
+      # Note: This `if` block must be used on every subsequent step that needs the check
+      # because `actions/cache/restore` output var `fail-on-cache-miss` defaults to `false`.
+      if: ${{ failure() || steps.client-build-download-cache.outputs.cache-hit != 'true' }}
       shell: bash
       working-directory: ./client/
       run: |
@@ -96,6 +98,7 @@ runs:
 
     - name: Client - Cache build artifacts
       id: client-build-upload-cache
+      if: ${{ failure() || steps.client-build-download-cache.outputs.cache-hit != 'true' }}
       uses: actions/cache/save@v3
       with:
         path: |
