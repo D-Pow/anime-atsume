@@ -116,6 +116,9 @@ runs:
       id: docker-build-and-push-image
       uses: docker/build-push-action@v4
       with:
+        # Explicitly define GitHub token as an input var since the default is `github.token`
+        # and the `github` context isn't available in composite actions.
+        github-token: ${{ env.GITHUB_TOKEN }}
         # Setting `context` with a path allows any file modifications from previous steps to be used in this action
         # See: https://github.com/docker/build-push-action#usage
         context: .
