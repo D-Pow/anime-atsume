@@ -24,7 +24,7 @@ outputs:
     value: ${{ steps.docker-metadata-extract.outputs.dockerImageNameAndTag }}
   registryUrl:
     description: Docker image registry full URL.
-    value: ${{ env.registryUrl }}
+    value: ${{ steps.docker-output-vars.outputs.registryUrl }}
   imageid:
     description: docker/build-push-action output - Image ID
     value: ${{ steps.docker-build-and-push-image.outputs.imageid }}
