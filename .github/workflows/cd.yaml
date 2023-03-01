@@ -118,7 +118,7 @@ jobs:
       # Publishing them to GitHub saves them in the registry, not
       # the repo's packages.
       - name: CD:Docker - Build image
-        id: cd-docker-build-image
+        id: cd-docker-build-and-publish-image
         uses: ./.github/workflows/actions/docker-publish
         with:
           GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}
@@ -129,7 +129,7 @@ jobs:
         with:
           GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}
           AZURE_CREDENTIALS: ${{ env.AZURE_CREDENTIALS }}
-          registryUrl: ${{ steps.cd-docker-build-image.outputs.registryUrl }}
+          registryUrl: ${{ steps.cd-docker-build-and-publish-image.outputs.registryUrl }}
 
       # - name: Deploy application to Render.com
       #   run: |
