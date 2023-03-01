@@ -38,6 +38,25 @@ runs:
     - name: Docker - Cache name init
       uses: ./.github/workflows/actions/cache-name
 
+    - name: Docker - Download client cache
+      id: docker-download-client-cache
+      uses: actions/cache/restore@v3
+      continue-on-error: true
+      with:
+        path: |
+          ./client/node_modules
+          ./server/src/main/resources/public
+        key: ${{ env.CLIENT_CACHE_ID }}
+
+    - name: Docker - Download server cache
+      id: docker-download-server-cache
+      uses: actions/cache/restore@v3
+      continue-on-error: true
+      with:
+        path: |
+          ./server/build/libs
+        key: ${{ env.SERVER_CACHE_ID }}
+
     # Resulting URL: ghcr.io/D-Pow/anime-atsume
     - name: Docker - Setup env
       shell: bash
