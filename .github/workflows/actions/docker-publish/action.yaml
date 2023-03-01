@@ -72,8 +72,11 @@ runs:
       run: |
         echo "GITHUB_TOKEN=${{ inputs.GITHUB_TOKEN }}" >> $GITHUB_ENV
         echo "imageName=${{ env.REPO_NAME }}" >> $GITHUB_ENV
+        # Lowercase the full registry `namespace/imageName` since uppercase isn't allowed in the Docker registry
+        imageNameFull="$(echo "${{ github.repository }}" | sed -E 's/./\L&/g')"
+        echo "imageNameFull=$imageNameFull" >> $GITHUB_ENV
         echo "registryUrlDomain=${{ inputs.registryUrlDomain }}" >> $GITHUB_ENV
-        echo "registryUrl=${{ inputs.registryUrlDomain }}/${{ github.repository }}" >> $GITHUB_ENV
+        echo "registryUrl=${{ inputs.registryUrlDomain }}/$imageNameFull" >> $GITHUB_ENV
         echo "imageRetentionDays=${{ inputs.imageRetentionDays }}" >> $GITHUB_ENV
 
     - name: Docker - Output vars
@@ -136,7 +139,7 @@ runs:
         push: true
         # Requires format: org-or-user/repo-name:tag-name
         # See example in: https://github.com/docker/build-push-action#path-context
-        tags: ${{ github.repository }}:latest
+        tags: ${{ env.imageNameFull }}:latest
         # labels: ${{ env.imageName }}
 
     - name: Docker - Print output image info
