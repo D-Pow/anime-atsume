@@ -1,0 +1,54 @@
+name: Azure - Deploy
+description: Builds the app in Azure for deployment and hosting
+
+
+env:
+  # See: https://github.com/Azure/webapps-deploy#configure-deployment-credentials
+  WEBSITE_WEBDEPLOY_USE_SCM: true
+
+
+inputs:
+  GITHUB_TOKEN:
+    description: GitHub token required for modifying branches or artifact publishing.
+    required: true
+  # See:
+  #   - How to get creds: https://www.techielass.com/create-azure-credentials-for-use-in-github-actions/
+  #   - Alternative GitHub action: https://github.com/marketplace/actions/azure-cli-action
+  AZURE_CREDENTIALS:
+    description: Creds for running Azure CLI commands.
+    required: true
+  registryUrl:
+    description: Docker image registry full URL.
+    required: true
+
+
+runs:
+  using: composite
+  steps:
+    - name: Checkout repository branch
+      uses: actions/checkout@v3
+
+    - name: Azure - Cache name init
+      uses: ./.github/workflows/actions/cache-name
+
+    - name: Azure - Setup env
+      shell: bash
+      run: |
+        echo "GITHUB_TOKEN=${{ inputs.GITHUB_TOKEN }}" >> $GITHUB_ENV
+        echo "AZURE_CREDENTIALS=${{ inputs.AZURE_CREDENTIALS }}" >> $GITHUB_ENV
+        echo "registryUrl=${{ inputs.registryUrl }}" >> $GITHUB_ENV
+
+    - name: Azure - Login
+      id: azure-login
+      uses: azure/login@v1
+      with:
+        creds: ${{ env.AZURE_CREDENTIALS }}
+
+    - name: Azure - Deploy
+      id: azure-deploy
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: ${{ env.REPO_NAME }}
+        images: '${{ env.registryUrl }}:latest'
+        # registryUrl: ${{ env.registryUrl }}
+        # publish-profile: ${{ secrets.azureWebAppPublishProfile }}
