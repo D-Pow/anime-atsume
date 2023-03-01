@@ -111,6 +111,9 @@ runs:
     #     image: "${{ env.dockerImageNameAndTag }}"
     #     retention_days: ${{ env.imageRetentionDays }}
 
+    # Login to the desired Docker registry.
+    # Default is Docker hub, but logging into GitHub's/another registry will
+    # set it as the publish destination instead.
     - name: Docker - Login to container registry
       uses: docker/login-action@v2
       with:
