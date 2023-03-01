@@ -68,6 +68,7 @@ runs:
 
     # Resulting URL: ghcr.io/D-Pow/anime-atsume
     - name: Docker - Setup env
+      id: docker-setup-env
       shell: bash
       run: |
         echo "GITHUB_TOKEN=${{ inputs.GITHUB_TOKEN }}" >> $GITHUB_ENV
