@@ -44,5 +44,3 @@ runs:
       with:
         app-name: ${{ env.REPO_NAME }}
         images: '${{ env.registryUrl }}:latest'
-        # registryUrl: ${{ env.registryUrl }}
-        # publish-profile: ${{ secrets.azureWebAppPublishProfile }}

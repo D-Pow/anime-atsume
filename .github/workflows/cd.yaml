@@ -100,14 +100,6 @@ jobs:
           echo "CLIENT_CACHE_ID=${{ env.CLIENT_CACHE_ID }}" >> $GITHUB_OUTPUT
           echo "SERVER_CACHE_ID=${{ env.SERVER_CACHE_ID }}" >> $GITHUB_OUTPUT
 
-      # - name: CD:Server - Download CI output
-      #   id: cd-server-download-artifacts
-      #   uses: actions/download-artifact@v3
-      #   with:
-      #     name: cd-server-build-output
-      #     path: |
-      #       ./server/build/libs
-
       - name: CD:Server - Download CI output
         id: cd-server-download-cache
         uses: actions/cache/restore@v3

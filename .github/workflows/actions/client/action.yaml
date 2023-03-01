@@ -73,7 +73,7 @@ runs:
     # - name: Client Verify
     #   id: client-verify
     #   shell: bash
-    #   working-directory: ./
+    #   working-directory: ./client/
     #   run: |
     #     npm run verify
 
