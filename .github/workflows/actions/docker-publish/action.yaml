@@ -119,7 +119,9 @@ runs:
         # Setting `context` with a path allows any file modifications from previous steps to be used in this action
         # See: https://github.com/docker/build-push-action#usage
         context: .
-        push: true  # Toggle whether or not to push to Docker image registry (GitHub's registry is different than packages)
+        # Toggle whether or not to push to Docker image registry
+        # Note: GitHub's registry is different than GitHub packages
+        push: true
         # Requires format: org-or-user/repo-name:tag-name
         # See example in: https://github.com/docker/build-push-action#path-context
         tags: ${{ github.repository }}:latest
