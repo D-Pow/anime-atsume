@@ -116,7 +116,11 @@ runs:
       id: docker-build-and-push-image
       uses: docker/build-push-action@v4
       with:
+        # Setting `context` with a path allows any file modifications from previous steps to be used in this action
+        # See: https://github.com/docker/build-push-action#usage
         context: .
-        push: true  # Toggle whether or not to push to GitHub's Docker image registry (different than packages)
-        tags: ${{ env.imageName }}:latest
-        labels: ${{ env.imageName }}
+        push: true  # Toggle whether or not to push to Docker image registry (GitHub's registry is different than packages)
+        # Requires format: org-or-user/repo-name:tag-name
+        # See example in: https://github.com/docker/build-push-action#path-context
+        tags: ${{ github.repository }}:latest
+        # labels: ${{ env.imageName }}
