@@ -23,19 +23,18 @@ runs:
           ./server/src/main/resources/public
         key: ${{ env.CLIENT_CACHE_ID }}
 
-    # TODO - Only run below steps if cache-hit == miss
-
-    # - name: Download client cache
-    #   id: server-download-client-artifacts
-    #   uses: actions/download-artifact@v3
-    #   with:
-    #     name: client-build-output
-    #     path: |
-    #       # ./client/node_modules
-    #       ./server/src/main/resources/public
+    - name: Server - Download server cache
+      id: server-download-server-artifacts
+      uses: actions/cache/restore@v3
+      continue-on-error: true
+      with:
+        path: |
+          ./server/build/libs
+        key: ${{ env.SERVER_CACHE_ID }}
 
     - name: Server Build
       id: server-build
+      if: ${{ failure() || steps.server-download-server-artifacts.outputs.cache-hit != 'true' }}
       shell: bash
       working-directory: ./server/
       run: |
@@ -50,6 +49,7 @@ runs:
 
     - name: Server - Cache build artifacts
       id: server-build-upload-cache
+      if: ${{ failure() || steps.server-download-server-artifacts.outputs.cache-hit != 'true' }}
       uses: actions/cache/save@v3
       with:
         path: |
