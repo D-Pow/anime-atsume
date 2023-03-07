@@ -3,6 +3,7 @@ package org.animeatsume;
 import lombok.extern.slf4j.Slf4j;
 import org.animeatsume.api.controller.FourAnimeController;
 import org.animeatsume.api.controller.KissanimeRuController;
+import org.animeatsume.api.controller.NineAnimeController;
 import org.animeatsume.api.model.TitleSearchRequest;
 import org.animeatsume.api.model.TitlesAndEpisodes;
 import org.animeatsume.api.model.kissanime.KissanimeVideoHostRequest;
@@ -34,6 +35,9 @@ public class ApplicationApi {
 
     @Autowired
     NovelPlanetService novelPlanetService;
+
+    @Autowired
+    NineAnimeController nineAnimeController;
 
     @Value("${org.animeatsume.activate-kissanime}")
     Boolean activateKissanime;
@@ -87,8 +91,14 @@ public class ApplicationApi {
                 .ok(kissanimeRuController.searchKissanimeTitles(titleSearchRequest));
         }
 
+        TitlesAndEpisodes searchResults = null; // = fourAnimeController.searchTitle(titleSearchRequest);
+
+        if (searchResults == null || searchResults.getResults().size() == 0) {
+            searchResults = nineAnimeController.searchShows(titleSearchRequest);
+        }
+
         return ResponseEntity
-            .ok(fourAnimeController.searchTitle(titleSearchRequest));
+            .ok(searchResults);
     }
 
     @PostMapping(value = "/getVideosForEpisode")
@@ -99,7 +109,11 @@ public class ApplicationApi {
 
         TitlesAndEpisodes.EpisodesForTitle videosForEpisode = fourAnimeController.getVideoForEpisode(kissanimeEpisodeRequest.getEpisodeUrl());
 
-        if (videosForEpisode != null) {
+        if (videosForEpisode == null || videosForEpisode.getEpisodes().size() == 0) {
+            videosForEpisode = nineAnimeController.getVideoForEpisode(kissanimeEpisodeRequest.getEpisodeUrl());
+        }
+
+        if (videosForEpisode != null && videosForEpisode.getEpisodes().size() > 0) {
             return ResponseEntity.ok(videosForEpisode);
         }
 
