@@ -1,5 +1,6 @@
 package org.animeatsume;
 
+import lombok.extern.slf4j.Slf4j;
 import org.animeatsume.api.controller.FourAnimeController;
 import org.animeatsume.api.controller.KissanimeRuController;
 import org.animeatsume.api.model.TitleSearchRequest;
@@ -9,8 +10,6 @@ import org.animeatsume.api.model.kissanime.NovelPlanetUrlRequest;
 import org.animeatsume.api.service.NovelPlanetService;
 import org.animeatsume.api.utils.http.CorsProxy;
 import org.animeatsume.api.utils.regex.RegexUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
@@ -24,8 +23,8 @@ import java.util.Map;
 
 @RestController
 @CrossOrigin
+@Slf4j
 public class ApplicationApi {
-    private static final Logger log = LoggerFactory.getLogger(ApplicationApi.class);
 
     @Autowired
     KissanimeRuController kissanimeRuController;
