@@ -17,7 +17,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.net.URI;
 import java.util.Map;
 
@@ -70,7 +70,7 @@ public class ApplicationApi {
         @RequestHeader HttpHeaders requestHeaders,
         HttpServletRequest request
     ) {
-        HttpMethod method = HttpMethod.resolve(request.getMethod());
+        HttpMethod method = HttpMethod.valueOf(request.getMethod());
 
         log.info("Executing {} CORS request to URL ({}) with body ({})", method, url, body);
 

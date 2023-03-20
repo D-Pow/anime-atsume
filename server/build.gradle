@@ -39,8 +39,8 @@ plugins {
     id 'idea'
 
     // adding plugins here removes the need to declare them in buildscript {}
-    id 'org.springframework.boot' version '2.7.4'  // See: https://docs.spring.io/spring-boot/docs/current/gradle-plugin/reference/htmlsingle
-    id 'io.spring.dependency-management' version '1.0.14.RELEASE'
+    id 'org.springframework.boot' version '3.0.4'  // See: https://docs.spring.io/spring-boot/docs/current/gradle-plugin/reference/htmlsingle
+    id 'io.spring.dependency-management' version '1.1.0'
     // If running as a standalone JavaFX app with Java >= v11, add this plugin
     // id 'org.openjfx.javafxplugin' version '0.0.10'
 
@@ -77,8 +77,8 @@ apply from: "utils/build.gradle"
 
 
 /* Code was originally written for Java v8 so ensure it can run with these configs */
-sourceCompatibility = JavaVersion.VERSION_1_8;
-targetCompatibility = JavaVersion.VERSION_1_8;
+sourceCompatibility = JavaVersion.VERSION_17;
+targetCompatibility = JavaVersion.VERSION_17;
 
 
 /**
@@ -187,15 +187,47 @@ sourceSets {
  */
 dependencies {
     // JavaFX was removed in Java 11 so ensure it's installed (uses OpenJDK)
-    implementation 'org.openjfx:javafx:18.0.2'
+    // Use `:18.0.2` for Java < 17
+    implementation 'org.openjfx:javafx:21-ea+5'
+
+    /*
+     * Spring Boot 3 dropped support for Java 8, which came with many consequences.
+     * Besides the obvious having to upgrade your installed Java version, this decision
+     * brought about numerous other problems, e.g. incredible amounts of logging issues
+     * (e.g. Slf4j, Log4j, Logback, etc. no longer work *at all* using their original configurations
+     * and require immense amounts of config-updates to get back to normal), `javax` is replaced 
+     * with `jakarta` which took *hours* to figure out (partly due to the IDE only wanting to import 
+     * `javax` classes; mostly due to that `@Entity` and similar classes weren't being tracked anymore
+     * if imported from `javax`, so the auto-configuration/bean-injection of Spring failed
+     * for no apparent reason; thus, it took incredibly long to go through the debugger, Stack Overflow,
+     * their docs (which are horrendous btw), etc. to figure out such a simple solution),
+     * and related off-the-wall issues.
+     * However, that being said, at least this new Java 17 configuration should last us a while
+     * without any drastic changes like this in the near future.
+     *
+     * See:
+     *  - Spring Boot 3 migration info: https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-3.0-Migration-Guide
+     *  - Spring (base) migration info: https://github.com/spring-projects/spring-framework/wiki/Upgrading-to-Spring-Framework-6.x
+     *  - Spring Boot 2.7 release notes which mention some helpful tidbits of info to prep for migration to 3: https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-2.7-Release-Notes
+     *  - Hibernate changelog task for them to move from `javax` to `jakarta`: https://github.com/hibernate/hibernate-orm/blob/15873c17fb7bd03e2579d8e3b6ab800734c21545/changelog.txt#L627
+     *
+     * Just for closure, in order to use `javax` again (which you shouldn't b/c Spring won't pick
+     * up the annotations anymore), these are the packages to use:
+     *  - javax.servlet:javax.servlet-api:4.0.1
+     *  - javax.persistence:javax.persistence-api:2.2
+     *  - javax.transaction:javax.transaction-api:1.3
+     */
 
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.projectlombok:lombok:1.18.24'
 
+    // Collection of most DB dialects out there, try to use this first and only use the
+    // others as fallbacks
+    implementation 'org.hibernate.orm:hibernate-community-dialects:6.1.7.Final'
+    implementation 'org.xerial:sqlite-jdbc:3.40.1.0'  // Old version: implementation 'com.github.gwenn:sqlite-dialect:0.1.2'
+    // implementation 'org.postgresql:postgresql:42.5.4'
     // implementation 'mysql:mysql-connector-java'
-    implementation 'org.xerial:sqlite-jdbc:3.30.1'
-    implementation 'com.github.gwenn:sqlite-dialect:0.1.0'
 
     // HTML parser
     implementation 'org.jsoup:jsoup:1.15.3'
