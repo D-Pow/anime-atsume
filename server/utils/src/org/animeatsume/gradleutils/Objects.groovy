@@ -86,6 +86,10 @@ def getGradlePropertiesAndSettings(Project projectToInspect) {
     return getGradlePropertiesAndSettings(false, projectToInspect);
 }
 def getGradlePropertiesAndSettings(boolean printNotReturn, Project projectToInspect) {
+    if (projectToInspect == null) {
+        projectToInspect = getRootProject();
+    }
+
     // Not sure why, but `.each { it ->` fails, thus it's omitted
     projectToInspect.properties.each {
         // Note: `$it.someField` is only for strings, `it.someField` is for normal code
