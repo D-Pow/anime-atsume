@@ -42,8 +42,21 @@ plugins {
     id 'org.springframework.boot' version '3.0.4'  // See: https://docs.spring.io/spring-boot/docs/current/gradle-plugin/reference/htmlsingle
     id 'io.spring.dependency-management' version '1.1.0'
     id 'io.freefair.lombok' version '8.0.1'
-    // If running as a standalone JavaFX app with Java >= v11, add this plugin
-    // id 'org.openjfx.javafxplugin' version '0.0.10'
+    // If running as a standalone JavaFX app with Java >= v11, add this plugin:
+    // id 'org.openjfx.javafxplugin' version '0.0.13'
+    // And this block at the root level of build.gradle:
+    // javafx {
+    //     version = '21-ea+5'
+    //     modules = [
+    //         "javafx.base",
+    //         "javafx.controls",
+    //         "javafx.fxml",
+    //         "javafx.graphics",
+    //         "javafx.media",
+    //         "javafx.swing",
+    //         "javafx.web",
+    //     ]
+    // }
 
     /*
      * Similar to the below `apply from:` statement, we could write our own custom plugin in
@@ -188,6 +201,7 @@ sourceSets {
  */
 dependencies {
     // JavaFX was removed in Java 11 so ensure it's installed (uses OpenJDK)
+    // Only required if not using the Gradle plugin above
     // Use `:18.0.2` for Java < 17
     implementation 'org.openjfx:javafx:21-ea+5'
 
