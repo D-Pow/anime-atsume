@@ -35,7 +35,7 @@ build() (
     declare _buildVerbose=
     declare OPTIND=1
 
-    while getopts ":cvh" opt; do
+    while getopts ":crvh" opt; do
         case "$opt" in
             c)
                 _buildCleanFirst=true
