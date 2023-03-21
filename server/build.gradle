@@ -281,8 +281,8 @@ dependencies {
 }
 
 
-if (System.properties['jfxrtDir'] == null) { // if not in root-level gradle.properties
-    System.properties['jfxrtDir'] = '.'
+if (System.properties.getProperty('jfxrtDir') == null) { // if not in root-level gradle.properties
+    System.properties.setProperty('jfxrtDir', '.');
 }
 
 
