@@ -54,15 +54,27 @@ RUN export ROOT_DIR="$(realpath -se .)"
 ENV CLIENT_DIR="${ROOT_DIR}/client"
 ENV SERVER_DIR="${ROOT_DIR}/server"
 ENV BUILD_DIR="${SERVER_DIR}/build/libs"
-ENV WAR_FILE="${BUILD_DIR}/anime-atsume.war"
-ENV DB_FILE="${BUILD_DIR}/anime_atsume.db"
+ENV WAR_FILE_NAME="anime-atsume.war"
+ENV WAR_FILE_BUILD_PATH="${BUILD_DIR}/${WAR_FILE_NAME}"
+ENV WAR_FILE_FINAL_PATH="./${WAR_FILE_NAME}"
+ENV DB_FILE_NAME="anime_atsume.db"
+ENV DB_FILE_BUILD_PATH="${BUILD_DIR}/${DB_FILE_NAME}"
+ENV DB_FILE_FINAL_PATH="./${DB_FILE_NAME}"
 
 # Copy the entire app (server/client) from the local filesystem to the Docker image
 COPY . .
 
 # Build the app if not already done before attempting Docker image generation
 # Copy build-output files to root dir for ease of use
-RUN if ! [[ -d "${BUILD_DIR}" ]]; then ./index.sh build -r; fi
+RUN \
+    if ! [[ -f "${WAR_FILE_FINAL_PATH}" ]]; then \
+        if ! [[ -f "${WAR_FILE_BUILD_PATH}" ]]; then \
+            ./index.sh build -r; \
+        else \
+            cp "${WAR_FILE_BUILD_PATH}" "${WAR_FILE_FINAL_PATH}"
+            cp "${DB_FILE_BUILD_PATH}" "${DB_FILE_FINAL_PATH}"
+        fi \
+    fi
 
 EXPOSE 8080
 
