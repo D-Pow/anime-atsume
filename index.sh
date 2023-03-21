@@ -86,11 +86,15 @@ checkBuildOutputDir() (
 
 
 dockerBuild() (
+    declare _dockerBuildFreshJar=
     declare _dockerBuildVerbose=
     declare OPTIND=1
 
-    while getopts ":v" opt; do
+    while getopts ":bv" opt; do
         case "$opt" in
+            b)
+                _dockerBuildFreshJar=true
+                ;;
             v)
                 _dockerBuildVerbose=true
                 ;;
@@ -103,7 +107,7 @@ dockerBuild() (
 
     shift $(( OPTIND - 1 ))
 
-    build -r
+    build -r ${_dockerBuildFreshJar:+-c}
 
     (
         command -v docker &>/dev/null && \
