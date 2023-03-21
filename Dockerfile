@@ -1,4 +1,4 @@
-FROM ubuntu:18.04
+FROM ubuntu:20.04
 
 
 # Note: Ensure the Dockerfile is in the same dir or above of all files meant to be copied into
