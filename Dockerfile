@@ -32,19 +32,19 @@ ENV SHELL=/bin/bash
 ARG BUILD_VERBOSE=true
 ENV BUILDKIT_PROGRESS=${BUILD_VERBOSE:+plain}
 
+# Set placeholder timezone so required package `tzdata` doesn't require interactive input
+# See: https://stackoverflow.com/questions/44331836/apt-get-install-tzdata-noninteractive/44333806#44333806
+RUN ln -fs /usr/share/zoneinfo/America/New_York /etc/localtime
+
+# Since the Java app now bundles OpenJFX, no need to install it here
 RUN apt-get clean && \
     apt-get update && \
-    apt-get install -y \
+    apt-get install -y --no-install-recommends \
         curl \
         git \
         sqlite3 \
-        openjdk-8-jdk \
-        openjfx=8u161-b12-1ubuntu2 \
-        libopenjfx-jni=8u161-b12-1ubuntu2 \
-        libopenjfx-java=8u161-b12-1ubuntu2 \
         jq \
-        && \
-    apt-mark hold openjfx libopenjfx-jni libopenjfx-java
+        openjdk-17-jdk
 
 # Change CWD from <root> to $HOME
 WORKDIR /home
