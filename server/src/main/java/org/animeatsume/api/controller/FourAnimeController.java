@@ -1,6 +1,6 @@
 package org.animeatsume.api.controller;
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 import org.animeatsume.api.model.TitleSearchRequest;
 import org.animeatsume.api.model.TitlesAndEpisodes;
 import org.animeatsume.api.model.VideoSearchResult;
@@ -15,7 +15,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 @Controller
-@Slf4j
+@Log4j2
 public class FourAnimeController {
     @Autowired
     FourAnimeService fourAnimeService;

@@ -221,6 +221,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.projectlombok:lombok:1.18.24'
+    implementation 'org.springframework.boot:spring-boot-starter-log4j2'
 
     // Collection of most DB dialects out there, try to use this first and only use the
     // others as fallbacks
@@ -285,7 +286,7 @@ configurations.all {
      * Fixes an error where `logback` is considered to have duplicate files.
      *
      * Alternatives:
-     *   - exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
+     *   - exclude group: 'ch.qos.logback'
      *   - exclude group: 'org.apache.logging.log4j', module: 'log4j-to-slf4j'
      *   - exclude module: 'slf4j-log4j14'
      *
@@ -297,7 +298,7 @@ configurations.all {
      * @see <a href="https://discuss.gradle.org/t/gradle-7-fail-for-duplicates-in-copy-specs-has-no-duplicates-in-project/39834">Gradle discussion</a>
      * @see <a href="https://github.com/gradle/gradle/issues/17236">GitHub issue</a>
      */
-    exclude group: 'ch.qos.logback', module: 'logback-classic'
+    exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
 }
 
 

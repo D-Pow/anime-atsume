@@ -1,8 +1,7 @@
 package org.animeatsume.api.service;
 
+import lombok.extern.log4j.Log4j2;
 import org.animeatsume.api.utils.http.Requests;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.*;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -16,8 +15,8 @@ import java.io.InputStream;
 import java.util.concurrent.CompletableFuture;
 
 @Service
+@Log4j2
 public class VideoFileService {
-    private static final Logger log = LoggerFactory.getLogger(VideoFileService.class);
     private static final String BASE_DIRECTORY = ".";
     private static final String VIDEO_DIRECTORY = "videos";
     private static final String NAME_SEPARATOR = "-";

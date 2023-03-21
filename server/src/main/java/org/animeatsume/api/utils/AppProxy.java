@@ -3,7 +3,7 @@ package org.animeatsume.api.utils;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@Slf4j
+@Log4j2
 public class AppProxy {
     @Data
     @AllArgsConstructor

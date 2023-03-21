@@ -1,6 +1,6 @@
 package org.animeatsume;
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 import org.animeatsume.api.controller.FourAnimeController;
 import org.animeatsume.api.controller.KissanimeRuController;
 import org.animeatsume.api.model.TitleSearchRequest;
@@ -23,7 +23,7 @@ import java.util.Map;
 
 @RestController
 @CrossOrigin
-@Slf4j
+@Log4j2
 public class ApplicationApi {
 
     @Autowired

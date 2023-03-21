@@ -2,8 +2,7 @@ package org.animeatsume.api.utils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.core.io.Resource;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 
@@ -24,9 +23,8 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
+@Log4j2
 public class ObjectUtils {
-    private static final Logger log = LoggerFactory.getLogger(ObjectUtils.class);
-
     public static <T> T findObjectInList(List<T> list, Predicate<T> filterPredicate) {
         return list.stream().filter(filterPredicate).findFirst().orElse(null);
     }

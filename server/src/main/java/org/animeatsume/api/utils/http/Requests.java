@@ -1,8 +1,7 @@
 package org.animeatsume.api.utils.http;
 
+import lombok.extern.log4j.Log4j2;
 import org.animeatsume.api.utils.ObjectUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.core.io.support.ResourceRegion;
@@ -27,9 +26,8 @@ import java.util.Map;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
+@Log4j2
 public class Requests {
-    private static final Logger log = LoggerFactory.getLogger(Requests.class);
-
     public static HttpHeaders copyHttpHeaders(HttpHeaders headers) {
         HttpHeaders copiedHeaders = new HttpHeaders();
 

@@ -1,6 +1,6 @@
 package org.animeatsume;
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CacheEvict;
@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.concurrent.Executor;
 
-@Slf4j
+@Log4j2
 @Configuration
 @EnableAsync
 @EnableCaching
