@@ -20,6 +20,13 @@ runs:
     - name: Checkout repository branch
       uses: actions/checkout@v3
 
+    - uses: actions/setup-java@v3
+      with:
+        # See:
+        #   - Supported Java distribution: https://github.com/actions/setup-java#supported-distributions
+        distribution: 'temurin'  # Eclipse version of JDK
+        java-version: '17'
+
     - name: Set repo name
       id: set-repo-name
       shell: bash
