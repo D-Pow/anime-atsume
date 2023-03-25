@@ -4,6 +4,7 @@ import lombok.extern.log4j.Log4j2;
 import org.animeatsume.api.controller.FourAnimeController;
 import org.animeatsume.api.controller.KissanimeRuController;
 import org.animeatsume.api.controller.NineAnimeController;
+import org.animeatsume.api.model.SearchAnimeResponse;
 import org.animeatsume.api.model.TitleSearchRequest;
 import org.animeatsume.api.model.TitlesAndEpisodes;
 import org.animeatsume.api.model.kissanime.KissanimeVideoHostRequest;
@@ -83,18 +84,18 @@ public class ApplicationApi {
 
 //    @Cacheable(ApplicationConfig.ANIME_TITLE_SEARCH_CACHE_NAME)
     @PostMapping(value = "/searchAnime", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Object> searchAnime(@RequestBody TitleSearchRequest titleSearchRequest) {
+    public ResponseEntity<SearchAnimeResponse> searchAnime(@RequestBody TitleSearchRequest titleSearchRequest) {
         titleSearchRequest.setTitle(RegexUtils.removeNonAlphanumericChars(titleSearchRequest.getTitle()));
 
         if (activateKissanime) {
             return ResponseEntity
-                .ok(kissanimeRuController.searchKissanimeTitles(titleSearchRequest));
+                .ok((SearchAnimeResponse) kissanimeRuController.searchKissanimeTitles(titleSearchRequest));
         }
 
-        TitlesAndEpisodes searchResults = fourAnimeController.searchTitle(titleSearchRequest);
+        SearchAnimeResponse searchResults = (SearchAnimeResponse) fourAnimeController.searchTitle(titleSearchRequest);
 
         if (searchResults == null || searchResults.getResults().size() == 0) {
-            searchResults = nineAnimeController.searchShows(titleSearchRequest);
+            searchResults = (SearchAnimeResponse) nineAnimeController.searchShows(titleSearchRequest);
         }
 
         if (searchResults == null) {
