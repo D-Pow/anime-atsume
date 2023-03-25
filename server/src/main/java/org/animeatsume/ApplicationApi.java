@@ -97,6 +97,12 @@ public class ApplicationApi {
             searchResults = nineAnimeController.searchShows(titleSearchRequest);
         }
 
+        if (searchResults == null) {
+            searchResults = new SearchAnimeResponse();
+
+            searchResults.setError("Anime servers are currently down :/");
+        }
+
         return ResponseEntity
             .ok(searchResults);
     }

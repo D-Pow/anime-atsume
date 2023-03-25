@@ -21,14 +21,20 @@ public class NineAnimeController {
     NineAnimeService nineAnimeService;
 
     public TitlesAndEpisodes searchShows(TitleSearchRequest request) {
-        TitlesAndEpisodes titleResults = nineAnimeService.searchShows(request.getTitle());
+        TitlesAndEpisodes titleResults = null;
 
-        if (titleResults != null) {
-            List<CompletableFuture<TitlesAndEpisodes.EpisodesForTitle>> episodeSearchFutures = titleResults.getResults().stream()
-                .map(titleResult -> nineAnimeService.searchEpisodes(titleResult))
-                .collect(Collectors.toList());
+        try {
+            titleResults = nineAnimeService.searchShows(request.getTitle());
 
-            ObjectUtils.getAllCompletableFutureResults(episodeSearchFutures);
+            if (titleResults != null) {
+                List<CompletableFuture<TitlesAndEpisodes.EpisodesForTitle>> episodeSearchFutures = titleResults.getResults().stream()
+                    .map(titleResult -> nineAnimeService.searchEpisodes(titleResult))
+                    .collect(Collectors.toList());
+
+                ObjectUtils.getAllCompletableFutureResults(episodeSearchFutures);
+            }
+        } catch (Exception e) {
+            log.error("Exception trying to serach 9anime:", e);
         }
 
         return titleResults;
