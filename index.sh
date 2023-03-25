@@ -28,8 +28,6 @@ clean() (
 
 
 build() (
-    cd "${serverDir}"
-
     declare _buildCleanFirst=
     declare _buildCopyFilesToRootDir=
     declare _buildVerbose=
@@ -67,7 +65,10 @@ build() (
 
     declare _buildGradleOpts="${_buildCleanFirst:+clean} ${_buildVerbose:+--console plain}"
 
-    ./gradlew ${_buildGradleOpts} build
+    (
+        cd "${serverDir}"
+        ./gradlew ${_buildGradleOpts} build
+    )
 
     if [[ -n "$_buildCopyFilesToRootDir" ]]; then
         cp -R "${buildDir}/*" "${rootDir}"
