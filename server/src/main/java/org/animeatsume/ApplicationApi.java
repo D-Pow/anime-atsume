@@ -3,6 +3,7 @@ package org.animeatsume;
 import lombok.extern.log4j.Log4j2;
 import org.animeatsume.api.controller.FourAnimeController;
 import org.animeatsume.api.controller.KissanimeRuController;
+import org.animeatsume.api.controller.NineAnimeController;
 import org.animeatsume.api.model.TitleSearchRequest;
 import org.animeatsume.api.model.TitlesAndEpisodes;
 import org.animeatsume.api.model.kissanime.KissanimeVideoHostRequest;
@@ -34,6 +35,9 @@ public class ApplicationApi {
 
     @Autowired
     NovelPlanetService novelPlanetService;
+
+    @Autowired
+    NineAnimeController nineAnimeController;
 
     @Value("${org.animeatsume.activate-kissanime}")
     Boolean activateKissanime;
@@ -77,7 +81,7 @@ public class ApplicationApi {
         return CorsProxy.doCorsRequest(method, url, origin, body, requestHeaders);
     }
 
-    @Cacheable(ApplicationConfig.ANIME_TITLE_SEARCH_CACHE_NAME)
+//    @Cacheable(ApplicationConfig.ANIME_TITLE_SEARCH_CACHE_NAME)
     @PostMapping(value = "/searchAnime", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> searchAnime(@RequestBody TitleSearchRequest titleSearchRequest) {
         titleSearchRequest.setTitle(RegexUtils.removeNonAlphanumericChars(titleSearchRequest.getTitle()));
@@ -87,8 +91,14 @@ public class ApplicationApi {
                 .ok(kissanimeRuController.searchKissanimeTitles(titleSearchRequest));
         }
 
+        TitlesAndEpisodes searchResults = fourAnimeController.searchTitle(titleSearchRequest);
+
+        if (searchResults == null || searchResults.getResults().size() == 0) {
+            searchResults = nineAnimeController.searchShows(titleSearchRequest);
+        }
+
         return ResponseEntity
-            .ok(fourAnimeController.searchTitle(titleSearchRequest));
+            .ok(searchResults);
     }
 
     @PostMapping(value = "/getVideosForEpisode")
@@ -99,7 +109,11 @@ public class ApplicationApi {
 
         TitlesAndEpisodes.EpisodesForTitle videosForEpisode = fourAnimeController.getVideoForEpisode(kissanimeEpisodeRequest.getEpisodeUrl());
 
-        if (videosForEpisode != null) {
+        if (videosForEpisode == null || videosForEpisode.getEpisodes().size() == 0) {
+            videosForEpisode = nineAnimeController.getVideoForEpisode(kissanimeEpisodeRequest.getEpisodeUrl());
+        }
+
+        if (videosForEpisode != null && videosForEpisode.getEpisodes().size() > 0) {
             return ResponseEntity.ok(videosForEpisode);
         }
 
