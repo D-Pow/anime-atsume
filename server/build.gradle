@@ -108,6 +108,7 @@ targetCompatibility = JavaVersion.VERSION_17;
  */
 allprojects {
     repositories {
+        jcenter()
         mavenCentral()
         google()
         gradlePluginPortal()  // For writing our own Gradle plugins
