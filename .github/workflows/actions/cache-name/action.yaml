@@ -26,6 +26,7 @@ runs:
       uses: actions/checkout@v3
 
     - name: Set default language versions
+      shell: bash
       run: |
         echo "nodeVersion=${env.nodeVersion:-${{ env.nodeVersion }}}" >> $GITHUB_ENV
         echo "javaVersion=${env.javaVersion:-${{ env.javaVersion }}}" >> $GITHUB_ENV
