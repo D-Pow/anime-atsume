@@ -43,11 +43,6 @@ runs:
     - name: Checkout repository branch
       uses: actions/checkout@v3
 
-    - name: Set NodeJS version
-      uses: actions/setup-node@v3
-      with:
-        node-version: 16
-
     - name: Client:Cache name - Init
       uses: ./.github/workflows/actions/cache-name
 

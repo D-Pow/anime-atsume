@@ -2,6 +2,11 @@ name: Cache - Initialize names
 description: Initializes the cache names for client and server
 
 
+env:
+  nodeVersion: 16
+  javaVersion: 17
+
+
 outputs:
   CLIENT_CACHE_ID:
     description: Client cache ID to use for all workflows/actions.
@@ -20,12 +25,17 @@ runs:
     - name: Checkout repository branch
       uses: actions/checkout@v3
 
+    - name: Set NodeJS version
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ env.nodeVersion }}
+
     - uses: actions/setup-java@v3
       with:
         # See:
         #   - Supported Java distribution: https://github.com/actions/setup-java#supported-distributions
         distribution: 'temurin'  # Eclipse version of JDK
-        java-version: '17'
+        java-version: ${{ env.javaVersion }}
 
     - name: Set repo name
       id: set-repo-name
