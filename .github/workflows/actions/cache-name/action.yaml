@@ -2,9 +2,15 @@ name: Cache - Initialize names
 description: Initializes the cache names for client and server
 
 
-env:
-  nodeVersion: 16
-  javaVersion: 17
+inputs:
+  nodeVersion:
+    description: Version of NodeJS to use.
+    required: false
+    default: 16
+  javaVersion:
+    description: Version of Java to use.
+    required: false
+    default: 17
 
 
 outputs:
@@ -28,8 +34,8 @@ runs:
     - name: Set default language versions
       shell: bash
       run: |
-        echo "nodeVersion=${env.nodeVersion:-${{ env.nodeVersion }}}" >> $GITHUB_ENV
-        echo "javaVersion=${env.javaVersion:-${{ env.javaVersion }}}" >> $GITHUB_ENV
+        echo "nodeVersion=${{ inputs.nodeVersion }}" >> $GITHUB_ENV
+        echo "javaVersion=${{ inputs.javaVersion }}" >> $GITHUB_ENV
 
     - name: Set NodeJS version
       uses: actions/setup-node@v3
