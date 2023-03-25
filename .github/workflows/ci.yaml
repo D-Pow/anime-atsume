@@ -76,6 +76,11 @@ jobs:
         uses: actions/checkout@v3
       - name: CI:Cache name - Init
         uses: ./.github/workflows/actions/cache-name
+      - name: CI - Output cache ID
+        id: ci-export-cache-id
+        run: |
+          echo "CLIENT_CACHE_ID=${{ env.CLIENT_CACHE_ID }}" >> $GITHUB_OUTPUT
+          echo "SERVER_CACHE_ID=${{ env.SERVER_CACHE_ID }}" >> $GITHUB_OUTPUT
       - name: Server Verify
         uses: ./.github/workflows/actions/server
 
