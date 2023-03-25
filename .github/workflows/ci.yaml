@@ -78,10 +78,6 @@ jobs:
       - name: CI:Cache name - Init
         uses: ./.github/workflows/actions/cache-name
 
-      - name: ls -lah for server
-        run: |
-          ls -FlaH
-
       - name: CI:Server - Download CI client output
         id: ci-server-download-cache
         uses: actions/cache/restore@v3
