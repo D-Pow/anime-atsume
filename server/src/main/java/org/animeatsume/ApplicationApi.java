@@ -4,6 +4,7 @@ import lombok.extern.log4j.Log4j2;
 import org.animeatsume.api.controller.FourAnimeController;
 import org.animeatsume.api.controller.KissanimeRuController;
 import org.animeatsume.api.controller.NineAnimeController;
+import org.animeatsume.api.controller.ZoroToController;
 import org.animeatsume.api.model.SearchAnimeResponse;
 import org.animeatsume.api.model.TitleSearchRequest;
 import org.animeatsume.api.model.TitlesAndEpisodes;
@@ -39,6 +40,9 @@ public class ApplicationApi {
 
     @Autowired
     NineAnimeController nineAnimeController;
+
+    @Autowired
+    ZoroToController zoroToController;
 
     @Value("${org.animeatsume.activate-kissanime}")
     Boolean activateKissanime;
@@ -95,12 +99,16 @@ public class ApplicationApi {
         SearchAnimeResponse searchResults = (SearchAnimeResponse) fourAnimeController.searchTitle(titleSearchRequest);
 
         if (searchResults == null || searchResults.getResults().size() == 0) {
-            searchResults = (SearchAnimeResponse) nineAnimeController.searchShows(titleSearchRequest);
+            searchResults = new SearchAnimeResponse(null);
+            searchResults.setResults(nineAnimeController.searchShows(titleSearchRequest).getResults());
         }
 
-        if (searchResults == null) {
-            searchResults = new SearchAnimeResponse();
+        if (searchResults == null || searchResults.getResults().size() == 0) {
+            searchResults = new SearchAnimeResponse(null);
+            searchResults.setResults(zoroToController.searchShows(titleSearchRequest).getResults());
+        }
 
+        if (searchResults == null || searchResults.getResults().size() == 0) {
             searchResults.setError("Anime servers are currently down :/");
         }
 
