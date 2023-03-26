@@ -25,6 +25,8 @@ import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -58,12 +60,16 @@ public class NineAnimeService {
         };
     }
 
-    private static String getUrlWithOrigin(String suffix) {
-        return String.format("%s/%s", ORIGIN, suffix);
+    private static String getUrlWithOrigin(String... suffixes) {
+        List<String> urlPaths = new ArrayList<>(Arrays.asList(suffixes));
+        urlPaths.add(0, ORIGIN);
+        String joinedUrl = String.join("/", urlPaths).replaceAll("[\\\\/]\"(?=(\\\\|/|$))", "");
+
+        return joinedUrl;
     }
 
     public TitlesAndEpisodes searchShows(String title) {
-        log.info("Searching {} for title ({}) ...", ORIGIN, title);
+        log.info("Searching <{}> for title ({}) ...", ORIGIN, title);
 
         String[][] titleSearchFormData = getSearchPostRequestBody(title);
         HttpEntity titleSearchHttpEntity = Requests.getFormDataHttpEntity(getSearchHeaders(), titleSearchFormData);
@@ -97,7 +103,7 @@ public class NineAnimeService {
 
     @Async
     public CompletableFuture<EpisodesForTitle> searchEpisodes(EpisodesForTitle episodesForTitle) {
-        log.info("Searching 9anime for episode list at ({}) ...", episodesForTitle.getUrl());
+        log.info("Searching <{}> for episode list at ({}) ...", ORIGIN, episodesForTitle.getUrl());
 
         String showSplashPage = (String) CorsProxy.doCorsRequest(
             HttpMethod.GET,
