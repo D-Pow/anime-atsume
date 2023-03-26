@@ -86,7 +86,7 @@ public class ApplicationApi {
         return CorsProxy.doCorsRequest(method, url, origin, body, requestHeaders);
     }
 
-//    @Cacheable(ApplicationConfig.ANIME_TITLE_SEARCH_CACHE_NAME)
+    @Cacheable(ApplicationConfig.ANIME_TITLE_SEARCH_CACHE_NAME)
     @PostMapping(value = "/searchAnime", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<SearchAnimeResponse> searchAnime(@RequestBody TitleSearchRequest titleSearchRequest) {
         titleSearchRequest.setTitle(RegexUtils.removeNonAlphanumericChars(titleSearchRequest.getTitle()));
