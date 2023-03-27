@@ -189,7 +189,10 @@ public class Requests {
                 }
 
                 HttpHeaders responseHeaders = headForHeadersWithAcceptAllFallback(url, restTemplate, requestEntity);
-                String contentTypeHeader = responseHeaders.getContentType().toString();
+                List<MediaType> headersAccept = responseHeaders.getAccept();
+                String contentTypeHeader = headersAccept
+                    .get(headersAccept.size() - 1)
+                    .toString();
                 Class<?> actualResponseTypeClass = getClassFromContentTypeHeader(contentTypeHeader);
 
                 response = restTemplate.exchange(
