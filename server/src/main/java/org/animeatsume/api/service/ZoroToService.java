@@ -123,16 +123,29 @@ public class ZoroToService {
             getSearchHeaders()
         ).getBody();
 
-        Element showParentList = Jsoup.parse(showSplashPage).select("#main-content").first();
+        Element watchNowButton = Jsoup.parse(showSplashPage).select(".film-buttons .btn-play").first();
 
-        if (showParentList == null) {
+        if (watchNowButton == null) {
             return null;
-        };
+        }
 
-        List<VideoSearchResult> episodes = showParentList.getElementsByTag("a").stream()
+        String showEpisodesPageHtml = (String) CorsProxy.doCorsRequest(
+            HttpMethod.GET,
+            URI.create(getUrlWithOrigin(watchNowButton.attr("href"))),
+            URI.create(ORIGIN),
+            null,
+            getSearchHeaders()
+        ).getBody();
+
+        // TODO - HTML doesn't have the episodes until JavaScript injects elements onto the page
+        log.info("showEpisodesPageHtml: {}", showEpisodesPageHtml);
+
+        Document showEpisodesPageDom = Jsoup.parse(showEpisodesPageHtml);
+
+        List<VideoSearchResult> episodes = showEpisodesPageDom.select(".ssl-item.ep-item").stream()
             .map(anchor -> {
                 String showUrl = anchor.attr("href");
-                String showTitle = anchor.select(".title").text();
+                String showTitle = anchor.attr("title");
 
                 return new VideoSearchResult(showUrl, showTitle);
             })
