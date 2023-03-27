@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -25,6 +26,8 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
@@ -49,12 +52,6 @@ public class ZoroToService {
         return headers;
     }
 
-    private static String[][] getSearchPostRequestBody(String searchQuery) {
-        return new String[][] {
-            { "value", searchQuery }
-        };
-    }
-
     private static String getUrlWithOrigin(String... suffixes) {
         List<String> urlPaths = new ArrayList<>(Arrays.asList(suffixes));
         urlPaths.add(0, ORIGIN);
@@ -66,17 +63,22 @@ public class ZoroToService {
     public TitlesAndEpisodes searchShows(String title) {
         log.info("Searching <{}> for title ({}) ...", ORIGIN, title);
 
-        HttpEntity titleSearchHttpEntity = Requests.getFormDataHttpEntity(getSearchHeaders(), null);
+        Object searchResponse = CorsProxy.doCorsRequest(
+            HttpMethod.GET,
+            URI.create(SEARCH_URL + title),
+            URI.create(ORIGIN),
+            null,
+            getSearchHeaders()
+        ).getBody();
 
-        String searchResponseHtml = ZoroToShowResponse.fromString(
-            (String) CorsProxy.doCorsRequest(
-                HttpMethod.GET,
-                URI.create(SEARCH_URL + title),
-                URI.create(ORIGIN),
-                titleSearchHttpEntity.getBody(),
-                titleSearchHttpEntity.getHeaders()
-            ).getBody()
-        ).getHtml();
+        ZoroToShowResponse searchResponseObject;
+
+        try {
+            searchResponseObject = ZoroToShowResponse.fromString((String) searchResponse);
+        } catch (Exception responseIsMapInsteadOfString) {
+            searchResponseObject = ZoroToShowResponse.fromMap((Map<String, Object>) searchResponse);
+        }
+        String searchResponseHtml = searchResponseObject.getHtml();
 
         if (searchResponseHtml != null) {
             Document showResultsDocument = Jsoup.parse(searchResponseHtml);
@@ -84,11 +86,21 @@ public class ZoroToService {
             List<EpisodesForTitle> showResults = showAnchors
                 .stream()
                 .map(element -> {
-                    return new EpisodesForTitle(
-                        getUrlWithOrigin(element.attr("href")),
-                        element.select("h3.film-name").text()
-                    );
+                    Element showTitleElement = element.selectFirst("h3.film-name");
+                    String showTitle = showTitleElement != null
+                        ? showTitleElement.text()
+                        : null;
+
+                    EpisodesForTitle show = showTitle != null
+                        ? new EpisodesForTitle(
+                            getUrlWithOrigin(element.attr("href")),
+                            showTitle
+                        )
+                        : null;
+
+                    return show;
                 })
+                .filter(Objects::nonNull)
                 .collect(Collectors.toList());
 
             log.info("Obtained {} show(s) for ({})", showResults.size(), title);
