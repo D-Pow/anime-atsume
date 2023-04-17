@@ -96,23 +96,21 @@ public class ApplicationApi {
                 .ok((SearchAnimeResponse) kissanimeRuController.searchKissanimeTitles(titleSearchRequest));
         }
 
-        SearchAnimeResponse searchResults = (SearchAnimeResponse) fourAnimeController.searchTitle(titleSearchRequest);
+        SearchAnimeResponse searchResults = null; // (SearchAnimeResponse) fourAnimeController.searchTitle(titleSearchRequest);
 
         if (searchResults == null || searchResults.getResults().size() == 0) {
-            searchResults = new SearchAnimeResponse(null);
+            searchResults = new SearchAnimeResponse();
             searchResults.setResults(nineAnimeController.searchShows(titleSearchRequest).getResults());
         }
 
         if (searchResults == null || searchResults.getResults().size() == 0) {
-            searchResults = new SearchAnimeResponse(null);
+            searchResults = new SearchAnimeResponse();
             searchResults.setResults(zoroToController.searchShows(titleSearchRequest).getResults());
         }
 
         if (searchResults == null || searchResults.getResults().size() == 0) {
             searchResults.setError("Anime servers are currently down :/");
         }
-
-        TitlesAndEpisodes searchResults = null; // = fourAnimeController.searchTitle(titleSearchRequest);
 
         if (searchResults == null || searchResults.getResults().size() == 0) {
             searchResults = nineAnimeController.searchShows(titleSearchRequest);

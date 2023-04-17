@@ -1,6 +1,7 @@
 package org.animeatsume.api.controller;
 
 import lombok.extern.log4j.Log4j2;
+import org.animeatsume.api.model.SearchAnimeResponse;
 import org.animeatsume.api.model.TitleSearchRequest;
 import org.animeatsume.api.model.TitlesAndEpisodes;
 import org.animeatsume.api.model.VideoSearchResult;
@@ -20,11 +21,11 @@ public class NineAnimeController {
     @Autowired
     NineAnimeService nineAnimeService;
 
-    public TitlesAndEpisodes searchShows(TitleSearchRequest request) {
-        TitlesAndEpisodes titleResults = null;
+    public SearchAnimeResponse searchShows(TitleSearchRequest request) {
+        SearchAnimeResponse titleResults = null;
 
         try {
-            titleResults = nineAnimeService.searchShows(request.getTitle());
+            titleResults = new SearchAnimeResponse(nineAnimeService.searchShows(request.getTitle()));
 
             if (titleResults != null) {
                 List<CompletableFuture<TitlesAndEpisodes.EpisodesForTitle>> episodeSearchFutures = titleResults.getResults().stream()
