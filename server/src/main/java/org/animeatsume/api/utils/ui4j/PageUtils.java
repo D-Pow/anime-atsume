@@ -1,11 +1,10 @@
 package org.animeatsume.api.utils.ui4j;
 
 import io.webfolder.ui4j.api.browser.Page;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.log4j.Log4j2;
 
+@Log4j2
 public class PageUtils {
-    private static final Logger log = LoggerFactory.getLogger(PageUtils.class);
 
     public static String getTitle(Page page) {
         return page.getDocument().getTitle().orElse("");

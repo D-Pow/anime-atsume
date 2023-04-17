@@ -1,8 +1,7 @@
 package org.animeatsume.api.utils.http;
 
+import lombok.extern.log4j.Log4j2;
 import org.animeatsume.api.utils.ObjectUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.core.io.support.ResourceRegion;
@@ -27,9 +26,8 @@ import java.util.Map;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
+@Log4j2
 public class Requests {
-    private static final Logger log = LoggerFactory.getLogger(Requests.class);
-
     public static HttpHeaders copyHttpHeaders(HttpHeaders headers) {
         HttpHeaders copiedHeaders = new HttpHeaders();
 
@@ -82,9 +80,11 @@ public class Requests {
 
         MultiValueMap<String, String> formDataBody = new LinkedMultiValueMap<>();
 
-        Stream.of(bodyEntries).forEach(keyValPair -> {
-            formDataBody.add(keyValPair[0], keyValPair[1]);
-        });
+        if (bodyEntries != null && bodyEntries.length > 0) {
+            Stream.of(bodyEntries).forEach(keyValPair -> {
+                formDataBody.add(keyValPair[0], keyValPair[1]);
+            });
+        }
 
         return new HttpEntity<>(formDataBody, headers);
     }
@@ -189,7 +189,10 @@ public class Requests {
                 }
 
                 HttpHeaders responseHeaders = headForHeadersWithAcceptAllFallback(url, restTemplate, requestEntity);
-                String contentTypeHeader = responseHeaders.getContentType().toString();
+                List<MediaType> headersAccept = responseHeaders.getAccept();
+                String contentTypeHeader = headersAccept
+                    .get(headersAccept.size() - 1)
+                    .toString();
                 Class<?> actualResponseTypeClass = getClassFromContentTypeHeader(contentTypeHeader);
 
                 response = restTemplate.exchange(

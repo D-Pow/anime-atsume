@@ -28,14 +28,12 @@ clean() (
 
 
 build() (
-    cd "${serverDir}"
-
     declare _buildCleanFirst=
     declare _buildCopyFilesToRootDir=
     declare _buildVerbose=
     declare OPTIND=1
 
-    while getopts ":cvh" opt; do
+    while getopts ":crvh" opt; do
         case "$opt" in
             c)
                 _buildCleanFirst=true
@@ -67,7 +65,10 @@ build() (
 
     declare _buildGradleOpts="${_buildCleanFirst:+clean} ${_buildVerbose:+--console plain}"
 
-    ./gradlew ${_buildGradleOpts} build
+    (
+        cd "${serverDir}"
+        ./gradlew ${_buildGradleOpts} build
+    )
 
     if [[ -n "$_buildCopyFilesToRootDir" ]]; then
         cp -R "${buildDir}/*" "${rootDir}"
@@ -86,11 +87,15 @@ checkBuildOutputDir() (
 
 
 dockerBuild() (
+    declare _dockerBuildFreshJar=
     declare _dockerBuildVerbose=
     declare OPTIND=1
 
-    while getopts ":v" opt; do
+    while getopts ":bv" opt; do
         case "$opt" in
+            b)
+                _dockerBuildFreshJar=true
+                ;;
             v)
                 _dockerBuildVerbose=true
                 ;;
@@ -103,7 +108,7 @@ dockerBuild() (
 
     shift $(( OPTIND - 1 ))
 
-    build -r
+    build -r ${_dockerBuildFreshJar:+-c}
 
     (
         command -v docker &>/dev/null && \
@@ -136,11 +141,11 @@ dockerClean() (
 )
 
 dockerRun() (
-    docker run -it --rm anime-atsume $@
+    docker run -it -p 80:8080 -p 443:8080 anime-atsume "$@"
 )
 
-dockerRunDeployed() (
-    docker run -it -p 80:8080 -p 443:8080 anime-atsume
+dockerRunWithoutPortsOpen() (
+    docker run -it --rm anime-atsume "$@"
 )
 
 

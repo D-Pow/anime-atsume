@@ -41,7 +41,6 @@ jobs:
 
     outputs:
       CLIENT_CACHE_ID: ${{ env.CLIENT_CACHE_ID }}
-      SERVER_CACHE_ID: ${{ env.SERVER_CACHE_ID }}
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -52,15 +51,15 @@ jobs:
       - name: CI:Cache name - Init
         uses: ./.github/workflows/actions/cache-name
 
-      - name: CI - Output cache ID
+      - name: CI - Output client cache ID
         id: ci-export-cache-id
         run: |
           echo "CLIENT_CACHE_ID=${{ env.CLIENT_CACHE_ID }}" >> $GITHUB_OUTPUT
-          echo "SERVER_CACHE_ID=${{ env.SERVER_CACHE_ID }}" >> $GITHUB_OUTPUT
 
       - name: Client Verify
         # Import pipeline logic via `uses`
         uses: ./.github/workflows/actions/client
+
 
   ci-server-verify:
     runs-on: ubuntu-latest
@@ -68,16 +67,34 @@ jobs:
       run:
         working-directory: ./server/
     needs: [ ci-client-verify ]
+    outputs:
+      SERVER_CACHE_ID: ${{ env.SERVER_CACHE_ID }}
     env:
       CLIENT_CACHE_ID: ${{ needs.ci-client-verify.outputs.CLIENT_CACHE_ID }}
-      SERVER_CACHE_ID: ${{ needs.ci-client-verify.outputs.SERVER_CACHE_ID }}
     steps:
       - name: Checkout repository branch
         uses: actions/checkout@v3
+
       - name: CI:Cache name - Init
         uses: ./.github/workflows/actions/cache-name
+
+      - name: CI:Server - Download CI client output
+        id: ci-server-download-cache
+        uses: actions/cache/restore@v3
+        continue-on-error: true
+        with:
+          path: |
+            ./server/src/main/resources/public
+          key: ${{ env.SERVER_CACHE_ID }}
+
+      - name: CI - Output server cache ID
+        id: ci-export-cache-id
+        run: |
+          echo "SERVER_CACHE_ID=${{ env.SERVER_CACHE_ID }}" >> $GITHUB_OUTPUT
+
       - name: Server Verify
         uses: ./.github/workflows/actions/server
+
 
   ci-complete:
     runs-on: ubuntu-latest
@@ -92,6 +109,9 @@ jobs:
       CLIENT_CACHE_ID: ${{ env.CLIENT_CACHE_ID }}
       SERVER_CACHE_ID: ${{ env.SERVER_CACHE_ID }}
     steps:
+      - name: Checkout repository branch
+        uses: actions/checkout@v3
+
       # Placeholder command just to allow this step to solely be a aggregate command such that
       # other commands wanting to depend on client/server build completion can have one dependency
       # instead of multiple.

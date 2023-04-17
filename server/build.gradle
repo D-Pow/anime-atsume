@@ -39,10 +39,24 @@ plugins {
     id 'idea'
 
     // adding plugins here removes the need to declare them in buildscript {}
-    id 'org.springframework.boot' version '2.7.4'  // See: https://docs.spring.io/spring-boot/docs/current/gradle-plugin/reference/htmlsingle
-    id 'io.spring.dependency-management' version '1.0.14.RELEASE'
-    // If running as a standalone JavaFX app with Java >= v11, add this plugin
-    // id 'org.openjfx.javafxplugin' version '0.0.10'
+    id 'org.springframework.boot' version '3.0.4'  // See: https://docs.spring.io/spring-boot/docs/current/gradle-plugin/reference/htmlsingle
+    id 'io.spring.dependency-management' version '1.1.0'
+    id 'io.freefair.lombok' version '8.0.1'
+    // If running as a standalone JavaFX app with Java >= v11, add this plugin:
+    // id 'org.openjfx.javafxplugin' version '0.0.13'
+    // And this block at the root level of build.gradle:
+    // javafx {
+    //     version = '21-ea+5'
+    //     modules = [
+    //         "javafx.base",
+    //         "javafx.controls",
+    //         "javafx.fxml",
+    //         "javafx.graphics",
+    //         "javafx.media",
+    //         "javafx.swing",
+    //         "javafx.web",
+    //     ]
+    // }
 
     /*
      * Similar to the below `apply from:` statement, we could write our own custom plugin in
@@ -77,8 +91,8 @@ apply from: "utils/build.gradle"
 
 
 /* Code was originally written for Java v8 so ensure it can run with these configs */
-sourceCompatibility = JavaVersion.VERSION_1_8;
-targetCompatibility = JavaVersion.VERSION_1_8;
+sourceCompatibility = JavaVersion.VERSION_17;
+targetCompatibility = JavaVersion.VERSION_17;
 
 
 /**
@@ -187,15 +201,48 @@ sourceSets {
  */
 dependencies {
     // JavaFX was removed in Java 11 so ensure it's installed (uses OpenJDK)
-    implementation 'org.openjfx:javafx:18.0.2'
+    // Only required if not using the Gradle plugin above
+    // Use `:18.0.2` for Java < 17
+    implementation 'org.openjfx:javafx:21-ea+5'
+
+    /*
+     * Spring Boot 3 dropped support for Java 8, which came with many consequences.
+     * Besides the obvious having to upgrade your installed Java version, this decision
+     * brought about numerous other problems, e.g. incredible amounts of logging issues
+     * (e.g. Slf4j, Log4j, Logback, etc. no longer work *at all* using their original configurations
+     * and require immense amounts of config-updates to get back to normal), `javax` is replaced 
+     * with `jakarta` which took *hours* to figure out (partly due to the IDE only wanting to import 
+     * `javax` classes; mostly due to that `@Entity` and similar classes weren't being tracked anymore
+     * if imported from `javax`, so the auto-configuration/bean-injection of Spring failed
+     * for no apparent reason; thus, it took incredibly long to go through the debugger, Stack Overflow,
+     * their docs (which are horrendous btw), etc. to figure out such a simple solution),
+     * and related off-the-wall issues.
+     * However, that being said, at least this new Java 17 configuration should last us a while
+     * without any drastic changes like this in the near future.
+     *
+     * See:
+     *  - Spring Boot 3 migration info: https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-3.0-Migration-Guide
+     *  - Spring (base) migration info: https://github.com/spring-projects/spring-framework/wiki/Upgrading-to-Spring-Framework-6.x
+     *  - Spring Boot 2.7 release notes which mention some helpful tidbits of info to prep for migration to 3: https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-2.7-Release-Notes
+     *  - Hibernate changelog task for them to move from `javax` to `jakarta`: https://github.com/hibernate/hibernate-orm/blob/15873c17fb7bd03e2579d8e3b6ab800734c21545/changelog.txt#L627
+     *
+     * Just for closure, in order to use `javax` again (which you shouldn't b/c Spring won't pick
+     * up the annotations anymore), these are the packages to use:
+     *  - javax.servlet:javax.servlet-api:4.0.1
+     *  - javax.persistence:javax.persistence-api:2.2
+     *  - javax.transaction:javax.transaction-api:1.3
+     */
 
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    implementation 'org.projectlombok:lombok:1.18.24'
+    implementation 'org.springframework.boot:spring-boot-starter-log4j2'
 
+    // Collection of most DB dialects out there, try to use this first and only use the
+    // others as fallbacks
+    implementation 'org.hibernate.orm:hibernate-community-dialects:6.1.7.Final'
+    implementation 'org.xerial:sqlite-jdbc:3.40.1.0'  // Old version: implementation 'com.github.gwenn:sqlite-dialect:0.1.2'
+    // implementation 'org.postgresql:postgresql:42.5.4'
     // implementation 'mysql:mysql-connector-java'
-    implementation 'org.xerial:sqlite-jdbc:3.30.1'
-    implementation 'com.github.gwenn:sqlite-dialect:0.1.0'
 
     // HTML parser
     implementation 'org.jsoup:jsoup:1.15.3'
@@ -226,8 +273,6 @@ dependencies {
         .orElse(new String[] { "${javaLibDir}/tools.jar" })
     )
 
-    annotationProcessor 'org.projectlombok:lombok:1.18.24'
-
     testImplementation('org.springframework.boot:spring-boot-starter-test') {
         exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
     }
@@ -236,8 +281,8 @@ dependencies {
 }
 
 
-if (System.properties['jfxrtDir'] == null) { // if not in root-level gradle.properties
-    System.properties['jfxrtDir'] = '.'
+if (System.properties.getProperty('jfxrtDir') == null) { // if not in root-level gradle.properties
+    System.properties.setProperty('jfxrtDir', '.');
 }
 
 
@@ -253,7 +298,7 @@ configurations.all {
      * Fixes an error where `logback` is considered to have duplicate files.
      *
      * Alternatives:
-     *   - exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
+     *   - exclude group: 'ch.qos.logback'
      *   - exclude group: 'org.apache.logging.log4j', module: 'log4j-to-slf4j'
      *   - exclude module: 'slf4j-log4j14'
      *
@@ -265,7 +310,7 @@ configurations.all {
      * @see <a href="https://discuss.gradle.org/t/gradle-7-fail-for-duplicates-in-copy-specs-has-no-duplicates-in-project/39834">Gradle discussion</a>
      * @see <a href="https://github.com/gradle/gradle/issues/17236">GitHub issue</a>
      */
-    exclude group: 'ch.qos.logback', module: 'logback-classic'
+    exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
 }
 
 

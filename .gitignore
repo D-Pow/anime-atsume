@@ -3,3 +3,4 @@
 **/.DS_Store
 .vercel
 **/*.sublime-*
+*.log

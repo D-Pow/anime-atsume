@@ -1,12 +1,11 @@
 package org.animeatsume.api.service;
 
+import lombok.extern.log4j.Log4j2;
 import org.animeatsume.api.model.kissanime.NovelPlanetSourceResponse;
 import org.animeatsume.api.utils.http.Cookies;
 import org.animeatsume.api.utils.http.CorsProxy;
 import org.animeatsume.api.utils.http.Requests;
 import org.animeatsume.api.utils.http.UriParser;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.*;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -18,8 +17,8 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 @Service
+@Log4j2
 public class NovelPlanetService {
-    private static final Logger log = LoggerFactory.getLogger(NovelPlanetService.class);
     private static final String websiteIdentifier = "/v/";
     private static final String apiIdentifier = "/api/source/";
     public static final String DOMAIN = "novelplanet";

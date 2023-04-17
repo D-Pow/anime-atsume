@@ -1,6 +1,6 @@
 package org.animeatsume.api.service;
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 import org.animeatsume.api.model.TitlesAndEpisodes;
 import org.animeatsume.api.model.TitlesAndEpisodes.EpisodesForTitle;
 import org.animeatsume.api.model.VideoSearchResult;
@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
-@Slf4j
+@Log4j2
 @Service
 public class FourAnimeService {
     private static final String ORIGIN = "https://4anime.to";

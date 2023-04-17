@@ -1,4 +1,4 @@
-FROM ubuntu:18.04
+FROM ubuntu:20.04
 
 
 # Note: Ensure the Dockerfile is in the same dir or above of all files meant to be copied into
@@ -32,19 +32,19 @@ ENV SHELL=/bin/bash
 ARG BUILD_VERBOSE=true
 ENV BUILDKIT_PROGRESS=${BUILD_VERBOSE:+plain}
 
+# Set placeholder timezone so required package `tzdata` doesn't require interactive input
+# See: https://stackoverflow.com/questions/44331836/apt-get-install-tzdata-noninteractive/44333806#44333806
+RUN ln -fs /usr/share/zoneinfo/America/New_York /etc/localtime
+
+# Since the Java app now bundles OpenJFX, no need to install it here
 RUN apt-get clean && \
     apt-get update && \
-    apt-get install -y \
+    apt-get install -y --no-install-recommends \
         curl \
         git \
         sqlite3 \
-        openjdk-8-jdk \
-        openjfx=8u161-b12-1ubuntu2 \
-        libopenjfx-jni=8u161-b12-1ubuntu2 \
-        libopenjfx-java=8u161-b12-1ubuntu2 \
         jq \
-        && \
-    apt-mark hold openjfx libopenjfx-jni libopenjfx-java
+        openjdk-17-jdk
 
 # Change CWD from <root> to $HOME
 WORKDIR /home
@@ -54,15 +54,28 @@ RUN export ROOT_DIR="$(realpath -se .)"
 ENV CLIENT_DIR="${ROOT_DIR}/client"
 ENV SERVER_DIR="${ROOT_DIR}/server"
 ENV BUILD_DIR="${SERVER_DIR}/build/libs"
-ENV WAR_FILE="${BUILD_DIR}/anime-atsume.war"
-ENV DB_FILE="${BUILD_DIR}/anime_atsume.db"
+ENV WAR_FILE_NAME="anime-atsume.war"
+ENV WAR_FILE_BUILD_PATH="${BUILD_DIR}/${WAR_FILE_NAME}"
+ENV WAR_FILE_FINAL_PATH="./${WAR_FILE_NAME}"
+ENV DB_FILE_NAME="anime_atsume.db"
+ENV DB_FILE_BUILD_PATH="${BUILD_DIR}/${DB_FILE_NAME}"
+ENV DB_FILE_FINAL_PATH="./${DB_FILE_NAME}"
 
 # Copy the entire app (server/client) from the local filesystem to the Docker image
 COPY . .
 
 # Build the app if not already done before attempting Docker image generation
 # Copy build-output files to root dir for ease of use
-RUN if ! [[ -d "${BUILD_DIR}" ]]; then ./index.sh build -r; fi
+RUN <<EOL
+    if ! [[ -f "${WAR_FILE_FINAL_PATH}" ]]; then
+        if ! [[ -f "${WAR_FILE_BUILD_PATH}" ]]; then
+            ./index.sh build -r;
+        else
+            cp "${WAR_FILE_BUILD_PATH}" "${WAR_FILE_FINAL_PATH}"
+            cp "${DB_FILE_BUILD_PATH}" "${DB_FILE_FINAL_PATH}"
+        fi
+    fi
+EOL
 
 EXPOSE 8080
 

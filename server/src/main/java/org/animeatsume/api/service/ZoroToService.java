@@ -4,6 +4,7 @@ import lombok.extern.log4j.Log4j2;
 import org.animeatsume.api.model.TitlesAndEpisodes;
 import org.animeatsume.api.model.TitlesAndEpisodes.EpisodesForTitle;
 import org.animeatsume.api.model.VideoSearchResult;
+import org.animeatsume.api.model.ZoroToShowResponse;
 import org.animeatsume.api.utils.ObjectUtils;
 import org.animeatsume.api.utils.http.CorsProxy;
 import org.animeatsume.api.utils.http.Requests;
@@ -16,6 +17,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -24,17 +26,16 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 @Log4j2
 @Service
-public class NineAnimeService {
-    private static final String ORIGIN = "https://123anime.to";
-    private static final String SEARCH_URL = ORIGIN + "/livesearch";
-    private static final String SHOW_RESULTS_SELECTOR = "a.nav-item";
-    private static final String SHOW_NAVIGATE_SELECTOR = "a.btn-play";
+public class ZoroToService {
+    private static final String ORIGIN = "https://zoro.to";
+    private static final String SEARCH_URL = ORIGIN + "/ajax/search/suggest?keyword=";
     private static final String EPISODES_SELECTOR = "#episodes-content a";
     private static final String DOWNLOAD_ANCHOR_SELECTOR = "a.pc-download";  // The "Download" link that redirects to a different page
     private static final String DOWNLOAD_BUTTON_SELECTOR = ".dowload a";  // The different download links of varying video resolutions. Yes, they made a typo
@@ -51,12 +52,6 @@ public class NineAnimeService {
         return headers;
     }
 
-    private static String[][] getSearchPostRequestBody(String searchQuery) {
-        return new String[][] {
-            { "value", searchQuery }
-        };
-    }
-
     private static String getUrlWithOrigin(String... suffixes) {
         List<String> urlPaths = new ArrayList<>(Arrays.asList(suffixes));
         urlPaths.add(0, ORIGIN);
@@ -68,29 +63,44 @@ public class NineAnimeService {
     public TitlesAndEpisodes searchShows(String title) {
         log.info("Searching <{}> for title ({}) ...", ORIGIN, title);
 
-        String[][] titleSearchFormData = getSearchPostRequestBody(title);
-        HttpEntity titleSearchHttpEntity = Requests.getFormDataHttpEntity(getSearchHeaders(), titleSearchFormData);
-
-        String searchResponseHtml = (String) CorsProxy.doCorsRequest(
-            HttpMethod.POST,
-            URI.create(SEARCH_URL),
+        Object searchResponse = CorsProxy.doCorsRequest(
+            HttpMethod.GET,
+            URI.create(SEARCH_URL + title),
             URI.create(ORIGIN),
-            titleSearchHttpEntity.getBody(),
-            titleSearchHttpEntity.getHeaders()
+            null,
+            getSearchHeaders()
         ).getBody();
 
-        // TODO - Delete this
-        // log.info("searchResponseHtml: {}", searchResponseHtml);
+        ZoroToShowResponse searchResponseObject;
+
+        try {
+            searchResponseObject = ZoroToShowResponse.fromString((String) searchResponse);
+        } catch (Exception responseIsMapInsteadOfString) {
+            searchResponseObject = ZoroToShowResponse.fromMap((Map<String, Object>) searchResponse);
+        }
+        String searchResponseHtml = searchResponseObject.getHtml();
 
         if (searchResponseHtml != null) {
             Document showResultsDocument = Jsoup.parse(searchResponseHtml);
-            Elements showAnchors = showResultsDocument.select(SHOW_RESULTS_SELECTOR);
+            Elements showAnchors = showResultsDocument.select("a");
             List<EpisodesForTitle> showResults = showAnchors
                 .stream()
-                .map(element -> new EpisodesForTitle(
-                    getUrlWithOrigin(element.attr("href")),
-                    element.select("h3.film-name").text()
-                ))
+                .map(element -> {
+                    Element showTitleElement = element.selectFirst("h3.film-name");
+                    String showTitle = showTitleElement != null
+                        ? showTitleElement.text()
+                        : null;
+
+                    EpisodesForTitle show = showTitle != null
+                        ? new EpisodesForTitle(
+                            getUrlWithOrigin(element.attr("href")),
+                            showTitle
+                        )
+                        : null;
+
+                    return show;
+                })
+                .filter(Objects::nonNull)
                 .collect(Collectors.toList());
 
             log.info("Obtained {} show(s) for ({})", showResults.size(), title);
@@ -113,77 +123,89 @@ public class NineAnimeService {
             getSearchHeaders()
         ).getBody();
 
-        Elements showParentListOfLength1 = Jsoup.parse(showSplashPage).select(".anisc-detail");
-        log.info("First Elem: size ({})", showParentListOfLength1.size());
+        Element watchNowButton = Jsoup.parse(showSplashPage).select(".film-buttons .btn-play").first();
 
-        if (showParentListOfLength1.size() < 1) {
-            return null;
-        };
-
-        Element showParent = showParentListOfLength1.first();
-        String showName = showParent.select("h2.film-name").text();
-
-        List<VideoSearchResult> showSplashPageWatchButtons = showParent
-            .select("a.btn-play")
-            .stream()
-            .map(element -> new VideoSearchResult(
-                getUrlWithOrigin(element.attr("href")),
-                showName
-            ))
-            .collect(Collectors.toList());
-
-        if (showSplashPageWatchButtons == null || showSplashPageWatchButtons.size() == 0) {
+        if (watchNowButton == null) {
             return null;
         }
 
-        String showWatchUrl = getUrlWithOrigin(showSplashPageWatchButtons.get(0).getUrl());
-
-        log.info("Attempting to request: {}", showWatchUrl);
-
-        String showHtml = (String) CorsProxy.doCorsRequest(
+        String showEpisodesPageHtml = (String) CorsProxy.doCorsRequest(
             HttpMethod.GET,
-            URI.create(showWatchUrl),
+            URI.create(getUrlWithOrigin(watchNowButton.attr("href"))),
             URI.create(ORIGIN),
             null,
             getSearchHeaders()
         ).getBody();
 
-        if (showHtml == null || showHtml.length() == 0) {
-            return null;
-        }
+        // TODO - HTML doesn't have the episodes until JavaScript injects elements onto the page
+        log.info("showEpisodesPageHtml: {}", showEpisodesPageHtml);
 
-        List<VideoSearchResult> episodeAnchors = Jsoup.parse(showHtml)
-            .select(EPISODES_SELECTOR)
-            .stream()
-            .map(element -> new VideoSearchResult(
-                String.format("%s/%s", ORIGIN, element.attr("href")),
-                element.attr("title")
+        Document showEpisodesPageDom = Jsoup.parse(showEpisodesPageHtml);
+
+        List<VideoSearchResult> episodes = showEpisodesPageDom.select(".ssl-item.ep-item").stream()
+            .map(anchor -> {
+                String showUrl = anchor.attr("href");
+                String showTitle = anchor.attr("title");
+
+                return new VideoSearchResult(showUrl, showTitle);
+            })
+            .filter(videoSearchResult ->(
+                videoSearchResult.getUrl() != null
+                && videoSearchResult.getUrl().length() > 0
+                && videoSearchResult.getTitle() != null
+                && videoSearchResult.getTitle().length() > 0
             ))
             .collect(Collectors.toList());
 
-        // TODO - I think this is unnecessary code leftover from merge conflict
-        // episodesForTitle.setEpisodes(getDirectVideoUrls(episodeAnchors));
-
-        log.info("Obtained {} episodes for ({})",
-            episodesForTitle.getEpisodes().size(),
-            episodesForTitle.getTitle()
-        );
-
-        getDirectVideoUrls(episodeAnchors);
-
-        log.info("Determined URLs for {} episodes for ({})",
-            episodesForTitle.getEpisodes().size(),
-            episodesForTitle.getTitle()
-        );
+        episodesForTitle.setEpisodes(episodes);
 
         return CompletableFuture.completedFuture(episodesForTitle);
+
+//        String showWatchUrl = getUrlWithOrigin(showSplashPageWatchButtons.get(0).getUrl());
+//
+//        log.info("Attempting to request: {}", showWatchUrl);
+//
+//        String showHtml = (String) CorsProxy.doCorsRequest(
+//            HttpMethod.GET,
+//            URI.create(showWatchUrl),
+//            URI.create(ORIGIN),
+//            null,
+//            getSearchHeaders()
+//        ).getBody();
+//
+//        if (showHtml == null || showHtml.length() == 0) {
+//            return null;
+//        }
+//
+//        List<VideoSearchResult> episodeAnchors = Jsoup.parse(showHtml)
+//            .select(EPISODES_SELECTOR)
+//            .stream()
+//            .map(element -> new VideoSearchResult(
+//                String.format("%s/%s", ORIGIN, element.attr("href")),
+//                element.attr("title")
+//            ))
+//            .collect(Collectors.toList());
+//
+//        log.info("Obtained {} episodes for ({})",
+//            episodesForTitle.getEpisodes().size(),
+//            episodesForTitle.getTitle()
+//        );
+//
+//        getDirectVideoUrls(episodeAnchors);
+//
+//        log.info("Determined URLs for {} episodes for ({})",
+//            episodesForTitle.getEpisodes().size(),
+//            episodesForTitle.getTitle()
+//        );
+//
+//        return CompletableFuture.completedFuture(episodesForTitle);
     }
 
     public List<VideoSearchResult> getDirectVideoUrls(List<VideoSearchResult> episodeAnchors) {
         List<CompletableFuture<VideoSearchResult>> allEpisodesAndDownloadUrls = episodeAnchors
             .stream()
             .map(episodeAnchor -> {
-                log.info("Getting 9anime MP4 video from ({})", episodeAnchor.getUrl());
+                log.info("Getting zoro.to MP4 video from ({})", episodeAnchor.getUrl());
 
                 String episodeDownloadHtml = (String) CorsProxy.doCorsRequest(
                     HttpMethod.GET,
@@ -271,7 +293,7 @@ public class NineAnimeService {
                 int secretVideoInIndexHtmlCaptureGroupForSrc = 2;
                 String secretVideoInIndexHtmlSrcUrl = secretVideoInIndexHtmlMatches.get(secretVideoInIndexHtmlCaptureGroupForSrc);
 
-                log.info("9anime video src not in video.src property [{}], rather in index.html [{}]",
+                log.info("zoro.to video src not in video.src property [{}], rather in index.html [{}]",
                     srcUrl,
                     secretVideoInIndexHtmlSrcUrl
                 );

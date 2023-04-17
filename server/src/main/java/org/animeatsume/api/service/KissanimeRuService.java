@@ -4,6 +4,7 @@ import io.webfolder.ui4j.api.browser.BrowserEngine;
 import io.webfolder.ui4j.api.browser.BrowserFactory;
 import io.webfolder.ui4j.api.browser.Page;
 import io.webfolder.ui4j.api.browser.PageConfiguration;
+import lombok.extern.log4j.Log4j2;
 import org.animeatsume.api.model.Anchor;
 import org.animeatsume.api.model.kissanime.CaptchaAttempt;
 import org.animeatsume.api.model.TitleSearchRequest;
@@ -15,8 +16,6 @@ import org.animeatsume.api.utils.http.Requests;
 import org.animeatsume.api.utils.regex.HtmlParser;
 import org.animeatsume.api.utils.regex.RegexUtils;
 import org.animeatsume.api.utils.ui4j.PageUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpEntity;
@@ -42,9 +41,8 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
+@Log4j2
 public class KissanimeRuService {
-    private static final Logger log = LoggerFactory.getLogger(KissanimeRuService.class);
-
     // BrowserEngine is a singleton; improve performance by avoiding making `synchronized` calls in endpoint handling
     private static BrowserEngine browser;
 

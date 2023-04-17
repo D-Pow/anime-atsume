@@ -1,7 +1,6 @@
 package org.animeatsume;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -20,9 +19,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 // TODO Replace blocking/synchronous RestTemplate usage with webflux's non-blocking/async WebClient
 @SpringBootApplication
+@Log4j2
 public class ApplicationDriver {
-    private static final Logger log = LoggerFactory.getLogger(ApplicationDriver.class);
-
     public static void main(String[] args) {
         SpringApplication.run(ApplicationDriver.class, args);
     }

@@ -2,6 +2,17 @@ name: Cache - Initialize names
 description: Initializes the cache names for client and server
 
 
+inputs:
+  nodeVersion:
+    description: Version of NodeJS to use.
+    required: false
+    default: 16
+  javaVersion:
+    description: Version of Java to use.
+    required: false
+    default: 17
+
+
 outputs:
   CLIENT_CACHE_ID:
     description: Client cache ID to use for all workflows/actions.
@@ -19,6 +30,24 @@ runs:
   steps:
     - name: Checkout repository branch
       uses: actions/checkout@v3
+
+    - name: Set default language versions
+      shell: bash
+      run: |
+        echo "nodeVersion=${{ inputs.nodeVersion }}" >> $GITHUB_ENV
+        echo "javaVersion=${{ inputs.javaVersion }}" >> $GITHUB_ENV
+
+    - name: Set NodeJS version
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ env.nodeVersion }}
+
+    - uses: actions/setup-java@v3
+      with:
+        # See:
+        #   - Supported Java distribution: https://github.com/actions/setup-java#supported-distributions
+        distribution: 'temurin'  # Eclipse version of JDK
+        java-version: ${{ env.javaVersion }}
 
     - name: Set repo name
       id: set-repo-name

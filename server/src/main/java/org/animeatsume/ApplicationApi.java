@@ -1,9 +1,11 @@
 package org.animeatsume;
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 import org.animeatsume.api.controller.FourAnimeController;
 import org.animeatsume.api.controller.KissanimeRuController;
 import org.animeatsume.api.controller.NineAnimeController;
+import org.animeatsume.api.controller.ZoroToController;
+import org.animeatsume.api.model.SearchAnimeResponse;
 import org.animeatsume.api.model.TitleSearchRequest;
 import org.animeatsume.api.model.TitlesAndEpisodes;
 import org.animeatsume.api.model.kissanime.KissanimeVideoHostRequest;
@@ -18,13 +20,13 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.net.URI;
 import java.util.Map;
 
 @RestController
 @CrossOrigin
-@Slf4j
+@Log4j2
 public class ApplicationApi {
 
     @Autowired
@@ -38,6 +40,9 @@ public class ApplicationApi {
 
     @Autowired
     NineAnimeController nineAnimeController;
+
+    @Autowired
+    ZoroToController zoroToController;
 
     @Value("${org.animeatsume.activate-kissanime}")
     Boolean activateKissanime;
@@ -74,7 +79,7 @@ public class ApplicationApi {
         @RequestHeader HttpHeaders requestHeaders,
         HttpServletRequest request
     ) {
-        HttpMethod method = HttpMethod.resolve(request.getMethod());
+        HttpMethod method = HttpMethod.valueOf(request.getMethod());
 
         log.info("Executing {} CORS request to URL ({}) with body ({})", method, url, body);
 
@@ -83,12 +88,28 @@ public class ApplicationApi {
 
     @Cacheable(ApplicationConfig.ANIME_TITLE_SEARCH_CACHE_NAME)
     @PostMapping(value = "/searchAnime", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Object> searchAnime(@RequestBody TitleSearchRequest titleSearchRequest) {
+    public ResponseEntity<SearchAnimeResponse> searchAnime(@RequestBody TitleSearchRequest titleSearchRequest) {
         titleSearchRequest.setTitle(RegexUtils.removeNonAlphanumericChars(titleSearchRequest.getTitle()));
 
         if (activateKissanime) {
             return ResponseEntity
-                .ok(kissanimeRuController.searchKissanimeTitles(titleSearchRequest));
+                .ok((SearchAnimeResponse) kissanimeRuController.searchKissanimeTitles(titleSearchRequest));
+        }
+
+        SearchAnimeResponse searchResults = (SearchAnimeResponse) fourAnimeController.searchTitle(titleSearchRequest);
+
+        if (searchResults == null || searchResults.getResults().size() == 0) {
+            searchResults = new SearchAnimeResponse(null);
+            searchResults.setResults(nineAnimeController.searchShows(titleSearchRequest).getResults());
+        }
+
+        if (searchResults == null || searchResults.getResults().size() == 0) {
+            searchResults = new SearchAnimeResponse(null);
+            searchResults.setResults(zoroToController.searchShows(titleSearchRequest).getResults());
+        }
+
+        if (searchResults == null || searchResults.getResults().size() == 0) {
+            searchResults.setError("Anime servers are currently down :/");
         }
 
         TitlesAndEpisodes searchResults = null; // = fourAnimeController.searchTitle(titleSearchRequest);
