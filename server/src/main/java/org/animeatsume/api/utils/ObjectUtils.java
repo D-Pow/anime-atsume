@@ -163,6 +163,9 @@ public class ObjectUtils {
      * @see <a href="https://www.geeksforgeeks.org/reflection-in-java">Reflection overview</a>
      * @see <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html#getDeclaredField-java.lang.String-">Reflection - calling {@code getDeclaredField()} on objects</a>
      * @see <a href="https://stackoverflow.com/questions/60542367/how-exactly-does-the-java-reduce-function-with-3-parameters-work/60554907#60554907">{@code .reduce()} third argument for return-type conversion</a>
+     *
+     * Related:
+     * @see <a href="https://stackoverflow.com/questions/15966726/how-to-change-method-behaviour-through-reflection/15967008#15967008">Object proxies for monitoring and modifying method calls</a>
      */
     private static Object getObjectProperties(Object obj, boolean asString, boolean recurseNestedObjects) {
         Class<?> objClass = obj.getClass();
