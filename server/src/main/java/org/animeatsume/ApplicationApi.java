@@ -86,7 +86,13 @@ public class ApplicationApi {
         return CorsProxy.doCorsRequest(method, url, origin, body, requestHeaders);
     }
 
-    @Cacheable(ApplicationConfig.ANIME_TITLE_SEARCH_CACHE_NAME)
+    // Like most annotations, for `@Cacheable`, we can only use either a `static final` var (from another class)
+    // or use the .properties var key directly (without the "proxy" of another class).
+    // Here, we use the .properties key to reduce duplicated code (so we don't have to repeat the .properties
+    // var in source code).
+    // See:
+    //  - https://stackoverflow.com/questions/39013894/reading-from-application-properties-attribute-value-must-be-constant/39013994#39013994
+    @Cacheable(cacheNames = "${org.animeatsume.cache.anime-title-search}")
     @PostMapping(value = "/searchAnime", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<SearchAnimeResponse> searchAnime(@RequestBody TitleSearchRequest titleSearchRequest) {
         titleSearchRequest.setTitle(RegexUtils.removeNonAlphanumericChars(titleSearchRequest.getTitle()));

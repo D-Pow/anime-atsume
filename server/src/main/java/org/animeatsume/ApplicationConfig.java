@@ -27,17 +27,20 @@ public class ApplicationConfig {
 
     @Value("${org.animeatsume.cache.cache-names}")
     public static String[] CACHE_NAMES;
+
     @Value("${org.animeatsume.cache.anime-title-search}")
-    public static final String ANIME_TITLE_SEARCH_CACHE_NAME = "animeTitleSearch";
+    public static String ANIME_TITLE_SEARCH_CACHE_NAME;
+
 
     public ApplicationConfig(
         @Value("${org.animeatsume.cache.cache-names}") String[] CACHE_NAMES,
         @Value("${org.animeatsume.cache.anime-title-search}") String ANIME_TITLE_SEARCH_CACHE_NAME
     ) {
         ApplicationConfig.CACHE_NAMES = CACHE_NAMES;
-        // ApplicationConfig.ANIME_TITLE_SEARCH_CACHE_NAME = ANIME_TITLE_SEARCH_CACHE_NAME;
-        log.info("CACHE_NAMES: {}", CACHE_NAMES);
-        log.info("ANIME_TITLE_SEARCH_CACHE_NAME: {}", ANIME_TITLE_SEARCH_CACHE_NAME);
+        ApplicationConfig.ANIME_TITLE_SEARCH_CACHE_NAME = ANIME_TITLE_SEARCH_CACHE_NAME;
+
+        log.debug("CACHE_NAMES: {}", CACHE_NAMES);
+        log.debug("ANIME_TITLE_SEARCH_CACHE_NAME: {}", ANIME_TITLE_SEARCH_CACHE_NAME);
     }
 
     @Bean
