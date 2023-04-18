@@ -99,9 +99,11 @@ public class ApplicationConfig {
     }
 
     // Cannot use runtime vars like those populated by `@Value()` inside `@CacheEvict` annotation
-    // nor `@Scheduled` annotations, so the string reference inside via `CacheManager` constructor
-    // call will technically be null, but for now that's ok since we have no other caches.
-    //@CacheEvict(allEntries = true, value = ANIME_TITLE_SEARCH_CACHE_NAME)
+    // nor `@Scheduled` annotations b/c the string reference inside via `CacheManager` constructor
+    // call will technically be null.
+    // We also can't use the key from .properties to get the value like we can in `@Cacheable`.
+    // Thus, manually clear the cache via `CacheManager`.
+    //@CacheEvict(allEntries = true, value = "${org.animeatsume.cache.anime-title-search}")
     @Scheduled(fixedDelay = ANIME_TITLE_SEARCH_CACHE_CLEAR_INTERVAL)
     public void clearSearchAnimeTitleCache() {
         clearCache(ANIME_TITLE_SEARCH_CACHE_NAME);
