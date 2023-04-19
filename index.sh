@@ -4,6 +4,12 @@ declare rootDir="$(realpath -se "$(dirname "${BASH_SOURCE[@]}")")"
 declare clientDir="${rootDir}/client"
 declare serverDir="${rootDir}/server"
 declare buildDir="${serverDir}/build/libs"
+declare feBuildDir="$(realpath -se "${rootDir}/$(
+    cat "${clientDir}/package.json" \
+    | grep -E '\bbuildOutputDir' \
+    | awk '{ print $2 }' \
+    | sed -E 's/"//g; s|\.*/?|\./|'
+)")"
 
 
 _egrep() {
