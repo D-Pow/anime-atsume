@@ -4,9 +4,9 @@ def installNvmAndNodeJsIfNotPresent() {
     boolean nodeJsIsInstalled = nodeJsIsInstalledStdOut != null && nodeJsIsInstalledStdOut.length() > 0;
 
     if (!nodeJsIsInstalled) {
-        println "Installing NodeJS version ${nodeVersion} using `nvm` via `${repoRootDirPath}/install-nvm.sh`..."
+        println "Installing NodeJS version ${nodeVersion} using `nvm` via `${repoRootDirPath}/nvm-install.sh`..."
 
-        cliCmd("${repoRootDirPath}/install-nvm.sh ${nodeVersion}");
+        cliCmd("${repoRootDirPath}/nvm-install.sh ${nodeVersion}");
 
         println "NodeJS installation successful!"
     }

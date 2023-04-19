@@ -211,7 +211,7 @@ $(
                 return 1
                 ;;
             i)
-                "${rootDir}/install-nvm.sh"
+                "${rootDir}/nvm-install.sh"
                 ;;
             *)
                 :  # Unknown flag - Forward to desired command
