@@ -31,8 +31,8 @@ def cliCmd(String commandAndArgs, String dir) {
  *  - Running Bash commands in Gradle: https://stackoverflow.com/questions/52389713/execute-bash-command-in-a-gradle-function
  *
  * Alternatives:
- *  - {@code "my command".execute().toString()}
- *      + Likely will require {@code cmd.execute().consumeProcessOutput(stdOut, stdErr)}
+ *  - {@code "my command".execute().text.trim()}
+ *      + `.text` should help remove the need for {@code cmd.execute().consumeProcessOutput(stdOut, stdErr)}, which `.toString()` would likely require
  *  - {@code executeCommand(cmd)}
  *  - {@code (Below with or without `.waitFor()`)}
  *  - {@code new String(cmd.execute()[.getOutputStream()|.toByteArray()][.toByteArray()])}
