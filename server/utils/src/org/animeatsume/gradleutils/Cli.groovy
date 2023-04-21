@@ -31,7 +31,9 @@ def cliCmd(String commandAndArgs, String dir) {
  *  - Running Bash commands in Gradle: https://stackoverflow.com/questions/52389713/execute-bash-command-in-a-gradle-function
  *
  * Alternatives:
- *  - {@code "my command".execute().text.trim()}
+ *  - {@code Process proc = "my command".execute(); proc.waitFor(); proc.text.trim()}
+ *      + Even better, specify the shell for `proc`: {@code Process proc = [ "bash", "-c", "my command as one string" ].execute()}
+ *      + `.waitFor()` is helpful for commands that take time to execute, e.g. `curl`.
  *      + `.text` should help remove the need for {@code cmd.execute().consumeProcessOutput(stdOut, stdErr)}, which `.toString()` would likely require
  *  - {@code executeCommand(cmd)}
  *  - {@code (Below with or without `.waitFor()`)}
