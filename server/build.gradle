@@ -131,6 +131,13 @@ allprojects {
  * @see <a href="https://docs.gradle.org/current/dsl/org.gradle.api.Project.html#N14E9A)"></a>
  */
 ext {
+    // Default formatting scheme for `jar`/`war` tasks: `<name>-<version>.<extension>`
+    // Note: "build" was only added before `archiveBaseName`, `archiveVersion`, etc. to distinguish global `ext` var from local `jar`/`war` var.
+    buildArchiveBaseName = rootProject.name.toLowerCase();  // Only the base `<name>` of the formatting scheme
+    buildArchiveVersion = "";  // Only the `<version>` portion of the formatting scheme
+    //buildArchiveFileName = "${buildArchiveBaseName}.jar";  // Full name of the generated .jar/.war archive, ignoring default formatting scheme
+
+
     osName = System.getProperty("os.name").toLowerCase();
     osArch = System.getProperty("os.arch").toLowerCase();
     osVersion = System.getProperty("os.version").toLowerCase();
@@ -353,11 +360,18 @@ configurations.all {
  */
 jar {
     enabled = false
+
+    archiveBaseName = buildArchiveBaseName;
+    archiveVersion = buildArchiveVersion;
+
     // archiveClassifier = ""  // Occasionally necessary
 }
 
 war {
     enabled = false
+
+    archiveBaseName = buildArchiveBaseName;
+    archiveVersion = buildArchiveVersion;
 }
 
 
@@ -414,9 +428,12 @@ tasks.run.dependsOn([ "bootRun" ]);
 bootWar {
     enabled = true;  // Required due to above deactivation of the `war` task
 
+    archiveBaseName = buildArchiveBaseName;
+    archiveVersion = buildArchiveVersion;
+
     doFirst {  // Run in `doFirst` rather than config step to avoid race conditions with `gradle.rootProject.setVersion()`
-        archiveBaseName = project.name
-        // archiveVersion = project.version  // Don't add `project.version` to output .war file name
+        archiveBaseName = buildArchiveBaseName;
+        // archiveVersion = buildArchiveVersion;  // Don't add `project.version` to output .war file name
     }
 
     if (injectJavaFxJar.toBoolean()) {
