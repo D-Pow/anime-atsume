@@ -487,28 +487,65 @@ gradle.projectsEvaluated {
 }
 
 
-wrapper { // TODO - Move to files.groovy
+
+wrapper {
     distributionType = Wrapper.DistributionType.ALL
 }
 
 tasks.register("wrapperVersion") {
     doLast {
-        String allGradleVersionsResponse = cliCmd("curl -fsSL 'https://gradle.org/releases' | grep -Eo 'v([0-9]+\\.){1,3}[0-9]*\\W' | sed -E 's/^v([0-9\\.]*).?\$/\\1/' | sort -Vur");
-        List<String> allGradleVersions = allGradleVersionsResponse.split("\n");
-        println("allGradleVersionsResponse: ${allGradleVersionsResponse}")
+        boolean shouldUpgrade = (
+            (
+                project.hasProperty("u")
+                || project.hasProperty("upgrade")
+            )
+            && (String) project.getProperties().get("u") != "false"
+            && (String) project.getProperties().get("upgrade") != "false"
+        );
 
-        String wrapperVersionNumber = allGradleVersions.get(0);
+        /*
+         * CLI cmd:
+         *  - Get Gradle-releases HTML page.
+         *  - Extract only version numbers.
+         *  - Extract only the number from the version (deleting text like "v" from "v1.2.3").
+         *  - Sort in descending order.
+         */
+        String allGradleVersionsResponse = cliCmd("curl -fsSL 'https://gradle.org/releases' | grep -Eo 'v([0-9]+\\.){1,3}[0-9]*\\W' | sed -E 's/^v([0-9\\.]*).?\$/\\1/; s/[^0-9\\.]//g' | sort -Vur");
+        List<String> allGradleVersions = allGradleVersionsResponse.split("\n");
+
+        if (project.hasProperty("l")) {
+            println("Available Gradle versions:\n${allGradleVersions}");
+        }
+
+        if (!shouldUpgrade) {
+            return;
+        }
+
+        String wrapperVersionNumberDefault = allGradleVersions.get(0);
+        String wrapperVersionNumber;
 
         if (project.hasProperty("v")) {
-            wrapperVersionNumber = project.getProperty("v");
+            wrapperVersionNumber = project.property("v");
         } else if (System.hasProperty("v")) {
             wrapperVersionNumber = System.getProperty("v");
         }
 
-        // TODO - Only upgrade if `-Pu` is passed
+        if (!allGradleVersions.contains(wrapperVersionNumber)) {
+            println("Specified Gradle wrapper version ${wrapperVersionNumber} doesn't exist. Choosing lower version matching ${wrapperVersionNumber}...");
+
+            wrapperVersionNumber = allGradleVersions.stream()
+                .filter(existingVersion -> "${wrapperVersionNumber}".matches("^${existingVersion}.*"))
+                .findFirst()
+                .orElse(wrapperVersionNumberDefault);
+        }
+
+        assert wrapperVersionNumber != null;
 
         println("Upgrading Gradle wrapper to v${wrapperVersionNumber}");
-        // See: https://gradle.org/install#with-the-gradle-wrapper
-        cliCmd("./gradlew wrapper --distribution-type=bin --gradle-version=${wrapperVersionNumber}")
+
+        // See:
+        //  - https://docs.gradle.org/current/userguide/gradle_wrapper.html#sec:upgrading_wrapper
+        //  - https://gradle.org/install#with-the-gradle-wrapper
+        cliCmd("./gradlew wrapper --distribution-type=bin --gradle-version=${wrapperVersionNumber}");
     }
 }
