@@ -30,14 +30,20 @@ import org.animeatsume.gradleutils.*;
 
 
 plugins {
+    /*  Base app plugins  */
     id 'java'
+    id 'application'  // Docs: https://docs.gradle.org/current/userguide/application_plugin.html#sec:application_tasks
     id 'war'
+
+    /*  Building and packaging plugins  */
     id 'java-library'  // Provides enum for Java versions. Example: https://docs.gradle.org/current/userguide/custom_plugins.html#:~:text=Example%209.%20Creating%20a%20simple%20script%20plugin
     id 'java-gradle-plugin'  // Add Gradle internal classes to classpath; Necessary to expose classes as `public` classes to the parent/build.gradle files importing this
+
+    /*  Language and IDE plugins  */
     id 'groovy'
-    id 'application'  // Docs: https://docs.gradle.org/current/userguide/application_plugin.html#sec:application_tasks
     id 'idea'
 
+    /*  Dependency plugins  */
     // adding plugins here removes the need to declare them in buildscript {}
     id 'org.springframework.boot' version '3.0.4'  // See: https://docs.spring.io/spring-boot/docs/current/gradle-plugin/reference/htmlsingle
     id 'io.spring.dependency-management' version '1.1.0'
@@ -125,9 +131,17 @@ allprojects {
  * @see <a href="https://docs.gradle.org/current/dsl/org.gradle.api.Project.html#N14E9A)"></a>
  */
 ext {
-    isWindows = System.getProperty("os.name")
-        .toLowerCase()
-        .startsWith("windows");
+    osName = System.getProperty("os.name").toLowerCase();
+    osArch = System.getProperty("os.arch").toLowerCase();
+    osVersion = System.getProperty("os.version").toLowerCase();
+
+    if (osName.matches("mac|darwin")) {
+        osName = "osx";
+    }
+
+    isWindows = osName.startsWith("windows");
+
+
     javaHome = "${System.properties['java.home']}";
     javaLibDir = "${javaHome}/lib";
 
@@ -139,6 +153,7 @@ ext {
         javaLibDir = "${javaHome}/../lib";
     }
 
+
     repoRootDirPath = new File("${project.projectDir.toString().trim()}/..").getCanonicalPath();
 
     try {
@@ -148,6 +163,7 @@ ext {
             repoRootDirPath = _repoRootDirPathViaGit;
         }
     } catch (e) {}
+
 
     clientDirPath = "${repoRootDirPath}/client";
     clientDirDepsPath = "${clientDirPath}/node_modules";
@@ -182,6 +198,7 @@ sourceSets {
 }
 
 
+
 /**
  *  - `implementation` = Adds to build output and classpath. Required to run your code but
  *      isn't needed during compilation. Try to use this most of the time.
@@ -194,6 +211,7 @@ sourceSets {
  *  - `runtimeOnly` - Don't even build the dependency, just inject it in the resulting build output.
  *  - `compile` - Deprecated. Same as thing as `api`.
  *
+ * @see <a href="https://abhiappmobiledeveloper.medium.com/difference-between-implementation-api-compile-and-runtimeonly-in-gradle-dependency-55b70215d245#ae30">Overview and comparison chart</a>
  * @see <a href="https://stackoverflow.com/questions/47365119/gradle-dependency-configuration-implementation-vs-api-vs-runtimeonly-vs-compil/47365147#47365147">SO post explaining dependency tags</a>
  * @see <a href="https://docs.gradle.org/current/userguide/java_plugin.html#sec:java_plugin_and_dependency_management">Gradle "Dependency management" docs</a>
  * @see <a href="https://docs.gradle.org/current/userguide/java_library_plugin.html#sec:java_library_configurations_graph">Gradle illustration of dependencies</a>
@@ -286,13 +304,6 @@ if (System.properties.getProperty('jfxrtDir') == null) { // if not in root-level
 }
 
 
-tasks.register("buildFrontend") {
-    doLast {
-        buildFrontendIfNotPresent();
-    }
-}
-
-
 configurations.all {
     /*
      * Fixes an error where `logback` is considered to have duplicate files.
@@ -371,6 +382,13 @@ tasks.register("preCompile") {
 }
 
 tasks.compileJava.dependsOn([ "preCompile" ]);
+
+
+tasks.register("buildFrontend") {
+    doLast {
+        buildFrontendIfNotPresent();
+    }
+}
 
 
 /**
