@@ -388,6 +388,13 @@ war {
  * at the top-level of the file.
  */
 
+tasks.register("cleanResources", Delete) {
+    delete(serverWebAssetDirPath);
+}
+tasks.register("cleanAll", Delete) {
+    dependsOn("clean", "cleanResources");
+}
+
 /**
  * {@inheritDoc}
  */
