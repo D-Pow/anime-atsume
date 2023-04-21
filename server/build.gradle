@@ -332,6 +332,15 @@ configurations.all {
 }
 
 
+application {
+    // TODO - Not stable. Find a way to actually find the true `main()` method of the source code.
+    File mainClassFile = (File) sourceSets.main.java.find(src -> src.name.toLowerCase().matches(".*(main|driver).*"));
+    String mainClassName = "${rootProject.group}.${mainClassFile.name.replace(".java", "")}";
+
+    mainClass = mainClassName;
+}
+
+
 /**
  * Not used, but this code would create a JAR file instead of a WAR file.
  * JAR files can run by themselves whereas WAR files require running in a Tomcat container.
