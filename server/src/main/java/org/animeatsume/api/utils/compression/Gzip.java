@@ -1,16 +1,29 @@
-import org.apache.commons.compress.compressors.CompressorException;
-import org.apache.commons.compress.compressors.CompressorStreamFactory;
-import org.apache.commons.compress.utils.IOUtils;
-import org.brotli.dec.BrotliInputStream;
+package org.animeatsume.api.utils.compression;
 
+import lombok.extern.log4j.Log4j2;
+import org.apache.logging.log4j.core.util.IOUtils;
 /*
  * Dependencies needed:
- * implementation 'org.brotli:dec:0.1.2' // apache doesn't include Brotli decompression
+ * implementation 'org.brotli:dec:0.1.2'  // apache doesn't include Brotli decompression
  * implementation 'org.apache.commons:commons-jcs-core:2.2.1'
  * implementation 'org.apache.commons:commons-compress:1.20'
+ *
+ * Since this file isn't currently used, just default to Gradle's nested dependencies.
  */
+import org.gradle.internal.impldep.org.apache.commons.compress.compressors.CompressorException;
+import org.gradle.internal.impldep.org.apache.commons.compress.compressors.CompressorStreamFactory;
 
-public class GzipDecompressionNotes {
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
+
+
+@Log4j2
+public class Gzip {
     public static String decodeGzipContent(String encoding, String body) {
         /*
          * This method is incomplete and not working, but some progress was
@@ -38,19 +51,21 @@ public class GzipDecompressionNotes {
         try {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             ByteArrayInputStream bodyInputStream = new ByteArrayInputStream(body.getBytes());
-            InputStream inputStream;
+            InputStream inputStream = new CompressorStreamFactory(true)
+                .createCompressorInputStream(encoding, bodyInputStream);
 
-            if (encoding.equals(CompressorStreamFactory.BROTLI) && false) {
-                inputStream = new BrotliInputStream(bodyInputStream);
-            } else {
-                inputStream = new CompressorStreamFactory(true).createCompressorInputStream(encoding, bodyInputStream);
+            if (encoding.equals(CompressorStreamFactory.BROTLI)) {
+                // TODO - Is this required?
+                //inputStream = new BrotliInputStream(bodyInputStream);
             }
 
             log.info("Length of input = {}", body.getBytes().length);
-            IOUtils.copy(inputStream, outputStream);
 
-            String output = new String(outputStream.toByteArray());
+            IOUtils.copy(new InputStreamReader(inputStream), new OutputStreamWriter(outputStream));
+            String output = outputStream.toString(StandardCharsets.UTF_8);
+
             log.info("Output was: {}", output);
+
             return output;
         } catch (CompressorException | IOException e) {
             log.error("Error decompressing response body. Error = {}", e.getMessage());
