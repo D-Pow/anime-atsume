@@ -450,6 +450,19 @@ war {
 }
 
 
+gradle.taskGraph.whenReady {
+    tasks.forEach { task ->
+        /**
+         * Fix the problem where there are duplicate files or archives.
+         * Only select tasks that contain `duplicatesStrategy`, lest Gradle throws a "property doesn't exist" error
+         */
+        if (task.hasProperty("duplicatesStrategy")) {
+            task.setProperty("duplicatesStrategy", DuplicatesStrategy.INCLUDE);
+        }
+    }
+}
+
+
 /**
  * Build, run, etc. all depend on the `compileJava` task.
  * As such, to ensure the front-end was built before attempting to run the server,
