@@ -36,10 +36,11 @@ clean() (
 build() (
     declare _buildCleanFirst=
     declare _buildCopyFilesToRootDir=
+    declare _buildHeadless=
     declare _buildVerbose=
     declare OPTIND=1
 
-    while getopts ":fcrvh" opt; do
+    while getopts ":fcrvmh" opt; do
         case "$opt" in
             f)
                 clean
@@ -49,6 +50,10 @@ build() (
                 ;;
             r)
                 _buildCopyFilesToRootDir=true
+                ;;
+            m)
+                # `-m` represents "Monocle" which is the headless JavaFX implementation
+                _buildHeadless=true
                 ;;
             v)
                 _buildVerbose=true
@@ -72,7 +77,7 @@ build() (
 
     shift $(( OPTIND - 1 ))
 
-    declare _buildGradleOpts="${_buildCleanFirst:+clean} ${_buildVerbose:+--console plain}"
+    declare _buildGradleOpts="${_buildCleanFirst:+cleanAll} ${_buildHeadless:+-Dheadless=true} ${_buildVerbose:+--console plain}"
 
     (
         cd "${serverDir}"
@@ -117,7 +122,7 @@ dockerBuild() (
 
     shift $(( OPTIND - 1 ))
 
-    build -r ${_dockerBuildFreshJar:+-c}
+    build -rm ${_dockerBuildFreshJar:+-c}
 
     (
         command -v docker &>/dev/null && \

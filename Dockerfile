@@ -70,7 +70,7 @@ COPY . .
 RUN <<EOL
     if ! [[ -f "${WAR_FILE_FINAL_PATH}" ]]; then
         if ! [[ -f "${WAR_FILE_BUILD_PATH}" ]]; then
-            ./index.sh build -r;
+            ./index.sh build -crm;
         else
             cp "${WAR_FILE_BUILD_PATH}" "${WAR_FILE_FINAL_PATH}"
             cp "${DB_FILE_BUILD_PATH}" "${DB_FILE_FINAL_PATH}"
