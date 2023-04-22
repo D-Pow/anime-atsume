@@ -40,6 +40,7 @@ plugins {
     id 'java-gradle-plugin'  // Add Gradle internal classes to classpath; Necessary to expose classes as `public` classes to the parent/build.gradle files importing this
 
     /*  Language and IDE plugins  */
+    id 'org.openjfx.javafxplugin' version '0.0.13'  // Gradle plugin to use/package JavaFX .jar files in our app since Java >= 11 doesn't include JavaFX
     id 'groovy'
     id 'idea'
 
@@ -48,21 +49,6 @@ plugins {
     id 'org.springframework.boot' version '3.0.4'  // See: https://docs.spring.io/spring-boot/docs/current/gradle-plugin/reference/htmlsingle
     id 'io.spring.dependency-management' version '1.1.0'
     id 'io.freefair.lombok' version '8.0.1'
-    // If running as a standalone JavaFX app with Java >= v11, add this plugin:
-    // id 'org.openjfx.javafxplugin' version '0.0.13'
-    // And this block at the root level of build.gradle:
-    // javafx {
-    //     version = '21-ea+5'
-    //     modules = [
-    //         "javafx.base",
-    //         "javafx.controls",
-    //         "javafx.fxml",
-    //         "javafx.graphics",
-    //         "javafx.media",
-    //         "javafx.swing",
-    //         "javafx.web",
-    //     ]
-    // }
 
     /*
      * Similar to the below `apply from:` statement, we could write our own custom plugin in
@@ -340,6 +326,48 @@ application {
     String mainClassName = "${rootProject.group}.${mainClassFile.name.replace(".java", "")}";
 
     mainClass = mainClassName;
+}
+
+
+javafx {
+    /*
+     * For normal dependencies (if not using this `javafx` plugin), we would expect to simply use the format:
+     *      implementation "org.openjfx:javafx:${javafxVersion}"
+     *
+     * Though, JavaFX contains native OS bindings for the graphics, interactions, etc.
+     * Since JAR files assume the necessary OS bindings were installed during the OpenJFX install,
+     * and since JavaFX was removed from that Java install in v11, this means we (likely) can't simply
+     * package a JavaFX application JAR by adding JFX dependencies into the generated JAR file.
+     * Instead, we would need to download the JavaFX SDK directly (.jar files and OS bindings), unzip it, and
+     * specify them as a `--module-path`/`--add-modules` in the CLI while running the .jar.
+     *
+     * To fix this, we have a few options:
+     *
+     * 1. In the simplest case, if we have OpenJFX installed on the OS, the local JFX installation (which adds
+     *    the OS bindings and JAR files) would work as long as its set in the PATH.
+     * 2. We could download the OpenJFX .jar files and OS bindings via our custom `downloadJavaFX()` Gradle util,
+     *    and use that via:
+     *    `java --module-path=./path/to/javafx-unzipped-dir/ --add-modules=javafx.base,javafx.graphics,etc -jar my-app.jar`
+     * 3. If we use this `javafx` plugin to download simplify the JFX .jar files, which also sets them into paths
+     *    for running/IDE interpretation/building/everything, we might possibly be able to run the final app output .jar
+     *    regardless of how the CLI command is run (e.g. `java -jar my-app.jar` without the `--module-path`/`--add-modules`
+     *    flags).
+     *    This needs to be verified, but theoretically, it's possible this would solve the JFX issues described above.
+     *
+     * Use `:18.0.2` for Java < 17.
+     */
+
+    version = javafxVersion
+    // Include all modules to allow for painless augmentation and extending later
+    modules = [
+        "javafx.base",
+        "javafx.graphics",
+        "javafx.controls",
+        "javafx.media",
+        "javafx.fxml",
+        "javafx.swing",
+        "javafx.web",
+    ]
 }
 
 
