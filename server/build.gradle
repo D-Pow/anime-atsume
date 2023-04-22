@@ -160,6 +160,8 @@ ext {
         javaLibDir = "${javaHome}/../lib";
     }
 
+    javafxVersion = "17.0.7"; // "21-ea+5";
+
 
     repoRootDirPath = new File("${project.projectDir.toString().trim()}/..").getCanonicalPath();
 
@@ -228,7 +230,7 @@ dependencies {
     // JavaFX was removed in Java 11 so ensure it's installed (uses OpenJDK)
     // Only required if not using the Gradle plugin above
     // Use `:18.0.2` for Java < 17
-    implementation 'org.openjfx:javafx:21-ea+5'
+    implementation "org.openjfx:javafx:${javafxVersion}"
 
     /*
      * Spring Boot 3 dropped support for Java 8, which came with many consequences.
@@ -397,20 +399,12 @@ war {
  * at the top-level of the file.
  */
 
-tasks.register("cleanResources", Delete) {
-    delete(serverWebAssetDirPath);
-}
-tasks.register("cleanAll", Delete) {
-    dependsOn("clean", "cleanResources");
-}
-
 /**
  * {@inheritDoc}
  */
 tasks.register("preCompile") {
     dependsOn "buildFrontend";  // Same as `tasks.<my-task>.dependsOn([ "someTask" ])`
 }
-
 tasks.compileJava.dependsOn([ "preCompile" ]);
 
 
@@ -433,7 +427,6 @@ bootRun {
     // support passing -Dsystem.property=value to bootRun task
     systemProperties = System.properties
 }
-
 tasks.run.dependsOn([ "bootRun" ]);
 
 /**
