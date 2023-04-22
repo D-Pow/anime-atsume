@@ -44,7 +44,8 @@ RUN apt-get clean && \
         git \
         sqlite3 \
         jq \
-        openjdk-17-jdk
+        openjdk-17-jdk \
+        openjfx
 
 # Change CWD from <root> to $HOME
 WORKDIR /home
