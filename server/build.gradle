@@ -404,6 +404,42 @@ jar {
     archiveVersion = buildArchiveVersion;
 
     // archiveClassifier = ""  // Occasionally necessary
+
+    manifest {
+        attributes(
+            'Main-Class': application.mainClass.get(),
+            'Class-Path': configurations.runtimeClasspath.files.collect { it.getName() }.join(' '),
+            'Implementation-Title': archiveBaseName,
+            // Comment Implementation-Version to not add version number to output .jar filename.
+            // See: https://stackoverflow.com/questions/26540059/get-gradle-to-ignore-version-number-in-jar-name
+            //'Implementation-Version': "${gradle.rootProject.version}",
+        )
+    }
+
+    /*
+     * Default to making a fat-jar so the final file can be run without the user needing to download dependencies and
+     * specify the modules via `--module-path`/`--add-modules`.
+     * This makes running the final app-output .jar file easier.
+     * Disable in CLI via `-PfatJar=false`
+     */
+    def createFatJar = project.properties.getOrDefault("fatJar", true);
+
+    if (createFatJar) {
+        // Copy all dependencies needed for runtime into jar but not the compile-time ones since they're only needed for building
+        from {
+            configurations.runtimeClasspath.collect {
+                it.isDirectory() ? it : zipTree(it)
+            }
+        }
+
+        // As mentioned in the `ext.javafx` config's docstring, fat-jars don't play nicely
+        // with `module-path` so exclude the file.
+        // See: https://stackoverflow.com/a/70175935/5771107
+        exclude("module-info.class");
+    }
+
+    // Exclude signature files if running the output .jar file fails due to security reasons on the parent OS
+    //exclude('META-INF/*.RSA', 'META-INF/*.SF', 'META-INF/*.DSA');
 }
 
 war {
