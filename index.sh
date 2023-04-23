@@ -155,11 +155,91 @@ dockerClean() (
 )
 
 dockerRun() (
-    docker run -it -p 80:8080 -p 443:8080 anime-atsume "$@"
-)
+    declare USAGE="${FUNCNAME[0]} [OPTIONS...]
+    Runs the generated \`anime-atsume\`
 
-dockerRunWithoutPortsOpen() (
-    docker run -it --rm anime-atsume "$@"
+    Options:
+        -p  |   Ports to map to the underlying Docker container's exposed port, 8080 (Default: -p=80 -p=443).
+            |   Set \`-p=\` to disable port mapping.
+        -c  |   Command to run instead of the default \`CMD\` Java command (e.g. \`/bin/bash\`).
+        -h  |   Print this help message and exit.
+    "
+    declare _dockerRunPorts=()
+    declare _dockerRunPortsDisabled=
+    declare _dockerRunCmd=
+    declare _dockerUnderlyingExposedPort=8080
+    declare opt=
+    declare OPTIND=1
+
+    declare _dockerRunEnvArgs=()
+    declare _dockerRunEnvArg=
+
+    while getopts ":p:c:-:h" opt; do
+        # Delete any leading `=` from the option argument value
+        # so that e.g. `-p=80` --> `opt: p, OPTARG: 80` instead of `OPTARG: =80`
+        OPTARG="${OPTARG#=}"
+
+        case "$opt" in
+            p)
+                if [[ -z "$_dockerRunPortsDisabled" ]]; then
+                    _dockerRunPorts+=("$OPTARG")
+                fi
+
+                if [[ -z "$OPTARG" ]]; then
+                    # Clear ports if an empty port was specifically desired
+                    _dockerRunPorts=()
+                    _dockerRunPortsDisabled=true
+                fi
+                ;;
+            c)
+                _dockerRunCmd="$OPTARG"
+                ;;
+            h)
+                echo -e "$USAGE"
+                return 1
+                ;;
+            -)
+                # If the arg starts with a hyphen, then it's a flag to be passed to
+                # the `docker run` command, e.g. `--rm`.
+                # Like other letters in `getopts -> case`, the first hyphen is removed
+                # and the second hyphen is parsed into `opt`.
+                # Thus, add both hyphens back in here.
+                _dockerRunEnvArgs+=("--$OPTARG")
+                ;;
+            *)
+                :  # Unknown flag/arg - Forward to underlying command
+                ;;
+        esac
+    done
+
+    shift $(( OPTIND - 1 ))
+
+
+    if [[ -z "$_dockerRunPortsDisabled" ]]; then
+        if (( ${#_dockerRunPorts[@]} == 0 )); then
+            # Default ports to expose: HTTP (80) and HTTPS (443)
+            _dockerRunPorts=(80 443)
+        fi
+
+        # Generates `docker run` args for port mapping, i.e. `-p hostPort:containerPort`
+        _dockerRunEnvArgs+=($(printf -- "-p %s:$_dockerUnderlyingExposedPort " "${_dockerRunPorts[@]}"))
+    fi
+
+    for _dockerRunEnvArg in "$@"; do
+        if [[ -z "$_dockerRunEnvArg" ]]; then
+            continue
+        fi
+
+        if echo "$_dockerRunEnvArg" | grep -Evq '^-'; then
+            # If the arg passed doesn't start with a hyphen, then it's an env
+            # var to be passed to the container via `-e <arg>`.
+            _dockerRunEnvArgs+=("-e")
+        fi
+
+        _dockerRunEnvArgs+=("$_dockerRunEnvArg")
+    done
+
+    docker run -it "${_dockerRunEnvArgs[@]}" anime-atsume ${_dockerRunCmd}
 )
 
 
