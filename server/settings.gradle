@@ -27,14 +27,19 @@ rootProject.name = "anime-atsume"
  */
 gradle.beforeProject {
     gradle.rootProject.setGroup("org.animeatsume")
-    gradle.rootProject.setVersion(
-        // Use `getProperties()` instead of `getProperty(String)` so we can default the value.
-        // Equivalent of ternary operators except simpler/cleaner.
-        gradle.rootProject.getProperties().getOrDefault(
-            "version",
-            System.getProperty("version", "1.0.0") // Custom method that equates to `getOrDefault(String, String)`
-        )
-    );
+
+    String systemVersion = System.getProperty("version", "1.0.0");
+    String projectVersion = gradle.rootProject.property("version");
+    /*
+     * If the version isn't declared in `project.properties`, then Gradle will stupidly return "unspecified"
+     * rather than "" or `null`.
+     * No clue what dev did that, but to make up for their ineptitude, we must do manual parsing/manipulation here.
+     * See:
+     *  - https://stackoverflow.com/questions/17262856/how-to-set-the-project-name-group-version-plus-source-target-compatibility-in
+     */
+    projectVersion = projectVersion.equalsIgnoreCase("unspecified") ? null : projectVersion;
+    String appVersion = projectVersion != null ? projectVersion : systemVersion;
+    gradle.rootProject.setVersion(appVersion);
 }
 
 /**

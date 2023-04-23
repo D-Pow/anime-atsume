@@ -2,6 +2,11 @@ name: Azure - Deploy
 description: Builds the app in Azure for deployment and hosting
 
 
+# Note: Azure says "always free for 750 hours" but they don't clarify that
+# those hours are *total*, not per month or similar, so they never refill.
+# See: https://dev.to/azure/azure-free-account-is-it-really-free-53cb
+
+
 env:
   # See: https://github.com/Azure/webapps-deploy#configure-deployment-credentials
   WEBSITE_WEBDEPLOY_USE_SCM: true

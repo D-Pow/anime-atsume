@@ -286,6 +286,12 @@ function Show(props) {
     );
 
     const renderWatchTab = () => {
+        if (episodeResults.error) {
+            <div className={'row d-flex justify-content-center'}>
+                <h4>{episodeResults.error}</h4>
+            </div>
+        }
+
         if (episodeResults.results == null || episodeResults.results.length === 0) {
             return (
                 <div className={'row d-flex justify-content-center'}>

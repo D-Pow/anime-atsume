@@ -1,6 +1,22 @@
 import org.gradle.api.tasks.SourceSet;
 
 
+def downloadFile(String filePath, String url) {
+    return downloadFile(new File(filePath), url);
+}
+def downloadFile(File file, String url) {
+    println("Downloading file \"${file.name}\" from <${url}>...");
+
+    new URL(url).withInputStream { inStream ->
+        file.withOutputStream {
+            it << inStream
+        }
+    }
+
+    println("Downloaded file \"${file.name}\" from <${url}>.");
+}
+
+
 def getSourceFiles() {
     return getSourceFiles(true);
 }
@@ -72,6 +88,23 @@ def searchFile(Map<String, Closure> places, List<String> searchPaths, String sea
 }
 
 
+def copyDbToBuildDir() {
+    copy {
+        from dbName
+        into warOutputDir
+    }
+
+    println("Copied ${dbName} to ${warOutputDir}")
+}
+
+
+tasks.register("cleanResources") {
+    delete(gradle.rootProject.serverWebAssetDirPath);
+}
+tasks.register("cleanAll") {
+    dependsOn("clean", "cleanResources");
+}
+
 tasks.register("printSrcInfo") {
     doLast {
         println("project.files:\n${objToJson(project.files("src", "buildSrc"))}\n\n");
@@ -126,7 +159,9 @@ tasks.register("printDependencies") {
 
 
 ext {
+    downloadFile = this.&downloadFile;
     getSourceFiles = this.&getSourceFiles;
     searchFile = this.&searchFile;
+    copyDbToBuildDir = this.&copyDbToBuildDir;
 }
 

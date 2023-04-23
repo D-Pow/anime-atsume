@@ -10,9 +10,10 @@ FROM ubuntu:20.04
 #   - https://stackoverflow.com/questions/24537340/docker-adding-a-file-from-a-parent-directory
 
 
-# Change default shell to Bash for better feature support/easier usage
+# Change default shell to Bash for better feature support/easier usage.
+# Note: Removes the need for specifying an `ENTRYPOINT` since Bash will now
+# be the default fallback.
 SHELL [ "/bin/bash", "-c" ]
-
 ENV SHELL=/bin/bash
 
 # `docker` flags useful for debugging:
@@ -44,7 +45,8 @@ RUN apt-get clean && \
         git \
         sqlite3 \
         jq \
-        openjdk-17-jdk
+        openjdk-17-jdk \
+        openjfx
 
 # Change CWD from <root> to $HOME
 WORKDIR /home
@@ -69,7 +71,7 @@ COPY . .
 RUN <<EOL
     if ! [[ -f "${WAR_FILE_FINAL_PATH}" ]]; then
         if ! [[ -f "${WAR_FILE_BUILD_PATH}" ]]; then
-            ./index.sh build -r;
+            ./index.sh build -crm;
         else
             cp "${WAR_FILE_BUILD_PATH}" "${WAR_FILE_FINAL_PATH}"
             cp "${DB_FILE_BUILD_PATH}" "${DB_FILE_FINAL_PATH}"
@@ -79,4 +81,4 @@ EOL
 
 EXPOSE 8080
 
-CMD java ${JAVA_OPTS} -Dglass.platform=Monocle -Dmonocle.platform=Headless -jar "${WAR_FILE}" --server.port=${PORT:-8080}
+CMD java ${JAVA_OPTS} -Dglass.platform=Monocle -Dmonocle.platform=Headless -jar "${WAR_FILE_FINAL_PATH}" --server.port=${PORT:-8080}

@@ -30,33 +30,25 @@ import org.animeatsume.gradleutils.*;
 
 
 plugins {
+    /*  Base app plugins  */
     id 'java'
+    id 'application'  // Docs: https://docs.gradle.org/current/userguide/application_plugin.html#sec:application_tasks
     id 'war'
+
+    /*  Building and packaging plugins  */
     id 'java-library'  // Provides enum for Java versions. Example: https://docs.gradle.org/current/userguide/custom_plugins.html#:~:text=Example%209.%20Creating%20a%20simple%20script%20plugin
     id 'java-gradle-plugin'  // Add Gradle internal classes to classpath; Necessary to expose classes as `public` classes to the parent/build.gradle files importing this
+
+    /*  Language and IDE plugins  */
+    id 'org.openjfx.javafxplugin' version '0.0.13'  // Gradle plugin to use/package JavaFX .jar files in our app since Java >= 11 doesn't include JavaFX
     id 'groovy'
-    id 'application'  // Docs: https://docs.gradle.org/current/userguide/application_plugin.html#sec:application_tasks
     id 'idea'
 
+    /*  Dependency plugins  */
     // adding plugins here removes the need to declare them in buildscript {}
     id 'org.springframework.boot' version '3.0.4'  // See: https://docs.spring.io/spring-boot/docs/current/gradle-plugin/reference/htmlsingle
     id 'io.spring.dependency-management' version '1.1.0'
     id 'io.freefair.lombok' version '8.0.1'
-    // If running as a standalone JavaFX app with Java >= v11, add this plugin:
-    // id 'org.openjfx.javafxplugin' version '0.0.13'
-    // And this block at the root level of build.gradle:
-    // javafx {
-    //     version = '21-ea+5'
-    //     modules = [
-    //         "javafx.base",
-    //         "javafx.controls",
-    //         "javafx.fxml",
-    //         "javafx.graphics",
-    //         "javafx.media",
-    //         "javafx.swing",
-    //         "javafx.web",
-    //     ]
-    // }
 
     /*
      * Similar to the below `apply from:` statement, we could write our own custom plugin in
@@ -125,9 +117,24 @@ allprojects {
  * @see <a href="https://docs.gradle.org/current/dsl/org.gradle.api.Project.html#N14E9A)"></a>
  */
 ext {
-    isWindows = System.getProperty("os.name")
-        .toLowerCase()
-        .startsWith("windows");
+    // Default formatting scheme for `jar`/`war` tasks: `<name>-<version>.<extension>`
+    // Note: "build" was only added before `archiveBaseName`, `archiveVersion`, etc. to distinguish global `ext` var from local `jar`/`war` var.
+    buildArchiveBaseName = rootProject.name.toLowerCase();  // Only the base `<name>` of the formatting scheme
+    buildArchiveVersion = "";  // Only the `<version>` portion of the formatting scheme
+    //buildArchiveFileName = "${buildArchiveBaseName}.jar";  // Full name of the generated .jar/.war archive, ignoring default formatting scheme
+
+
+    osName = System.getProperty("os.name").toLowerCase();
+    osArch = System.getProperty("os.arch").toLowerCase();
+    osVersion = System.getProperty("os.version").toLowerCase();
+
+    if (osName.matches("mac|darwin")) {
+        osName = "osx";
+    }
+
+    isWindows = osName.startsWith("windows");
+
+
     javaHome = "${System.properties['java.home']}";
     javaLibDir = "${javaHome}/lib";
 
@@ -139,6 +146,9 @@ ext {
         javaLibDir = "${javaHome}/../lib";
     }
 
+    javafxVersion = "17.0.7"; // "21-ea+5";
+
+
     repoRootDirPath = new File("${project.projectDir.toString().trim()}/..").getCanonicalPath();
 
     try {
@@ -148,6 +158,7 @@ ext {
             repoRootDirPath = _repoRootDirPathViaGit;
         }
     } catch (e) {}
+
 
     clientDirPath = "${repoRootDirPath}/client";
     clientDirDepsPath = "${clientDirPath}/node_modules";
@@ -182,6 +193,7 @@ sourceSets {
 }
 
 
+
 /**
  *  - `implementation` = Adds to build output and classpath. Required to run your code but
  *      isn't needed during compilation. Try to use this most of the time.
@@ -194,6 +206,7 @@ sourceSets {
  *  - `runtimeOnly` - Don't even build the dependency, just inject it in the resulting build output.
  *  - `compile` - Deprecated. Same as thing as `api`.
  *
+ * @see <a href="https://abhiappmobiledeveloper.medium.com/difference-between-implementation-api-compile-and-runtimeonly-in-gradle-dependency-55b70215d245#ae30">Overview and comparison chart</a>
  * @see <a href="https://stackoverflow.com/questions/47365119/gradle-dependency-configuration-implementation-vs-api-vs-runtimeonly-vs-compil/47365147#47365147">SO post explaining dependency tags</a>
  * @see <a href="https://docs.gradle.org/current/userguide/java_plugin.html#sec:java_plugin_and_dependency_management">Gradle "Dependency management" docs</a>
  * @see <a href="https://docs.gradle.org/current/userguide/java_library_plugin.html#sec:java_library_configurations_graph">Gradle illustration of dependencies</a>
@@ -203,7 +216,7 @@ dependencies {
     // JavaFX was removed in Java 11 so ensure it's installed (uses OpenJDK)
     // Only required if not using the Gradle plugin above
     // Use `:18.0.2` for Java < 17
-    implementation 'org.openjfx:javafx:21-ea+5'
+    implementation "org.openjfx:javafx:${javafxVersion}"
 
     /*
      * Spring Boot 3 dropped support for Java 8, which came with many consequences.
@@ -286,13 +299,6 @@ if (System.properties.getProperty('jfxrtDir') == null) { // if not in root-level
 }
 
 
-tasks.register("buildFrontend") {
-    doLast {
-        buildFrontendIfNotPresent();
-    }
-}
-
-
 configurations.all {
     /*
      * Fixes an error where `logback` is considered to have duplicate files.
@@ -311,6 +317,57 @@ configurations.all {
      * @see <a href="https://github.com/gradle/gradle/issues/17236">GitHub issue</a>
      */
     exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
+}
+
+
+application {
+    // TODO - Not stable. Find a way to actually find the true `main()` method of the source code.
+    File mainClassFile = (File) sourceSets.main.java.find(src -> src.name.toLowerCase().matches(".*(main|driver).*"));
+    String mainClassName = "${rootProject.group}.${mainClassFile.name.replace(".java", "")}";
+
+    mainClass = mainClassName;
+}
+
+
+javafx {
+    /*
+     * For normal dependencies (if not using this `javafx` plugin), we would expect to simply use the format:
+     *      implementation "org.openjfx:javafx:${javafxVersion}"
+     *
+     * Though, JavaFX contains native OS bindings for the graphics, interactions, etc.
+     * Since JAR files assume the necessary OS bindings were installed during the OpenJFX install,
+     * and since JavaFX was removed from that Java install in v11, this means we (likely) can't simply
+     * package a JavaFX application JAR by adding JFX dependencies into the generated JAR file.
+     * Instead, we would need to download the JavaFX SDK directly (.jar files and OS bindings), unzip it, and
+     * specify them as a `--module-path`/`--add-modules` in the CLI while running the .jar.
+     *
+     * To fix this, we have a few options:
+     *
+     * 1. In the simplest case, if we have OpenJFX installed on the OS, the local JFX installation (which adds
+     *    the OS bindings and JAR files) would work as long as its set in the PATH.
+     * 2. We could download the OpenJFX .jar files and OS bindings via our custom `downloadJavaFX()` Gradle util,
+     *    and use that via:
+     *    `java --module-path=./path/to/javafx-unzipped-dir/ --add-modules=javafx.base,javafx.graphics,etc -jar my-app.jar`
+     * 3. If we use this `javafx` plugin to download simplify the JFX .jar files, which also sets them into paths
+     *    for running/IDE interpretation/building/everything, we might possibly be able to run the final app output .jar
+     *    regardless of how the CLI command is run (e.g. `java -jar my-app.jar` without the `--module-path`/`--add-modules`
+     *    flags).
+     *    This needs to be verified, but theoretically, it's possible this would solve the JFX issues described above.
+     *
+     * Use `:18.0.2` for Java < 17.
+     */
+
+    version = javafxVersion
+    // Include all modules to allow for painless augmentation and extending later
+    modules = [
+        "javafx.base",
+        "javafx.graphics",
+        "javafx.controls",
+        "javafx.media",
+        "javafx.fxml",
+        "javafx.swing",
+        "javafx.web",
+    ]
 }
 
 
@@ -342,11 +399,67 @@ configurations.all {
  */
 jar {
     enabled = false
+
+    archiveBaseName = buildArchiveBaseName;
+    archiveVersion = buildArchiveVersion;
+
     // archiveClassifier = ""  // Occasionally necessary
+
+    manifest {
+        attributes(
+            'Main-Class': application.mainClass.get(),
+            'Class-Path': configurations.runtimeClasspath.files.collect { it.getName() }.join(' '),
+            'Implementation-Title': archiveBaseName,
+            // Comment Implementation-Version to not add version number to output .jar filename.
+            // See: https://stackoverflow.com/questions/26540059/get-gradle-to-ignore-version-number-in-jar-name
+            //'Implementation-Version': "${gradle.rootProject.version}",
+        )
+    }
+
+    /*
+     * Default to making a fat-jar so the final file can be run without the user needing to download dependencies and
+     * specify the modules via `--module-path`/`--add-modules`.
+     * This makes running the final app-output .jar file easier.
+     * Disable in CLI via `-PfatJar=false`
+     */
+    def createFatJar = project.properties.getOrDefault("fatJar", true);
+
+    if (createFatJar) {
+        // Copy all dependencies needed for runtime into jar but not the compile-time ones since they're only needed for building
+        from {
+            configurations.runtimeClasspath.collect {
+                it.isDirectory() ? it : zipTree(it)
+            }
+        }
+
+        // As mentioned in the `ext.javafx` config's docstring, fat-jars don't play nicely
+        // with `module-path` so exclude the file.
+        // See: https://stackoverflow.com/a/70175935/5771107
+        exclude("module-info.class");
+    }
+
+    // Exclude signature files if running the output .jar file fails due to security reasons on the parent OS
+    //exclude('META-INF/*.RSA', 'META-INF/*.SF', 'META-INF/*.DSA');
 }
 
 war {
     enabled = false
+
+    archiveBaseName = buildArchiveBaseName;
+    archiveVersion = buildArchiveVersion;
+}
+
+
+gradle.taskGraph.whenReady {
+    tasks.forEach { task ->
+        /**
+         * Fix the problem where there are duplicate files or archives.
+         * Only select tasks that contain `duplicatesStrategy`, lest Gradle throws a "property doesn't exist" error
+         */
+        if (task.hasProperty("duplicatesStrategy")) {
+            task.setProperty("duplicatesStrategy", DuplicatesStrategy.INCLUDE);
+        }
+    }
 }
 
 
@@ -369,8 +482,14 @@ war {
 tasks.register("preCompile") {
     dependsOn "buildFrontend";  // Same as `tasks.<my-task>.dependsOn([ "someTask" ])`
 }
-
 tasks.compileJava.dependsOn([ "preCompile" ]);
+
+
+tasks.register("buildFrontend") {
+    doLast {
+        buildFrontendIfNotPresent();
+    }
+}
 
 
 /**
@@ -385,7 +504,6 @@ bootRun {
     // support passing -Dsystem.property=value to bootRun task
     systemProperties = System.properties
 }
-
 tasks.run.dependsOn([ "bootRun" ]);
 
 /**
@@ -396,9 +514,12 @@ tasks.run.dependsOn([ "bootRun" ]);
 bootWar {
     enabled = true;  // Required due to above deactivation of the `war` task
 
+    archiveBaseName = buildArchiveBaseName;
+    archiveVersion = buildArchiveVersion;
+
     doFirst {  // Run in `doFirst` rather than config step to avoid race conditions with `gradle.rootProject.setVersion()`
-        archiveBaseName = project.name
-        // archiveVersion = project.version  // Don't add `project.version` to output .war file name
+        archiveBaseName = buildArchiveBaseName;
+        // archiveVersion = buildArchiveVersion;  // Don't add `project.version` to output .war file name
     }
 
     if (injectJavaFxJar.toBoolean()) {
@@ -487,28 +608,65 @@ gradle.projectsEvaluated {
 }
 
 
-wrapper { // TODO - Move to files.groovy
+
+wrapper {
     distributionType = Wrapper.DistributionType.ALL
 }
 
 tasks.register("wrapperVersion") {
     doLast {
-        String allGradleVersionsResponse = cliCmd("curl -fsSL 'https://gradle.org/releases' | grep -Eo 'v([0-9]+\\.){1,3}[0-9]*\\W' | sed -E 's/^v([0-9\\.]*).?\$/\\1/' | sort -Vur");
-        List<String> allGradleVersions = allGradleVersionsResponse.split("\n");
-        println("allGradleVersionsResponse: ${allGradleVersionsResponse}")
+        boolean shouldUpgrade = (
+            (
+                project.hasProperty("u")
+                || project.hasProperty("upgrade")
+            )
+            && (String) project.getProperties().get("u") != "false"
+            && (String) project.getProperties().get("upgrade") != "false"
+        );
 
-        String wrapperVersionNumber = allGradleVersions.get(0);
+        /*
+         * CLI cmd:
+         *  - Get Gradle-releases HTML page.
+         *  - Extract only version numbers.
+         *  - Extract only the number from the version (deleting text like "v" from "v1.2.3").
+         *  - Sort in descending order.
+         */
+        String allGradleVersionsResponse = cliCmd("curl -fsSL 'https://gradle.org/releases' | grep -Eo 'v([0-9]+\\.){1,3}[0-9]*\\W' | sed -E 's/^v([0-9\\.]*).?\$/\\1/; s/[^0-9\\.]//g' | sort -Vur");
+        List<String> allGradleVersions = allGradleVersionsResponse.split("\n");
+
+        if (project.hasProperty("l")) {
+            println("Available Gradle versions:\n${allGradleVersions}");
+        }
+
+        if (!shouldUpgrade) {
+            return;
+        }
+
+        String wrapperVersionNumberDefault = allGradleVersions.get(0);
+        String wrapperVersionNumber;
 
         if (project.hasProperty("v")) {
-            wrapperVersionNumber = project.getProperty("v");
+            wrapperVersionNumber = project.property("v");
         } else if (System.hasProperty("v")) {
             wrapperVersionNumber = System.getProperty("v");
         }
 
-        // TODO - Only upgrade if `-Pu` is passed
+        if (!allGradleVersions.contains(wrapperVersionNumber)) {
+            println("Specified Gradle wrapper version ${wrapperVersionNumber} doesn't exist. Choosing lower version matching ${wrapperVersionNumber}...");
+
+            wrapperVersionNumber = allGradleVersions.stream()
+                .filter(existingVersion -> "${wrapperVersionNumber}".matches("^${existingVersion}.*"))
+                .findFirst()
+                .orElse(wrapperVersionNumberDefault);
+        }
+
+        assert wrapperVersionNumber != null;
 
         println("Upgrading Gradle wrapper to v${wrapperVersionNumber}");
-        // See: https://gradle.org/install#with-the-gradle-wrapper
-        cliCmd("./gradlew wrapper --distribution-type=bin --gradle-version=${wrapperVersionNumber}")
+
+        // See:
+        //  - https://docs.gradle.org/current/userguide/gradle_wrapper.html#sec:upgrading_wrapper
+        //  - https://gradle.org/install#with-the-gradle-wrapper
+        cliCmd("./gradlew wrapper --distribution-type=bin --gradle-version=${wrapperVersionNumber}");
     }
 }

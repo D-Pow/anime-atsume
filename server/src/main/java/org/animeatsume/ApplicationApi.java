@@ -3,6 +3,9 @@ package org.animeatsume;
 import lombok.extern.log4j.Log4j2;
 import org.animeatsume.api.controller.FourAnimeController;
 import org.animeatsume.api.controller.KissanimeRuController;
+import org.animeatsume.api.controller.NineAnimeController;
+import org.animeatsume.api.controller.ZoroToController;
+import org.animeatsume.api.model.SearchAnimeResponse;
 import org.animeatsume.api.model.TitleSearchRequest;
 import org.animeatsume.api.model.TitlesAndEpisodes;
 import org.animeatsume.api.model.kissanime.KissanimeVideoHostRequest;
@@ -34,6 +37,12 @@ public class ApplicationApi {
 
     @Autowired
     NovelPlanetService novelPlanetService;
+
+    @Autowired
+    NineAnimeController nineAnimeController;
+
+    @Autowired
+    ZoroToController zoroToController;
 
     @Value("${org.animeatsume.activate-kissanime}")
     Boolean activateKissanime;
@@ -77,18 +86,45 @@ public class ApplicationApi {
         return CorsProxy.doCorsRequest(method, url, origin, body, requestHeaders);
     }
 
-    @Cacheable(ApplicationConfig.ANIME_TITLE_SEARCH_CACHE_NAME)
+    // Like most annotations, for `@Cacheable`, we can only use either a `static final` var (from another class)
+    // or use the .properties var key directly (without the "proxy" of another class).
+    // However, we can't use the .properties key to reduce duplicated code (so we don't have to repeat the .properties
+    // var in source code), so we must duplicate the code here unfortunately.
+    // See:
+    //  - https://stackoverflow.com/questions/39013894/reading-from-application-properties-attribute-value-must-be-constant/39013994#39013994
+    //@Cacheable(cacheNames = "${org.animeatsume.cache.anime-title-search}")
+    @Cacheable(cacheNames = ApplicationConfig.ANIME_TITLE_SEARCH_CACHE_NAME)
     @PostMapping(value = "/searchAnime", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Object> searchAnime(@RequestBody TitleSearchRequest titleSearchRequest) {
+    public ResponseEntity<SearchAnimeResponse> searchAnime(@RequestBody TitleSearchRequest titleSearchRequest) {
         titleSearchRequest.setTitle(RegexUtils.removeNonAlphanumericChars(titleSearchRequest.getTitle()));
 
         if (activateKissanime) {
             return ResponseEntity
-                .ok(kissanimeRuController.searchKissanimeTitles(titleSearchRequest));
+                .ok((SearchAnimeResponse) kissanimeRuController.searchKissanimeTitles(titleSearchRequest));
+        }
+
+        SearchAnimeResponse searchResults = null; // (SearchAnimeResponse) fourAnimeController.searchTitle(titleSearchRequest);
+
+        if (searchResults == null || searchResults.getResults().size() == 0) {
+            searchResults = new SearchAnimeResponse();
+            searchResults.setResults(nineAnimeController.searchShows(titleSearchRequest).getResults());
+        }
+
+        if (searchResults == null || searchResults.getResults().size() == 0) {
+            searchResults = new SearchAnimeResponse();
+            searchResults.setResults(zoroToController.searchShows(titleSearchRequest).getResults());
+        }
+
+        if (searchResults == null || searchResults.getResults().size() == 0) {
+            searchResults.setError("Anime servers are currently down :/");
+        }
+
+        if (searchResults == null || searchResults.getResults().size() == 0) {
+            searchResults = nineAnimeController.searchShows(titleSearchRequest);
         }
 
         return ResponseEntity
-            .ok(fourAnimeController.searchTitle(titleSearchRequest));
+            .ok(searchResults);
     }
 
     @PostMapping(value = "/getVideosForEpisode")
@@ -99,7 +135,11 @@ public class ApplicationApi {
 
         TitlesAndEpisodes.EpisodesForTitle videosForEpisode = fourAnimeController.getVideoForEpisode(kissanimeEpisodeRequest.getEpisodeUrl());
 
-        if (videosForEpisode != null) {
+        if (videosForEpisode == null || videosForEpisode.getEpisodes().size() == 0) {
+            videosForEpisode = nineAnimeController.getVideoForEpisode(kissanimeEpisodeRequest.getEpisodeUrl());
+        }
+
+        if (videosForEpisode != null && videosForEpisode.getEpisodes().size() > 0) {
             return ResponseEntity.ok(videosForEpisode);
         }
 

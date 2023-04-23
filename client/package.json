@@ -9,10 +9,13 @@
     "type": "git",
     "url": "git+https://github.com/D-Pow/anime-atsume.git"
   },
+  "config": {
+    "buildOutputDir": "../server/src/main/resources/public/"
+  },
   "scripts": {
     "start": "webpack-dev-server --config ./config/webpack.config.js",
     "mock": "cross-env MOCK=true npm start",
-    "clean": "npx shx rm -rf ../server/src/main/resources/public/",
+    "clean": "npx shx rm -rf $npm_package_config_buildOutputDir",
     "prebuild": "npm run clean",
     "build": "cross-env NODE_ENV=production webpack --mode production --config ./config/webpack.config.js",
     "test": "jest --coverage tests",

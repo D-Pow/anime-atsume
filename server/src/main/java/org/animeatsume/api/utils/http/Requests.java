@@ -80,9 +80,11 @@ public class Requests {
 
         MultiValueMap<String, String> formDataBody = new LinkedMultiValueMap<>();
 
-        Stream.of(bodyEntries).forEach(keyValPair -> {
-            formDataBody.add(keyValPair[0], keyValPair[1]);
-        });
+        if (bodyEntries != null && bodyEntries.length > 0) {
+            Stream.of(bodyEntries).forEach(keyValPair -> {
+                formDataBody.add(keyValPair[0], keyValPair[1]);
+            });
+        }
 
         return new HttpEntity<>(formDataBody, headers);
     }
@@ -187,7 +189,10 @@ public class Requests {
                 }
 
                 HttpHeaders responseHeaders = headForHeadersWithAcceptAllFallback(url, restTemplate, requestEntity);
-                String contentTypeHeader = responseHeaders.getContentType().toString();
+                List<MediaType> headersAccept = responseHeaders.getAccept();
+                String contentTypeHeader = headersAccept
+                    .get(headersAccept.size() - 1)
+                    .toString();
                 Class<?> actualResponseTypeClass = getClassFromContentTypeHeader(contentTypeHeader);
 
                 response = restTemplate.exchange(
