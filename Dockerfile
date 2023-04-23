@@ -80,4 +80,4 @@ EOL
 
 EXPOSE 8080
 
-CMD java ${JAVA_OPTS} -Dglass.platform=Monocle -Dmonocle.platform=Headless -jar "${WAR_FILE}" --server.port=${PORT:-8080}
+CMD java ${JAVA_OPTS} -Dglass.platform=Monocle -Dmonocle.platform=Headless -jar "${WAR_FILE_FINAL_PATH}" --server.port=${PORT:-8080}
