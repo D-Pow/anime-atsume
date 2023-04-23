@@ -10,9 +10,10 @@ FROM ubuntu:20.04
 #   - https://stackoverflow.com/questions/24537340/docker-adding-a-file-from-a-parent-directory
 
 
-# Change default shell to Bash for better feature support/easier usage
+# Change default shell to Bash for better feature support/easier usage.
+# Note: Removes the need for specifying an `ENTRYPOINT` since Bash will now
+# be the default fallback.
 SHELL [ "/bin/bash", "-c" ]
-
 ENV SHELL=/bin/bash
 
 # `docker` flags useful for debugging:
