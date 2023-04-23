@@ -227,7 +227,7 @@ $(
     shift $(( OPTIND - 1 ))
 
     declare cmd="$1"  # First arg = command to run. Last arg = `${@:$#}``
-    declare cmdArgs="${@:2}"
+    declare cmdArgs=("${@:2}")
 
     if [[ -z "$cmd" ]]; then
         main -h
@@ -235,7 +235,7 @@ $(
         return 1
     fi
 
-    $cmd "$cmdArgs"
+    $cmd "${cmdArgs[@]}"
 }
 
 
