@@ -118,12 +118,12 @@ jobs:
         with:
           GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}
 
-      - name: CD:Azure - Deploy
-        id: cd-azure-deploy
-        uses: ./.github/workflows/actions/deploy-azure
-        with:
-          GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}
-          registryUrl: ${{ steps.cd-docker-build-and-publish-image.outputs.registryUrl }}
+      # - name: CD:Azure - Deploy
+      #   id: cd-azure-deploy
+      #   uses: ./.github/workflows/actions/deploy-azure
+      #   with:
+      #     GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}
+      #     registryUrl: ${{ steps.cd-docker-build-and-publish-image.outputs.registryUrl }}
 
       # - name: Deploy application to Render.com
       #   run: |
