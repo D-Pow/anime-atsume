@@ -242,6 +242,10 @@ dockerRun() (
     docker run -it "${_dockerRunEnvArgs[@]}" anime-atsume ${_dockerRunCmd}
 )
 
+dockerPullLatest() (
+    docker pull ghcr.io/d-pow/anime-atsume:latest
+)
+
 
 deploy() (
     echo -e "TODO: Update this with most recent hosting platform's procedure"
