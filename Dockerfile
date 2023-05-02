@@ -79,5 +79,7 @@ RUN if ! [[ -f "${WAR_FILE_FINAL_PATH}" ]]; then \
 
 EXPOSE 8080
 
-# Limit memory usage in website host via `JAVA_OPTS=-Xmx640m` (replace number with MB of RAM desired)
+# Limit memory usage in website host via `JAVA_OPTS=-Xmx640m` (replace number with MB of RAM desired).
+# Modify Spring .properties with `-Dmy.prop.name=myVal` if running directly from `java`
+# or `-e JAVA_OPTS=-Dmy.prop.name=myVal` if running from `docker run`.
 CMD java ${JAVA_OPTS} -Dglass.platform=Monocle -Dmonocle.platform=Headless -jar "${WAR_FILE_FINAL_PATH}" --server.port=${PORT:-8080}
