@@ -243,7 +243,13 @@ dockerRun() (
 )
 
 dockerPullLatest() (
-    docker pull ghcr.io/d-pow/anime-atsume:latest
+    declare dockerImageUrl="${1:-ghcr.io/d-pow/anime-atsume}"
+
+    docker pull "${dockerImageUrl}:latest"
+)
+
+dockerStopAllContainers() (
+    docker stop $(docker container ls -q) 2>/dev/null
 )
 
 
