@@ -11,6 +11,7 @@ Notes:
     * Usually, running on ports 80 or 443 will require `sudo`
 * If running in a hosted VM, use the `nohup` command to allow the process to run even after your SSH session has ended. **Make sure to run in background**
     * e.g. `nohup java -jar anime-atsume.war --server.port=80 &`
+* [DNS types](http://freedns.afraid.org/faq/type.php).
 
 ### Docker
 * Build image: `docker build -t app .`
