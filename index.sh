@@ -310,6 +310,8 @@ certConvertToPkcs() (
     declare pkcsOutFileAbs="$pemParentPathAbs/$pkcsOutFilename"
     declare pkcsOutFileRel="$pemParentPathRel/$pkcsOutFilename"
 
+    sudo rm -f "$pkcsOutFilename" "$pkcsOutFileAbs" "$pkcsOutFileRel"
+
     # See:
     #   - Generating PKCS#12 from LetsEncrypt .pem files: https://stackoverflow.com/a/38873138/5771107
     #   - Password inline in command: https://stackoverflow.com/a/27497899/5771107
