@@ -99,7 +99,9 @@ def copyDbToBuildDir() {
 
 
 tasks.register("cleanResources") {
-    delete(gradle.rootProject.serverWebAssetDirPath);
+    doLast {
+        delete(gradle.rootProject.serverWebAssetDirPath);
+    }
 }
 tasks.register("cleanAll") {
     dependsOn("clean", "cleanResources");
