@@ -1,0 +1,156 @@
+name: AWS - Deploy
+description: Builds the app in AWS for deployment and hosting
+
+
+# Logic for deploying a Docker web app to AWS.
+#
+# See:
+#   - AWS GitHub Actions repos: https://github.com/orgs/aws-actions/repositories
+#   - CLI docs: https://aws.amazon.com/cli
+#   - Configure IAM and create access keys: https://us-east-1.console.aws.amazon.com/iamv2/home
+#     - CLI setup guide: https://docs.aws.amazon.com/cli/latest/userguide/getting-started-prereqs.html
+#     - IAM identity center (from setup guide, leads to configuring access keys): https://docs.aws.amazon.com/singlesignon/latest/userguide/get-started-enable-identity-center.html
+#   - Example EC2 (pipeline): https://medium.com/ryanjang-devnotes/ci-cd-hands-on-github-actions-docker-hub-aws-ec2-ba09f80297e1
+#   - Example EC2 (manual): https://medium.com/bb-tutorials-and-thoughts/running-docker-containers-on-aws-ec2-9b17add53646
+#   - GH Action that does that + Terraform/Ansible/others: https://github.com/marketplace/actions/deploy-docker-to-aws-ec2
+#   - Amazon's Docker deployment example: https://github.com/aws-samples/build-and-deploy-docker-images-to-aws-using-ec2-image-builder
+#   - Example ECR: https://dev.to/aws-builders/deploying-a-container-image-to-aws-ecr-using-a-github-action-k33
+
+
+inputs:
+  GITHUB_TOKEN:
+    description: GitHub token required for modifying branches or artifact publishing.
+    required: true
+  registryUrl:
+    description: Docker image registry full URL.
+    required: true
+  AWS_ACCESS_KEY_ID:
+    description: AWS access key.
+    required: true
+  AWS_SECRET_ACCESS_KEY:
+    description: AWS secret access key.
+    required: true
+  AWS_REGION:
+    description: AWS default region of EC2 instance.
+    required: true
+  AWS_SSH_KEY:
+    description: AWS SSH RSA key.
+    required: true
+  AWS_INSTANCE_URL:
+    description: AWS EC2 instance URL for SSH.
+    required: true
+
+
+runs:
+  using: composite
+  steps:
+    - name: Checkout repository branch
+      uses: actions/checkout@v3
+
+    - name: AWS - Cache name init
+      uses: ./.github/workflows/actions/cache-name
+
+    - name: AWS - Setup env
+      id: aws-setup-env
+      shell: bash
+      run: |
+        echo "GITHUB_TOKEN=${{ inputs.GITHUB_TOKEN }}" >> $GITHUB_ENV
+        echo "registryUrl=${{ inputs.registryUrl }}" >> $GITHUB_ENV
+        echo "AWS_ACCESS_KEY_ID=${{ inputs.AWS_ACCESS_KEY_ID }}" >> $GITHUB_ENV
+        echo "AWS_SECRET_ACCESS_KEY=${{ inputs.AWS_SECRET_ACCESS_KEY }}" >> $GITHUB_ENV
+        echo "AWS_REGION=${{ inputs.AWS_REGION }}" >> $GITHUB_ENV
+        echo "AWS_SSH_KEY=${{ inputs.AWS_SSH_KEY }}" >> $GITHUB_ENV
+        echo "AWS_INSTANCE_URL=${{ inputs.AWS_INSTANCE_URL }}" >> $GITHUB_ENV
+
+    - name: AWS - Install CLI
+      id: aws-cli-install
+      shell: bash
+      run: |
+        curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+        unzip awscliv2.zip
+        sudo ./aws/install
+        aws configure set aws_access_key_id ${{ env.AWS_ACCESS_KEY_ID }}
+        aws configure set aws_secret_access_key ${{ env.AWS_SECRET_ACCESS_KEY }}
+        aws configure set region ${{ env.AWS_REGION }}
+        aws configure set output text
+
+    - name: AWS - Get EC2 instance ID
+      id: aws-cli-get-instance-id
+      shell: bash
+      run: |
+        awsInstanceId=$(aws ec2 describe-instances --query 'Reservations[*].Instances[*].InstanceId' --filters 'Name=dns-name,Values=${{ env.AWS_INSTANCE_URL }}' --output text)
+        echo "awsInstanceId=$awsInstanceId" >> $GITHUB_ENV
+
+    - name: AWS - Configure Credentials
+      id: aws-configure-credentials
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        aws-access-key-id: ${{ env.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ env.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+
+    # Publishes Docker images to AWS' registry.
+    # Doesn't run the image, it only hosts it.
+    # - name: AWS - Login to ECR Docker registry
+    #   id: aws-ecr-login
+    #   uses: aws-actions/amazon-ecr-login@v1
+    #   with:
+    #     registry-type: public
+
+    # Deploys a Docker image to run on AWS ECS
+    # AWS ECS free tier only lasts for 6 months rather than 12 months for EC2,
+    # so disable this for now.
+    # - name: AWS - Generate new ECS task definition file
+    #   id: aws-ecs-generate-task-def
+    #   uses: aws-actions/amazon-ecs-render-task-definition@v1
+    #   with:
+    #     task-definition: task-definition.json
+    #     container-name: web
+    #     image: "${{ env.registryUrl }}:latest"
+    #     environment-variables: "LOG_LEVEL=info"
+    #
+    # - name: AWS - Deploy new ECS task
+    #   id: aws-ecs-execute-task-def
+    #   uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+    #   with:
+    #     task-definition: ${{ steps.aws-ecs-generate-task-def.outputs.task-definition }}
+    #     service: my-service
+    #     cluster: my-cluster
+
+    # Deploys the published Docker image to AWS EC2.
+    # Since Amazon didn't make any GitHub Actions for EC2 instances,
+    # we have to manually login to the server, pull the latest Docker image,
+    # and run it.
+    # ECS would be a much better option as would some of the other services
+    # (e.g. CodeBuild since it would handle our code for us), but the logic
+    # below is simple enough, so just stick with this for now.
+    #
+    # `aws` CLI method
+    # - name: AWS - CLI login to EC2 to pull and run latest Docker image
+    #   id: aws-pull-docker-img-and-run
+    #   shell: bash
+    #   run: |
+    #     aws ssm send-command \
+    #       --document-name "AWS-RunShellScript" \
+    #       --targets '[{"Key":"InstanceIds","Values":["${{ env.awsInstanceId }}"]}]' \
+    #       --parameters '{"commands":[
+    #           "#!/usr/bin/env bash",
+    #           "docker stop $(docker container ls -q) 2>/dev/null || true",
+    #           "docker pull ${{ env.registryUrl }}:latest",
+    #           "docker run -p 80:8080 -p 443:8080 anime-atsume"
+    #       ]}'
+    #
+    # SSH method
+    - name: AWS - SSH into EC2 to pull and run latest Docker image
+      id: aws-pull-docker-img-and-run
+      shell: bash
+      run: |
+        echo "${{ env.AWS_SSH_KEY }}" > aws-ssh-key.pem
+        chmod 400 aws-ssh-key.pem
+        # Disabling StrictHostKeyChecking is unsafe but works
+        # See: https://askubuntu.com/questions/123072/ssh-automatically-accept-keys/123080#123080
+        ssh -i ./aws-ssh-key.pem -oStrictHostKeyChecking=accept-new ubuntu@${{ env.AWS_INSTANCE_URL }} "
+          docker stop $(docker container ls -q) 2>/dev/null
+          docker pull ${{ env.registryUrl }}:latest
+          docker run -p 80:8080 -p 443:8080 ${{ env.registryUrl }}:latest
+        "

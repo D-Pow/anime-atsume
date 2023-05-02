@@ -63,6 +63,11 @@ env:
   #   - How to get creds: https://www.techielass.com/create-azure-credentials-for-use-in-github-actions/
   #   - Alternative GitHub action: https://github.com/marketplace/actions/azure-cli-action
   AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  AWS_REGION: ${{ secrets.AWS_REGION }}
+  AWS_SSH_KEY: ${{ secrets.AWS_SSH_KEY }}
+  AWS_INSTANCE_URL: ${{ secrets.AWS_INSTANCE_URL }}
 
 
 # Since Render.com isn't configurable and it decides to do whatever it wants, don't (re-)run
@@ -117,6 +122,18 @@ jobs:
         uses: ./.github/workflows/actions/docker-publish
         with:
           GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}
+
+      - name: CD:AWS - Deploy
+        id: cd-aws-deploy
+        uses: ./.github/workflows/actions/deploy-aws
+        with:
+          GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}
+          registryUrl: ${{ steps.cd-docker-build-and-publish-image.outputs.registryUrl }}
+          AWS_ACCESS_KEY_ID: ${{ env.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ env.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ env.AWS_REGION }}
+          AWS_SSH_KEY: ${{ env.AWS_SSH_KEY }}
+          AWS_INSTANCE_URL: ${{ env.AWS_INSTANCE_URL }}
 
       # - name: CD:Azure - Deploy
       #   id: cd-azure-deploy
