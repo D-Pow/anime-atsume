@@ -284,6 +284,45 @@ certGenerate() (
         certonly --standalone
 )
 
+certConvertToPkcs() (
+    # Spring Boot expects PKCS#12 format, not .pem, so generate it here.
+
+    declare origUser="$(whoami)"
+
+    declare pemParentPath="${1:-/etc/letsencrypt/live}"
+    declare pemAllFilesRel=($(sudo find "$pemParentPath" -iname '*.pem'))
+    declare pemFirstFile="${pemAllFilesRel[0]}"
+    declare pemParentPathAbs="$(dirname $(sudo realpath -e "$pemFirstFile"))"
+    declare pemParentPathRel="$(dirname $(sudo realpath -se "$pemFirstFile"))"
+    declare pemAllFilesAbs=($(sudo find "$pemParentPathAbs" -iname '*.pem'))
+
+    declare opensslInFile="${pemParentPathAbs}/$(echo ${pemAllFilesAbs[@]} | grep -Pio 'fullchain[^\s]*\.pem')"
+    declare opensslInKeyFile="${pemParentPathAbs}/$(echo ${pemAllFilesAbs[@]} | grep -Pio 'privkey[^\s]*\.pem')"
+    declare opensslInCaFile="${pemParentPathAbs}/$(echo ${pemAllFilesAbs[@]} | grep -Pio '\bchain[^\s]*\.pem')"
+
+    declare pkcsOutFilename="keystore.p12"
+    declare pkcsOutFileAbs="$pemParentPathAbs/$pkcsOutFilename"
+    declare pkcsOutFileRel="$pemParentPathRel/$pkcsOutFilename"
+
+    # See:
+    #   - Generating PKCS#12 from LetsEncrypt .pem files: https://stackoverflow.com/a/38873138/5771107
+    #   - Password inline in command: https://stackoverflow.com/a/27497899/5771107
+    sudo openssl pkcs12 -export \
+        -in "$opensslInFile" \
+        -inkey "$opensslInKeyFile" \
+        -out $pkcsOutFileAbs \
+        -name tomcat \
+        -CAfile "$opensslInCaFile" \
+        -passout pass: \
+        -caname root
+
+    sudo ln -s "$pkcsOutFileAbs" "$pkcsOutFileRel"
+    sudo ln -s "$pkcsOutFileAbs" "$pkcsOutFilename"
+
+    sudo chown "$origUser:$origUser" "$pkcsOutFileRel"
+    sudo chown "$origUser:$origUser" "$pkcsOutFilename"
+)
+
 
 main() {
     declare USAGE="${rootDir}/${BASH_SOURCE[0]} [OPTIONS...] <cmd>

@@ -5,3 +5,4 @@
 .vercel
 **/*.sublime-*
 *.log
+**/*.pem
