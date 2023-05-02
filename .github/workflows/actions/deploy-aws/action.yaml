@@ -62,6 +62,7 @@ runs:
         echo "AWS_SSH_KEY=${{ inputs.AWS_SSH_KEY }}" >> $GITHUB_ENV
         echo "AWS_INSTANCE_URL=${{ inputs.AWS_INSTANCE_URL }}" >> $GITHUB_ENV
 
+    # Alternative: https://github.com/unfor19/install-aws-cli-action/blob/master/entrypoint.sh
     - name: AWS - Install CLI
       id: aws-cli-install
       shell: bash
