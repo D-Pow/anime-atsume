@@ -359,6 +359,7 @@ certConvertToPkcs() (
     # because the parent dirs of the keystore are only readable by root.
     sudo cp "$pkcsOutFileAbs" "$pkcsOutFilename"
     sudo chmod a+r "$pkcsOutFilename"
+    sudo cp "$pkcsOutFilename" "$HOME/$pkcsOutFilename"
 
     echo "$pkcsOutFileAbs"
 )
