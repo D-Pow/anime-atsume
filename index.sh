@@ -332,11 +332,20 @@ certConvertToPkcs() (
         -passout pass: \
         -caname root
 
-    sudo ln -s "$pkcsOutFileAbs" "$pkcsOutFileRel"
-    sudo ln -s "$pkcsOutFileAbs" "$pkcsOutFilename"
+    # It'd probably be a good idea not to change ownership of the file
+    # to prevent accidental modifications to it.
+    #sudo chown "$origUser:$origUser" "$pkcsOutFileAbs"
+    # Allow everyone to read the keystore file.
+    sudo chmod a+r "$pkcsOutFileAbs"
 
-    sudo chown "$origUser:$origUser" "$pkcsOutFileRel"
-    sudo chown "$origUser:$origUser" "$pkcsOutFilename"
+    # Make a symlink to the keystore file in the `/etc/letsencrypt/live/` dir
+    # where all the other `.pem` files are.
+    # I don't think this is necessary but it doesn't hurt to do so.
+    sudo ln -s "$pkcsOutFileAbs" "$pkcsOutFileRel"
+    # However, don't make a symlink in the current dir, rather copy the file
+    # because the parent dirs of the keystore are only readable by root.
+    sudo cp "$pkcsOutFileAbs" "$pkcsOutFilename"
+    sudo chmod a+r "$pkcsOutFileAbs"
 
     echo "$pkcsOutFileAbs"
 )
