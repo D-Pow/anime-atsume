@@ -151,7 +151,7 @@ runs:
         # Disabling StrictHostKeyChecking is unsafe but works
         # See: https://askubuntu.com/questions/123072/ssh-automatically-accept-keys/123080#123080
         ssh -i ./aws-ssh-key.pem -oStrictHostKeyChecking=accept-new ubuntu@${{ env.AWS_INSTANCE_URL }} "
-          git clone https://github.com/${{ github.repository }}
+          git clone https://github.com/${{ github.repository }}.git
           ./index.sh dockerStopAllContainers
           ./index.sh dockerPullLatest ${{ env.registryUrl }}
           docker run -p 80:8080 -p 443:8080 anime-atsume
