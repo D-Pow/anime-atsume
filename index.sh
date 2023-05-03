@@ -337,6 +337,14 @@ certConvertToPkcs() (
 
     sudo chown "$origUser:$origUser" "$pkcsOutFileRel"
     sudo chown "$origUser:$origUser" "$pkcsOutFilename"
+
+    echo "$pkcsOutFileAbs"
+)
+
+certCopyToDockerContainer() (
+    # See:
+    #   - https://stackoverflow.com/questions/68971170/how-to-add-files-to-an-existing-docker-image/68971285#68971285
+    docker cp "$(certConvertToPkcs)" anime-atsume:/home
 )
 
 
