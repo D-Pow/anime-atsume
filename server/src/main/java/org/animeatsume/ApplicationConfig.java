@@ -51,7 +51,7 @@ public class ApplicationConfig {
     @Value("${org.animeatsume.cache.anime-title-search}")
     public static final String ANIME_TITLE_SEARCH_CACHE_NAME = "animeTitleSearch";
 
-    @Value("${log.env}")
+    @Value("${print.env}")
     private static Boolean logEnvVars;
 
     @Autowired
@@ -61,7 +61,7 @@ public class ApplicationConfig {
     public ApplicationConfig(
         @Value("${org.animeatsume.cache.cache-names}") String[] CACHE_NAMES,
         @Value("${org.animeatsume.cache.anime-title-search}") String ANIME_TITLE_SEARCH_CACHE_NAME,
-        @Value("${log.env}") Boolean logEnvVars
+        @Value("${print.env}") Boolean logEnvVars
     ) {
         ApplicationConfig.CACHE_NAMES = CACHE_NAMES;
         // ApplicationConfig.ANIME_TITLE_SEARCH_CACHE_NAME = ANIME_TITLE_SEARCH_CACHE_NAME;
