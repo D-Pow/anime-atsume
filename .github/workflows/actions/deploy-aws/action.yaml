@@ -59,8 +59,10 @@ runs:
         echo "AWS_ACCESS_KEY_ID=${{ inputs.AWS_ACCESS_KEY_ID }}" >> $GITHUB_ENV
         echo "AWS_SECRET_ACCESS_KEY=${{ inputs.AWS_SECRET_ACCESS_KEY }}" >> $GITHUB_ENV
         echo "AWS_REGION=${{ inputs.AWS_REGION }}" >> $GITHUB_ENV
-        echo "AWS_SSH_KEY=${{ inputs.AWS_SSH_KEY }}" >> $GITHUB_ENV
         echo "AWS_INSTANCE_URL=${{ inputs.AWS_INSTANCE_URL }}" >> $GITHUB_ENV
+        # Can't set multiline entries to GITHUB_ENV, so output SSH key to file here rather than later
+        # See: https://trstringer.com/github-actions-multiline-strings
+        echo "${{ inputs.AWS_SSH_KEY }}" > aws-ssh-key.pem
 
     # Alternative: https://github.com/unfor19/install-aws-cli-action/blob/master/entrypoint.sh
     - name: AWS - Install CLI
@@ -146,7 +148,6 @@ runs:
       id: aws-pull-docker-img-and-run
       shell: bash
       run: |
-        echo "${{ env.AWS_SSH_KEY }}" > aws-ssh-key.pem
         chmod 400 aws-ssh-key.pem
         # Disabling StrictHostKeyChecking is unsafe but works
         # See: https://askubuntu.com/questions/123072/ssh-automatically-accept-keys/123080#123080
