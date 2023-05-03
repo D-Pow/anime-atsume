@@ -149,7 +149,7 @@ runs:
         #   - GitHub registry example: https://docs.docker.com/build/ci/github-actions/push-multi-registries/
         tags: |
           ${{ env.registryUrl }}:latest
-          ${{ env.registryUrl }}:$GITHUB_SHA
+          ${{ env.registryUrl }}:${{ github.sha }}
         # labels: ${{ env.imageName }}
 
     - name: Docker - Print output image info
