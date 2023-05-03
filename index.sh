@@ -230,7 +230,7 @@ dockerRun() (
             continue
         fi
 
-        if echo "$_dockerRunEnvArg" | grep -Evq '^-'; then
+        if echo "$_dockerRunEnvArg" | _egrep -vq '^-'; then
             # If the arg passed doesn't start with a hyphen, then it's an env
             # var to be passed to the container via `-e <arg>`.
             _dockerRunEnvArgs+=("-e")
@@ -310,9 +310,9 @@ certConvertToPkcs() (
     declare pemParentPathRel="$(dirname $(sudo realpath -se "$pemFirstFile"))"
     declare pemAllFilesAbs=($(sudo find "$pemParentPathAbs" -iname '*.pem'))
 
-    declare opensslInFile="${pemParentPathAbs}/$(echo ${pemAllFilesAbs[@]} | grep -Pio 'fullchain[^\s]*\.pem')"
-    declare opensslInKeyFile="${pemParentPathAbs}/$(echo ${pemAllFilesAbs[@]} | grep -Pio 'privkey[^\s]*\.pem')"
-    declare opensslInCaFile="${pemParentPathAbs}/$(echo ${pemAllFilesAbs[@]} | grep -Pio '\bchain[^\s]*\.pem')"
+    declare opensslInFile="${pemParentPathAbs}/$(echo ${pemAllFilesAbs[@]} | _egrep -io 'fullchain[^\s]*\.pem')"
+    declare opensslInKeyFile="${pemParentPathAbs}/$(echo ${pemAllFilesAbs[@]} | _egrep -io 'privkey[^\s]*\.pem')"
+    declare opensslInCaFile="${pemParentPathAbs}/$(echo ${pemAllFilesAbs[@]} | _egrep -io '\bchain[^\s]*\.pem')"
 
     declare pkcsOutFilename="keystore.p12"
     declare pkcsOutFileAbs="$pemParentPathAbs/$pkcsOutFilename"
