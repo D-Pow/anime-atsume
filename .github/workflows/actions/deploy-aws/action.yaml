@@ -75,9 +75,20 @@ runs:
         unzip awscliv2.zip
         sudo ./aws/install
 
+    - name: AWS - Configure Credentials
+      id: aws-configure-credentials
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        aws-access-key-id: ${{ env.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ env.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+
     - name: AWS - CLI Login
       id: aws-cli-login
       shell: bash
+      # `aws-actions/configure-aws-credentials` should have already taken care of login logic,
+      # but in case it fails for whatever reason, attempt to set them here
+      continue-on-error: true
       run: |
         aws configure set aws_access_key_id ${{ env.AWS_ACCESS_KEY_ID }}
         aws configure set aws_secret_access_key ${{ env.AWS_SECRET_ACCESS_KEY }}
@@ -90,14 +101,6 @@ runs:
       run: |
         awsInstanceId=$(aws ec2 describe-instances --query 'Reservations[*].Instances[*].InstanceId' --filters 'Name=dns-name,Values=${{ env.AWS_INSTANCE_URL }}' --output text)
         echo "awsInstanceId=$awsInstanceId" >> $GITHUB_ENV
-
-    - name: AWS - Configure Credentials
-      id: aws-configure-credentials
-      uses: aws-actions/configure-aws-credentials@v2
-      with:
-        aws-access-key-id: ${{ env.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ env.AWS_SECRET_ACCESS_KEY }}
-        aws-region: ${{ env.AWS_REGION }}
 
     # Publishes Docker images to AWS' registry.
     # Doesn't run the image, it only hosts it.
