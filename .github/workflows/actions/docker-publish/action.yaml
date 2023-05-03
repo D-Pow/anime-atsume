@@ -117,7 +117,6 @@ runs:
     # Default is Docker hub, but logging into GitHub's/another registry will
     # set it as the publish destination instead.
     - name: Docker - Login to container registry
-      if: ${{ failure() || steps.docker-download-server-cache.outputs.cache-hit != 'true' }}
       uses: docker/login-action@v2
       with:
         registry: ${{ env.registryUrlDomain }}
@@ -126,14 +125,12 @@ runs:
 
     - name: Docker - Extract metadata (tags, labels)
       id: docker-metadata-extract
-      if: ${{ failure() || steps.docker-download-server-cache.outputs.cache-hit != 'true' }}
       uses: docker/metadata-action@v4
       with:
         images: ${{ env.registryUrl }}
 
     - name: Docker - Build and push image
       id: docker-build-and-push-image
-      if: ${{ failure() || steps.docker-download-server-cache.outputs.cache-hit != 'true' }}
       uses: docker/build-push-action@v4
       with:
         # Explicitly define GitHub token as an input var since the default is `github.token`
@@ -150,12 +147,13 @@ runs:
         # See:
         #   - Simple example: https://github.com/docker/build-push-action#path-context
         #   - GitHub registry example: https://docs.docker.com/build/ci/github-actions/push-multi-registries/
-        # tags: ${{ env.registryUrl }}:${{ github.GITHUB_SHA }}
+        tags: |
+          ${{ env.registryUrl }}:latest
+          ${{ env.registryUrl }}:$GITHUB_SHA
         # labels: ${{ env.imageName }}
 
     - name: Docker - Print output image info
       id: docker-print-output-info
-      if: ${{ failure() || steps.docker-download-server-cache.outputs.cache-hit != 'true' }}
       shell: bash
       run: |
         echo "Image ID: ${{ steps.docker-build-and-push-image.outputs.imageid }}"
