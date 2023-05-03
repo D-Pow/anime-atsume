@@ -318,6 +318,11 @@ certConvertToPkcs() (
     declare pkcsOutFileAbs="$pemParentPathAbs/$pkcsOutFilename"
     declare pkcsOutFileRel="$pemParentPathRel/$pkcsOutFilename"
 
+    # All SSL keystore files already exist, so no need to regenerate them
+    if [[ -f "$pkcsOutFilename" ]] && if [[ -f "$pkcsOutFileAbs" ]] && if [[ -f "$pkcsOutFileRel" ]]; then
+        return
+    fi
+
     sudo rm -f "$pkcsOutFilename" "$pkcsOutFileAbs" "$pkcsOutFileRel"
 
     # See:
