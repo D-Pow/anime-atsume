@@ -260,6 +260,14 @@ dockerStopAllContainers() (
     docker stop $(docker container ls -q) 2>/dev/null
 )
 
+dockerDeleteAllContainers() (
+    docker rm --volumes $(docker ps -a | tail -n +2 | awk '{ print $1 }')
+)
+
+dockerDeleteAllImages() (
+    docker image rm -f $(docker images -aq)
+)
+
 
 deploy() (
     echo -e "TODO: Update this with most recent hosting platform's procedure"

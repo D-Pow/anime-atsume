@@ -171,6 +171,8 @@ runs:
           git clone https://github.com/${{ github.repository }}.git
           cd anime-atsume
           ./index.sh dockerStopAllContainers
+          ./index.sh dockerDeleteAllContainers
+          ./index.sh dockerDeleteAllImages
           ./index.sh dockerPullLatest ${{ env.registryUrl }}
           ./index.sh certCopyToDockerContainer
           cd ..
