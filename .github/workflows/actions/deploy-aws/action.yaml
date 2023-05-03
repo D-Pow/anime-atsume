@@ -174,12 +174,21 @@ runs:
         ssh -i ./aws-ssh-key.pem -oStrictHostKeyChecking=accept-new ubuntu@${{ env.AWS_INSTANCE_URL }} "
           [[ -d anime-atsume ]] && rm -rf anime-atsume
           git clone https://github.com/${{ github.repository }}.git
+
           cd anime-atsume
+
           ./index.sh dockerStopAllContainers
           ./index.sh dockerDeleteAllContainers
           ./index.sh dockerDeleteAllImages
           ./index.sh dockerPullLatest ${{ env.registryUrl }}
           ./index.sh certCopyToDockerContainer
+
           cd ..
-          docker run -p 80:8080 -p 443:8443 -v ./anime-atsume:/home/repo -e 'JAVA_OPTS=-Dserver.ssl.key-store=./repo/keystore.p12 -Dserver.ssl.key-store-password=${{ env.AWS_SERVER_KEYSTORE_PASSWORD }}' anime-atsume
+
+          docker run \
+            -p 80:8080 \
+            -p 443:8443 \
+            -v ./anime-atsume:/home/repo \
+            -e 'JAVA_OPTS=-Dserver.ssl.key-store=./repo/keystore.p12 -Dserver.ssl.key-store-password=${{ env.AWS_SERVER_KEYSTORE_PASSWORD }}' \
+            anime-atsume
         "
