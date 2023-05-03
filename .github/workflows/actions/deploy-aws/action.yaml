@@ -168,8 +168,10 @@ runs:
         # See: https://askubuntu.com/questions/123072/ssh-automatically-accept-keys/123080#123080
         ssh -i ./aws-ssh-key.pem -oStrictHostKeyChecking=accept-new ubuntu@${{ env.AWS_INSTANCE_URL }} "
           git clone https://github.com/${{ github.repository }}.git
+          cd anime-atsume
           ./index.sh dockerStopAllContainers
           ./index.sh dockerPullLatest ${{ env.registryUrl }}
           ./index.sh certCopyToDockerContainer
+          cd ..
           docker run -p 80:8080 -p 443:8443 -e 'JAVA_OPTS=-Dserver.ssl.key-store=./keystore.p12' anime-atsume
         "
