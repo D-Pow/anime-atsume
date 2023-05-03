@@ -244,8 +244,16 @@ dockerRun() (
 
 dockerPullLatest() (
     declare dockerImageUrl="${1:-ghcr.io/d-pow/anime-atsume}"
+    # Extract only the last, trailing word after the final `/`
+    declare dockerImageName="$(echo "$dockerImageUrl" | sed -E 's|.*/([^/]+)$|\1|')"
+    # Prioritize arg 2 > parsed image name from arg 1 > anime-atsume
+    dockerImageName="${dockerImageName:-anime-atsume}"
+    dockerImageName="${2:-${dockerImageName}}"
+    declare dockerImageNameRemote="${dockerImageUrl}:latest"
 
-    docker pull "${dockerImageUrl}:latest"
+    docker pull "$dockerImageNameRemote"
+
+    docker tag "$dockerImageUrl" "$dockerImageName"
 )
 
 dockerStopAllContainers() (

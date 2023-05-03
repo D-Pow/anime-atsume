@@ -154,5 +154,5 @@ runs:
           git clone https://github.com/${{ github.repository }}
           ./index.sh dockerStopAllContainers
           ./index.sh dockerPullLatest ${{ env.registryUrl }}
-          docker run -p 80:8080 -p 443:8080 ${{ env.registryUrl }}:latest
+          docker run -p 80:8080 -p 443:8080 anime-atsume
         "
