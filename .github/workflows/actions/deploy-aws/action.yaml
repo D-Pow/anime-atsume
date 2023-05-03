@@ -39,6 +39,9 @@ inputs:
   AWS_INSTANCE_URL:
     description: AWS EC2 instance URL for SSH.
     required: true
+  AWS_SERVER_KEYSTORE_PASSWORD:
+    description: Password used when creating the keystore via Let's Encrypt
+    required: true
 
 
 runs:
@@ -60,6 +63,7 @@ runs:
         echo "AWS_SECRET_ACCESS_KEY=${{ inputs.AWS_SECRET_ACCESS_KEY }}" >> $GITHUB_ENV
         echo "AWS_REGION=${{ inputs.AWS_REGION }}" >> $GITHUB_ENV
         echo "AWS_INSTANCE_URL=${{ inputs.AWS_INSTANCE_URL }}" >> $GITHUB_ENV
+        echo "AWS_SERVER_KEYSTORE_PASSWORD=${{ inputs.AWS_SERVER_KEYSTORE_PASSWORD }}" >> $GITHUB_ENV
 
         # We can set multiline entries to GITHUB_ENV only through HERE-documents, so output
         # SSH key to file here instead of later for simplicity.
@@ -177,5 +181,5 @@ runs:
           ./index.sh dockerPullLatest ${{ env.registryUrl }}
           ./index.sh certCopyToDockerContainer
           cd ..
-          docker run -p 80:8080 -p 443:8443 -e 'JAVA_OPTS=-Dserver.ssl.key-store=./keystore.p12' anime-atsume
+          docker run -p 80:8080 -p 443:8443 -v ./anime-atsume:/home/repo -e 'JAVA_OPTS=-Dserver.ssl.key-store=./repo/keystore.p12 -Dserver.ssl.key-store-password=${{ env.AWS_SERVER_KEYSTORE_PASSWORD }}' anime-atsume
         "

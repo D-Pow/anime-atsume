@@ -68,6 +68,7 @@ env:
   AWS_REGION: ${{ secrets.AWS_REGION }}
   AWS_SSH_KEY: ${{ secrets.AWS_SSH_KEY }}
   AWS_INSTANCE_URL: ${{ secrets.AWS_INSTANCE_URL }}
+  AWS_SERVER_KEYSTORE_PASSWORD: ${{ secrets.AWS_SERVER_KEYSTORE_PASSWORD }}
 
 
 # Since Render.com isn't configurable and it decides to do whatever it wants, don't (re-)run
@@ -134,6 +135,7 @@ jobs:
           AWS_REGION: ${{ env.AWS_REGION }}
           AWS_SSH_KEY: ${{ env.AWS_SSH_KEY }}
           AWS_INSTANCE_URL: ${{ env.AWS_INSTANCE_URL }}
+          AWS_SERVER_KEYSTORE_PASSWORD: ${{ env.AWS_SERVER_KEYSTORE_PASSWORD }}
 
       # - name: CD:Azure - Deploy
       #   id: cd-azure-deploy
