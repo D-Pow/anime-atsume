@@ -358,7 +358,7 @@ certConvertToPkcs() (
     # However, don't make a symlink in the current dir, rather copy the file
     # because the parent dirs of the keystore are only readable by root.
     sudo cp "$pkcsOutFileAbs" "$pkcsOutFilename"
-    sudo chmod a+r "$pkcsOutFileAbs"
+    sudo chmod a+r "$pkcsOutFilename"
 
     echo "$pkcsOutFileAbs"
 )
