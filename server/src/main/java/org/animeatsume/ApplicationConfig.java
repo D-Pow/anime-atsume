@@ -1,8 +1,11 @@
 package org.animeatsume;
 
 import lombok.extern.log4j.Log4j2;
+import org.apache.catalina.connector.Connector;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
+import org.springframework.boot.web.servlet.server.ServletWebServerFactory;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
@@ -39,6 +42,9 @@ public class ApplicationConfig {
     private static final long WEEK_IN_MILLISECONDS = 1000 * 60 * 60 * 24 * 7;
     private static final long ANIME_TITLE_SEARCH_CACHE_CLEAR_INTERVAL = WEEK_IN_MILLISECONDS;
 
+    @Value("${server.http.port}")
+    private int SERVER_HTTP_PORT;
+
     @Value("${org.animeatsume.cache.cache-names}")
     public static String[] CACHE_NAMES;
 
@@ -65,6 +71,7 @@ public class ApplicationConfig {
         log.debug("ANIME_TITLE_SEARCH_CACHE_NAME: {}", ANIME_TITLE_SEARCH_CACHE_NAME);
     }
 
+
     @Bean
     public Executor taskExecutor(
         @Value("${spring.task.execution.pool.core-size}") int corePoolSize,
@@ -82,6 +89,30 @@ public class ApplicationConfig {
 
         return executor;
     }
+
+
+    /**
+     * @see <a href="https://stackoverflow.com/questions/30896234/how-set-up-spring-boot-to-run-https-http-ports/52648698#52648698">Correct Spring Boot v2 answer</a>
+     * @see <a href="https://docs.spring.io/spring-boot/docs/current/reference/html/features.html#features.external-config">Using separate .properties files per env</a>
+     * @see <a href="https://stackoverflow.com/questions/44969873/spring-boot-key-store-password-set-in-code/44971126#44971126">Alternative: Setting server.ssl properties in Java code instead of .properties</a>
+     * @see <a href="https://stackoverflow.com/questions/29072628/how-can-i-override-spring-boot-application-properties-programmatically">More info for above alternative</a>
+     * @see <a href="https://stackoverflow.com/questions/65890334/configure-spring-boots-with-custom-sslcontext-programmatically-for-mtls/65898905#65898905">Alternative to set properties in Java code is finicky</a>
+     * @see <a href="https://stackoverflow.com/questions/47580247/optional-environment-variables-in-spring-app/47581132#47581132">Attempt: Defaulting properties with Java code within .properties</a>
+     * @see <a href="https://stackoverflow.com/questions/64426386/spring-boot-controller-to-handle-all-requests-for-preprocessing-before-forwardin">Possible alternative: Filter requests before handling them in main server code</a>
+     * @see <a href="https://mvysny.github.io/spring-boot-enable-http-https">Attempt: Tring the same as the correct answer, but with v1 logic</a>
+     * @see <a href="https://stackoverflow.com/questions/19613562/how-can-i-specify-my-keystore-file-with-spring-boot-and-tomcat">Attempt: Trying to dynamically toggle .properties `server.ssl.key-store` based on existence</a>
+     */
+    @Bean
+    public ServletWebServerFactory servletContainer() {
+        Connector connector = new Connector(TomcatServletWebServerFactory.DEFAULT_PROTOCOL);
+        connector.setPort(SERVER_HTTP_PORT);
+
+        TomcatServletWebServerFactory tomcat = new TomcatServletWebServerFactory();
+        tomcat.addAdditionalTomcatConnectors(connector);
+
+        return tomcat;
+    }
+
 
     // Note: We can't use `@Autowired CacheManager cacheManager` because the cache names array needs to be final,
     // and the only way to do that when mixing with the CacheManager is via manual `@Bean` method.
