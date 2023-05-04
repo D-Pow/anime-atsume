@@ -79,7 +79,7 @@ runs:
       # `aws` is likely already installed, so ignore any failures
       continue-on-error: true
       run: |
-        ( type aws &>/dev/null ) && return
+        ( type aws &>/dev/null ) && exit
         curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
         unzip awscliv2.zip
         sudo ./aws/install
