@@ -132,13 +132,20 @@ jobs:
         uses: ./.github/workflows/actions/cache-name
 
       - name: CD:Server - Download CI output
-        id: cd-docker-download-server-cache
+        id: cd-deploy-download-server-cache
         uses: actions/cache/restore@v3
         continue-on-error: true
         with:
           path: |
             ./server/build/libs
           key: ${{ env.SERVER_CACHE_ID }}
+
+      - name: CD:Deploy - Login to Docker container registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.registryUrlDomain }}
+          username: ${{ github.actor }}
+          password: ${{ env.GITHUB_TOKEN }}
 
       - name: CD:AWS - Deploy
         id: cd-aws-deploy
