@@ -256,10 +256,18 @@ dockerRunExisting() (
 
 dockerGetRunningContainer() (
     declare dockerContainerName="${1:-anime-atsume}"
+    declare dockerContainerFormat="${2:-{{.Names\}\}}"
 
-    docker ps --format='{{.Image}} {{.Names}}' \
-        | grep "$dockerContainerName" \
-        | awk '{ print $2 }'
+    # `--format` could also contain `{{.ID}}` (same as just `-q` flag), `{{.Image}}`, etc.
+    # `--filter "status=running"` is unnecessary since `docker ps` defaults to only running containers
+    docker ps \
+        --filter "ancestor=${dockerContainerName}" \
+        --format "$dockerContainerFormat"
+
+    # Manual alternative:
+    # docker ps --format='{{.Image}} {{.Names}}' \
+    #     | _egrep "$dockerContainerName|" \
+    #     | awk '{ print $2 }'
 )
 
 dockerGetLog() (
