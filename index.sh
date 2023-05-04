@@ -276,6 +276,14 @@ dockerGetLog() (
     docker logs "$dockerContainerName"
 )
 
+dockerGetExitCode() (
+    # Exit code will almost always be 0 or 1 if underlying app success/failure,
+    # but will be > 1 if Docker failure (image doesn't exist, ports in use, etc.)
+    declare dockerContainerName="${1:-$(dockerGetRunningContainer)}"
+
+    docker inspect "$dockerContainerName" --format='{{.State.ExitCode}}'
+)
+
 dockerVerifyAppIsRunning() (
     declare dockerContainerName="$(dockerGetRunningContainer)"
 
@@ -296,7 +304,7 @@ dockerVerifyAppIsRunning() (
             # Print the container's log to the console in case it was run
             # in Docker's detached mode or in Bash's background
             dockerGetLog "$dockerContainerName"
-            return 1
+            return $(dockerGetExitCode "$dockerContainerName")
         fi
 
         (( _verifyCounter++ ))
@@ -310,7 +318,7 @@ dockerVerifyAppIsRunning() (
     # officially boots/opens its ports
     if [[ -z "$(dockerGetRunningContainer)" ]]; then
         dockerGetLog "$dockerContainerName"
-        return 1
+        return $(dockerGetExitCode "$dockerContainerName")
     fi
 )
 
