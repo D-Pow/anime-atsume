@@ -69,6 +69,7 @@ env:
   AWS_SSH_KEY: ${{ secrets.AWS_SSH_KEY }}
   AWS_INSTANCE_URL: ${{ secrets.AWS_INSTANCE_URL }}
   AWS_SERVER_KEYSTORE_PASSWORD: ${{ secrets.AWS_SERVER_KEYSTORE_PASSWORD }}
+  registryUrlDomain: ghcr.io
 
 
 # Since Render.com isn't configurable and it decides to do whatever it wants, don't (re-)run
@@ -112,6 +113,7 @@ jobs:
         uses: ./.github/workflows/actions/docker-publish
         with:
           GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}
+          registryUrlDomain: ${{ env.registryUrlDomain }}
 
 
   cd-deploy:

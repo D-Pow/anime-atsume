@@ -10,8 +10,7 @@ inputs:
     required: true
   registryUrlDomain:
     description: Docker registry URL's domain.
-    required: false
-    default: ghcr.io
+    required: true
   imageRetentionDays:
     description: How many days to keep the Docker image artifact in GitHub artifacts.
     required: false
