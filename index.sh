@@ -613,12 +613,14 @@ certConvertToPkcs() (
 
     declare origUser="$(whoami)"
 
-    declare pemParentPath="${1:-/etc/letsencrypt/live}"
-    declare pemAllFilesRel=($(sudo find "$pemParentPath" -iname '*.pem'))
+    declare pemParentPath="${1:-/etc/letsencrypt}"
+    # Specifically get only symlinks via `-type l`
+    declare pemAllFilesRel=($(sudo find "$pemParentPath" -iname '*.pem' -type l))
     declare pemFirstFile="${pemAllFilesRel[0]}"
     declare pemParentPathAbs="$(dirname $(sudo realpath -e "$pemFirstFile"))"
     declare pemParentPathRel="$(dirname $(sudo realpath -se "$pemFirstFile"))"
-    declare pemAllFilesAbs=($(sudo find "$pemParentPathAbs" -iname '*.pem'))
+    # Exclude symlinks via `-type f`
+    declare pemAllFilesAbs=($(sudo find "$pemParentPathAbs" -iname '*.pem' -type f))
 
     declare opensslInFile="${pemParentPathAbs}/$(echo ${pemAllFilesAbs[@]} | _egrep -io 'fullchain[^\s]*\.pem')"
     declare opensslInKeyFile="${pemParentPathAbs}/$(echo ${pemAllFilesAbs[@]} | _egrep -io 'privkey[^\s]*\.pem')"
