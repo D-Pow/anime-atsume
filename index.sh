@@ -264,6 +264,18 @@ dockerRunExisting() (
     docker exec -it "$(dockerGetRunningContainer)" bash
 )
 
+dockerRunOnProd() (
+    declare serverKeystorePassword="$1"
+
+    nohup docker run \
+        -d \
+        -p 80:8080 \
+        -p 443:8443 \
+        -v /home/ubuntu/anime-atsume:/home/repo \
+        -e "JAVA_OPTS=-Dserver.ssl.key-store=./repo/keystore.p12 -Dserver.ssl.key-store-password=${serverKeystorePassword}" \
+        anime-atsume
+)
+
 dockerGetRunningContainer() (
     declare dockerContainerName="${1:-anime-atsume}"
     declare dockerContainerFormat="${2:-{{.Names\}\}}"
@@ -284,6 +296,10 @@ dockerGetLog() (
     declare dockerContainerName="${1:-$(dockerGetRunningContainer)}"
 
     docker logs "$dockerContainerName"
+)
+
+dockerGetLogLive() (
+    docker logs --follow $(dockerGetRunningContainer)
 )
 
 dockerGetExitCode() (
@@ -665,6 +681,149 @@ certCopyToDockerContainer() (
     #   - https://stackoverflow.com/questions/68971170/how-to-add-files-to-an-existing-docker-image/68971285#68971285
     docker cp "$(certConvertToPkcs)" anime-atsume:/home
 )
+
+
+
+mountServerLocally() {
+    declare USAGE="${FUNCNAME[0]} -h <url> [OPTIONS...]
+    Runs the generated \`anime-atsume\`
+
+    Required options:
+        -h  |   SSH host URL.
+
+    Optional options:
+        -u  |   SSH username (default: user).
+        -k  |   SSH login \`.pem\` key file path.
+        -s  |   Server's path to mount (default: /).
+        -l  |   Local path to mount (default: \$HOME/server).
+    "
+    declare sshUser=
+    declare sshHost=
+    declare sshLoginKeyFile=
+    declare serverMountPath=
+    declare localMountPath=
+
+    declare opt=
+    declare OPTIND=1
+
+    while getopts ":u:h:k:s:l:" opt; do
+        # Delete any leading `=` from the option argument value
+        # so that e.g. `-p=80` --> `opt: p, OPTARG: 80` instead of `OPTARG: =80`
+        OPTARG="${OPTARG#=}"
+
+        case "$opt" in
+            u)
+                sshUser="$OPTARG"
+                ;;
+            h)
+                sshHost="$OPTARG"
+                ;;
+            k)
+                sshLoginKeyFile="$OPTARG"
+                ;;
+            s)
+                serverMountPath="$OPTARG"
+                ;;
+            l)
+                localMountPath="$OPTARG"
+                ;;
+            *)
+                echo -e "$USAGE" >&2
+                return 1
+                ;;
+        esac
+    done
+
+    shift $(( OPTIND - 1 ))
+
+    sshUser="${sshUser:-user}"
+    serverMountPath="${serverMountPath:-/}"
+    localMountPath="${localMountPath:-$HOME/server}"
+
+    if ! [[ -d "$localMountPath" ]]; then
+        mkdir "$localMountPath"
+    fi
+
+    # See:
+    #   - sshfs with .pem file: https://stackoverflow.com/questions/22217767/how-to-mount-a-folder-on-amazon-ec2-instance-with-private-key-using-sshfs/22249600#22249600
+    declare optionalSshfsOpts=
+
+    if [[ -n "$sshLoginKeyFile" ]]; then
+        optionalSshfsOpts="-o IdentityFile=$(realpath "$sshLoginKeyFile")"
+    fi
+
+    sshfs "${sshUser}@${sshHost}:${serverMountPath}" "$localMountPath" $optionalSshfsOpts
+
+    echo "$localMountPath"
+}
+
+unmountServerLocally() {
+    sudo umount -f "$1"
+}
+
+
+mountAwsLocally() {
+    mountServerLocally \
+        -u ubuntu \
+        -h "$1" \
+        -l "$HOME/aws-server" \
+        -k "${2:-./aws-ssh-key.pem}"
+}
+
+unmountAwsLocally() {
+    unmountServerLocally "$HOME/aws-server"
+}
+
+
+awsGetInstancesUrls() {
+    # Specify instance ID if present
+    declare awsInstanceId="$1"
+
+    # For some reason, `aws` can't process strings as options, and
+    # especially strings with quotes in them.
+    # Thus, use an array.
+    declare awsCmdOpts=()
+
+    if [[ -n "$awsInstanceId" ]]; then
+        awsCmdOpts+=(--filters Name=instance-id,Values=${awsInstanceId})
+    fi
+
+    aws ec2 describe-instances \
+        --query 'Reservations[*].Instances[*].PublicDnsName' \
+        --output text \
+        ${awsCmdOpts[@]}
+}
+
+awsGetInstancesIds() {
+    # Specify instance URL if present
+    declare awsInstanceUrl="$1"
+
+    # For some reason, `aws` can't process strings as options, and
+    # especially strings with quotes in them.
+    # Thus, use an array.
+    declare awsCmdOpts=()
+
+    if [[ -n "$awsInstanceUrl" ]]; then
+        awsCmdOpts+=(--filters Name=dns-name,Values=${awsInstanceUrl})
+    fi
+
+    aws ec2 describe-instances \
+        --query 'Reservations[*].Instances[*].InstanceId' \
+        --output text \
+        ${awsCmdOpts[@]}
+}
+
+awsSsh() {
+    declare sshHost="${1:-$(awsGetInstancesUrls)}"
+    declare sshUser="${2:-ubuntu}"
+
+    ssh \
+        -i "./aws-ssh-key.pem" \
+        -oStrictHostKeyChecking=accept-new \
+        -oExitOnForwardFailure=yes \
+        "${sshUser}@${sshHost}"
+}
+
 
 
 main() {
