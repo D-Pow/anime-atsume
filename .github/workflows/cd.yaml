@@ -122,7 +122,6 @@ jobs:
       imageid: ${{ needs.cd-publish-docker.outputs.imageid }}
       dockerImageNameAndTag: ${{ needs.cd-publish-docker.outputs.dockerImageNameAndTag }}
       digest: ${{ needs.cd-publish-docker.outputs.digest }}
-      metadata: ${{ needs.cd-publish-docker.outputs.metadata }}
     steps:
       - name: Checkout repository branch
         uses: actions/checkout@v3

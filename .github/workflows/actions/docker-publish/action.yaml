@@ -31,9 +31,6 @@ outputs:
   digest:
     description: docker/build-push-action output - Image digest
     value: ${{ steps.docker-build-and-push-image.outputs.digest }}
-  metadata:
-    description: docker/build-push-action output - Build result metadata
-    value: ${{ steps.docker-build-and-push-image.outputs.metadata }}
 
 
 # See:
@@ -158,4 +155,3 @@ runs:
       run: |
         echo "imageid=${{ steps.docker-build-and-push-image.outputs.imageid }}" >> $GITHUB_OUTPUT
         echo "digest=${{ steps.docker-build-and-push-image.outputs.digest }}" >> $GITHUB_OUTPUT
-        echo "metadata=${{ steps.docker-build-and-push-image.outputs.metadata }}" >> $GITHUB_OUTPUT
