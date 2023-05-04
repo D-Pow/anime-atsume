@@ -271,8 +271,7 @@ dockerGetRunningContainer() (
 )
 
 dockerGetLog() (
-    declare dockerImageName="${1:-anime-atsume}"
-    declare dockerContainerName="$(dockerGetRunningContainer)"
+    declare dockerContainerName="${1:-$(dockerGetRunningContainer)}"
 
     docker logs "$dockerContainerName"
 )
