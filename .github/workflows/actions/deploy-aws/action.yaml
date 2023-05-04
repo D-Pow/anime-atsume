@@ -183,12 +183,10 @@ runs:
           ./index.sh dockerPullLatest ${{ env.registryUrl }}
           ./index.sh certCopyToDockerContainer
 
-          cd ..
-
           nohup docker run \
             -p 80:8080 \
             -p 443:8443 \
-            -v ./anime-atsume:/home/repo \
+            -v \$(pwd):/home/repo \
             -e 'JAVA_OPTS=-Dserver.ssl.key-store=./repo/keystore.p12 -Dserver.ssl.key-store-password=${{ env.AWS_SERVER_KEYSTORE_PASSWORD }}' \
             anime-atsume \
             &
