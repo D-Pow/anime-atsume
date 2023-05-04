@@ -229,9 +229,7 @@ runs:
           # `docker run` command itself didn't fail (e.g. if ports were already in
           # use or couldn't find the image) by checking the exit code of `nohup CMD`.
           dockerRunExitCode=\"\$?\"
-          if (( \$dockerRunExitCode > 0 )); then
-            exit \$dockerRunExitCode
-          fi
+          (( \$dockerRunExitCode > 0 )) && exit \$dockerRunExitCode
 
           # Verify the app is running correctly and forward the exit code accordingly
           ./index.sh dockerVerifyAppIsRunning
