@@ -276,6 +276,44 @@ dockerGetLog() (
     docker logs "$dockerContainerName"
 )
 
+dockerVerifyAppIsRunning() (
+    declare dockerContainerName="$(dockerGetRunningContainer)"
+
+    if [[ -z "$dockerContainerName" ]]; then
+        return 1
+    fi
+
+    declare springBootPortOpenedLogMessage="Starting ProtocolHandler"
+    # On average, it seems to take around 10 seconds for Spring to start
+    # so keep checking for twice that time
+    declare _verifyMaxTries=20
+    declare _verifyCounter=0
+
+    # Check if the container died or if it got hung up on something.
+    # Specify the container name in case it died and isn't running anymore.
+    while ! dockerGetLog "$dockerContainerName" 2>/dev/null | grep -q "$springBootPortOpenedLogMessage"; do
+        if [[ -z "$(dockerGetRunningContainer)" ]] || (( $_verifyCounter >= $_verifyMaxTries )); then
+            # Print the container's log to the console in case it was run
+            # in Docker's detached mode or in Bash's background
+            dockerGetLog "$dockerContainerName"
+            return 1
+        fi
+
+        (( _verifyCounter++ ))
+
+        sleep 1
+    done
+
+    sleep 5
+
+    # Add one final check in case a runtime error is encountered after the app
+    # officially boots/opens its ports
+    if [[ -z "$(dockerGetRunningContainer)" ]]; then
+        dockerGetLog "$dockerContainerName"
+        return 1
+    fi
+)
+
 dockerPullLatest() (
     declare dockerImageUrl="${1:-ghcr.io/d-pow/anime-atsume}"
     # Extract only the last, trailing word after the final `/`
