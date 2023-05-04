@@ -89,6 +89,11 @@ jobs:
     runs-on: ubuntu-latest
     # Only run on merge to master: https://github.community/t/depend-on-another-workflow/16311/3
     if: ${{ github.event.pull_request.merged || github.ref == 'refs/heads/master' }}
+    outputs:
+      registryUrl: ${{ steps.cd-docker-info.outputs.registryUrl }}
+      imageid: ${{ steps.cd-docker-info.outputs.imageid }}
+      dockerImageNameAndTag: ${{ steps.cd-docker-info.outputs.dockerImageNameAndTag }}
+      digest: ${{ steps.cd-docker-info.outputs.digest }}
     steps:
       - name: Checkout repository branch
         uses: actions/checkout@v3
@@ -114,6 +119,14 @@ jobs:
         with:
           GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}
           registryUrlDomain: ${{ env.registryUrlDomain }}
+
+      - name: CD:Docker - Output publish info
+        id: cd-docker-info
+        run: |
+          echo "registryUrl=${{ env.registryUrl }}" >> $GITHUB_OUTPUT
+          echo "imageid=${{ env.imageid }}" >> $GITHUB_OUTPUT
+          echo "dockerImageNameAndTag=${{ env.dockerImageNameAndTag }}" >> $GITHUB_OUTPUT
+          echo "digest=${{ env.digest }}" >> $GITHUB_OUTPUT
 
 
   cd-deploy:
