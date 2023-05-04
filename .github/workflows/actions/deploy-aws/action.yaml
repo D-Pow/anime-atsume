@@ -175,26 +175,58 @@ runs:
         #   Note: Not as secure as manually adding the host: https://askubuntu.com/questions/123072/ssh-automatically-accept-keys/123080#123080
         # Make ssh error if the underlying commands fail via `ExitOnForwardFailure`.
         #   Note: Could also send ssh itself to the background via -f, but this is unnecessary for CI/CD pipeline logic.
+        #
+        #
+        #
+        # Inner `ssh` command breakdowns:
+        #
+        # `set -m`:
+        # Allow background/foreground job control, e.g. bg, fg, jobs -l, etc.
+        #
+        # `cd anime-atsume`:
+        # Stay in the cloned repo's dir to gain access to our helpful index.sh commands.
+        #   Note: This means the server's volume mounted to Docker needs to be relative
+        #   to the repo dir, not the `WORKDIR` or `HOME`.
+        #
+        # `nohup`/`docker run -d`/`docker run &`
+        # Don't kill the created docker process upon ssh exit via `nohup`.
+        #   This primarily disconnects the TTY (interactive part of the shell
+        #   that processes which interact with `/dev/tty`, which can handle
+        #   input and output regardless of how STDIN/OUT/ERR was redirected),
+        #   which means signals generated from IO, e.g. Ctrl+C, no longer
+        #   affect it.
+        #   See: https://superuser.com/questions/1557557/how-why-does-ssh-output-to-tty-when-both-stdout-and-stderr-are-redirected/1557724#1557724
+        # It's also common to send the `nohup CMD` process to the background via `&`
+        # so that it more thoroughly blocks user interaction, ensuring that the process
+        # will still run after shell exit.
+        #   However, in our case, we're verifying the grandchild (`CMD` within Docker
+        #   container, e.g. source code error) doesn't error out, nor does the child
+        #   (`docker run`, e.g. if the ports are already in use).
+        #   To do so, we don't want to send the command to the background because then
+        #   we'd have to manually poll `jobs -l`, `ps`, etc. output to check the status.
+        #   Instead, since we want to check the success of both Docker and its
+        #   underlying CMD, we use our own custom polling script logic.
+        # Run Docker in 'detached mode' (similar to background but in Docker rather than Bash)
+        # via `-d` to remove the `CMD` command's STDOUT during boot.
+        #
+        # `dockerRunExitCode`:
+        # Before starting our potentially time-consuming polling, ensure the
+        # `docker run` command itself didn't fail (e.g. if ports were already in
+        # use or couldn't find the image) by checking the exit code of `nohup CMD`.
+        #
+        # `index.sh verify`:
+        # Verify the app is running correctly and forward the exit code accordingly.
         ssh \
           -i ./aws-ssh-key.pem \
           -oStrictHostKeyChecking=accept-new \
           -oExitOnForwardFailure=yes \
           ubuntu@${{ env.AWS_INSTANCE_URL }} \
         "
-          # Allows for background/foreground job control, e.g. bg, fg, jobs -l, etc.
           set -m
-
-          whoami
-          for var in {SHELL,0,SSH_ORIGINAL_COMMAND,SSH_TTY}; do
-            echo \"\$var: \${!var}\"
-          done
 
           [[ -d anime-atsume ]] && rm -rf anime-atsume
           git clone https://github.com/${{ github.repository }}.git
 
-          # Stay in the cloned repo's dir to gain access to our helpful index.sh commands.
-          #   Note: This means the server's volume mounted to Docker needs to be relative
-          #   to the repo dir, not the `WORKDIR` or `HOME`.
           cd anime-atsume
 
           ./index.sh dockerStopAllContainers
@@ -203,25 +235,6 @@ runs:
           ./index.sh dockerPullLatest ${{ env.registryUrl }}
           ./index.sh certCopyToDockerContainer
 
-          # Don't kill the created docker process upon ssh exit via `nohup`.
-          #   This primarily disconnects the TTY (interactive part of the shell
-          #   that processes which interact with `/dev/tty`, which can handle
-          #   input and output regardless of how STDIN/OUT/ERR was redirected),
-          #   which means signals generated from IO, e.g. Ctrl+C, no longer
-          #   affect it.
-          #   See: https://superuser.com/questions/1557557/how-why-does-ssh-output-to-tty-when-both-stdout-and-stderr-are-redirected/1557724#1557724
-          # It's also common to send the `nohup CMD` process to the background via `&`
-          # so that it more thoroughly blocks user interaction, ensuring that the process
-          # will still run after shell exit.
-          #   However, in our case, we're verifying the grandchild (`CMD` within Docker
-          #   container, e.g. source code error) doesn't error out, nor does the child
-          #   (`docker run`, e.g. if the ports are already in use).
-          #   To do so, we don't want to send the command to the background because then
-          #   we'd have to manually poll `jobs -l`, `ps`, etc. output to check the status.
-          #   Instead, since we want to check the success of both Docker and its
-          #   underlying CMD, we use our own custom polling script logic.
-          # Run Docker in 'detached mode' (similar to background but in Docker rather than Bash)
-          # via `-d` to remove the `CMD` command's STDOUT during boot.
           nohup docker run \
             -d \
             -p 80:8080 \
@@ -230,15 +243,9 @@ runs:
             -e 'JAVA_OPTS=-Dserver.ssl.key-store=./repo/keystore.p12 -Dserver.ssl.key-store-password=${{ env.AWS_SERVER_KEYSTORE_PASSWORD }}' \
             anime-atsume
 
-          # Before starting our potentially time-consuming polling, ensure the
-          # `docker run` command itself didn't fail (e.g. if ports were already in
-          # use or couldn't find the image) by checking the exit code of `nohup CMD`.
-          dockerRunExitCode=\$?
-          if [[ \$dockerRunExitCode -gt 0 ]]; then
-            exit \$dockerRunExitCode
-          fi
+          dockerRunExitCode=\"\$?\"
+          (( \$dockerRunExitCode > 0 )) && exit \$dockerRunExitCode
 
-          # Verify the app is running correctly and forward the exit code accordingly
           ./index.sh dockerVerifyAppIsRunning
           exit \$?
         "
