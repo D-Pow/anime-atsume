@@ -153,9 +153,9 @@ runs:
         # labels: ${{ env.imageName }}
 
     - name: Docker - Print output image info
-      id: docker-print-output-info
+      id: docker-output-info
       shell: bash
       run: |
-        echo "Image ID: ${{ steps.docker-build-and-push-image.outputs.imageid }}"
-        echo "Image digest: ${{ steps.docker-build-and-push-image.outputs.digest }}"
-        echo "Image metadata: ${{ steps.docker-build-and-push-image.outputs.metadata }}"
+        echo "imageid=${{ steps.docker-build-and-push-image.outputs.imageid }}" >> $GITHUB_OUTPUT
+        echo "digest=${{ steps.docker-build-and-push-image.outputs.digest }}" >> $GITHUB_OUTPUT
+        echo "metadata=${{ steps.docker-build-and-push-image.outputs.metadata }}" >> $GITHUB_OUTPUT

@@ -86,10 +86,6 @@ jobs:
 
   cd-publish-docker:
     runs-on: ubuntu-latest
-    outputs:
-      REPO_NAME: ${{ env.REPO_NAME }}
-      CLIENT_CACHE_ID: ${{ env.CLIENT_CACHE_ID }}
-      SERVER_CACHE_ID: ${{ env.SERVER_CACHE_ID }}
     # Only run on merge to master: https://github.community/t/depend-on-another-workflow/16311/3
     if: ${{ github.event.pull_request.merged || github.ref == 'refs/heads/master' }}
     steps:
@@ -98,13 +94,6 @@ jobs:
 
       - name: CD:Docker - Cache name - Init
         uses: ./.github/workflows/actions/cache-name
-
-      - name: CD:Docker - Output cache IDs
-        id: cd-docker-output-cache-id
-        run: |
-          echo "REPO_NAME=${{ env.REPO_NAME }}" >> $GITHUB_OUTPUT
-          echo "CLIENT_CACHE_ID=${{ env.CLIENT_CACHE_ID }}" >> $GITHUB_OUTPUT
-          echo "SERVER_CACHE_ID=${{ env.SERVER_CACHE_ID }}" >> $GITHUB_OUTPUT
 
       - name: CD:Docker - Download CI output
         id: cd-docker-download-server-cache
@@ -129,26 +118,17 @@ jobs:
     runs-on: ubuntu-latest
     needs: [ cd-publish-docker ]
     env:
-      REPO_NAME: ${{ needs.cd-publish-docker.outputs.REPO_NAME }}
-      CLIENT_CACHE_ID: ${{ needs.cd-publish-docker.outputs.CLIENT_CACHE_ID }}
-      SERVER_CACHE_ID: ${{ needs.cd-publish-docker.outputs.SERVER_CACHE_ID }}
-    outputs:
-      REPO_NAME: ${{ env.REPO_NAME }}
-      CLIENT_CACHE_ID: ${{ env.CLIENT_CACHE_ID }}
-      SERVER_CACHE_ID: ${{ env.SERVER_CACHE_ID }}
+      registryUrl: ${{ needs.cd-publish-docker.outputs.registryUrl }}
+      imageid: ${{ needs.cd-publish-docker.outputs.imageid }}
+      dockerImageNameAndTag: ${{ needs.cd-publish-docker.outputs.dockerImageNameAndTag }}
+      digest: ${{ needs.cd-publish-docker.outputs.digest }}
+      metadata: ${{ needs.cd-publish-docker.outputs.metadata }}
     steps:
       - name: Checkout repository branch
         uses: actions/checkout@v3
 
       - name: CD:Cache name - Init
         uses: ./.github/workflows/actions/cache-name
-
-      - name: CD - Output cache IDs
-        id: cd-deploy-output-cache-id
-        run: |
-          echo "REPO_NAME=${{ env.REPO_NAME }}" >> $GITHUB_OUTPUT
-          echo "CLIENT_CACHE_ID=${{ env.CLIENT_CACHE_ID }}" >> $GITHUB_OUTPUT
-          echo "SERVER_CACHE_ID=${{ env.SERVER_CACHE_ID }}" >> $GITHUB_OUTPUT
 
       - name: CD:Server - Download CI output
         id: cd-docker-download-server-cache
@@ -164,7 +144,7 @@ jobs:
         uses: ./.github/workflows/actions/deploy-aws
         with:
           GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}
-          registryUrl: ${{ steps.cd-docker-build-and-publish-image.outputs.registryUrl }}
+          registryUrl: ${{ env.registryUrl }}
           AWS_ACCESS_KEY_ID: ${{ env.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ env.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: ${{ env.AWS_REGION }}
@@ -177,7 +157,7 @@ jobs:
       #   uses: ./.github/workflows/actions/deploy-azure
       #   with:
       #     GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}
-      #     registryUrl: ${{ steps.cd-docker-build-and-publish-image.outputs.registryUrl }}
+      #     registryUrl: ${{ env.registryUrl }}
 
       # - name: Deploy application to Render.com
       #   run: |
