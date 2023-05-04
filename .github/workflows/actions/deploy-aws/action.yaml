@@ -169,9 +169,18 @@ runs:
       run: |
         chmod 400 aws-ssh-key.pem
 
-        # Disabling StrictHostKeyChecking is unsafe but it works
-        # See: https://askubuntu.com/questions/123072/ssh-automatically-accept-keys/123080#123080
-        ssh -i ./aws-ssh-key.pem -oStrictHostKeyChecking=accept-new -oExitOnForwardFailure=yes ubuntu@${{ env.AWS_INSTANCE_URL }} "
+        # SSH into the EC2 container.
+        # Use the supplied .pem key via `-i` for security.
+        # Auto-allow new hosts via `StrictHostKeyChecking` (simplifies logic here because we don't need to add ~/.ssh/known_hosts).
+        #   Note: Not as secure as manually adding the host: https://askubuntu.com/questions/123072/ssh-automatically-accept-keys/123080#123080
+        # Make ssh error if the underlying commands fail via `ExitOnForwardFailure`.
+        #   Note: Could also send ssh itself to the background via -f, but this is unnecessary for CI/CD pipeline logic.
+        ssh \
+          -i ./aws-ssh-key.pem \
+          -oStrictHostKeyChecking=accept-new \
+          -oExitOnForwardFailure=yes \
+          ubuntu@${{ env.AWS_INSTANCE_URL }} \
+        "
           [[ -d anime-atsume ]] && rm -rf anime-atsume
           git clone https://github.com/${{ github.repository }}.git
 
@@ -183,6 +192,9 @@ runs:
           ./index.sh dockerPullLatest ${{ env.registryUrl }}
           ./index.sh certCopyToDockerContainer
 
+          # Don't kill the created docker process upon ssh exit via `nohup`.
+          # Keep it running after ssh exit via `&`.
+          # Stay in the cloned repo's dir from above to allow running index.sh commands after `ssh`.
           nohup docker run \
             -p 80:8080 \
             -p 443:8443 \
