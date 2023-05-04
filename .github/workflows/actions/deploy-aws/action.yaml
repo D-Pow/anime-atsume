@@ -184,6 +184,11 @@ runs:
           # Allows for background/foreground job control, e.g. bg, fg, jobs -l, etc.
           set -m
 
+          whoami
+          for var in {SHELL,0,SSH_ORIGINAL_COMMAND,SSH_TTY}; do
+            echo \"\$var: \${!var}\"
+          done
+
           [[ -d anime-atsume ]] && rm -rf anime-atsume
           git clone https://github.com/${{ github.repository }}.git
 
@@ -228,7 +233,7 @@ runs:
           # Before starting our potentially time-consuming polling, ensure the
           # `docker run` command itself didn't fail (e.g. if ports were already in
           # use or couldn't find the image) by checking the exit code of `nohup CMD`.
-          dockerRunExitCode=\"\$?\"
+          dockerRunExitCode=\$?
           if [[ \$dockerRunExitCode -gt 0 ]]; then
             exit \$dockerRunExitCode
           fi
