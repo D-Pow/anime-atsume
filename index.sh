@@ -100,6 +100,14 @@ checkBuildOutputDir() (
 )
 
 
+hashJar() (
+    declare jarFile="${1:-${buildDir}/*.[jw]ar}"
+    declare hashLength="${2:-8}"
+
+    sha256sum $jarFile | _egrep -o --color=never "^.{${hashLength}}"
+)
+
+
 dockerBuild() (
     declare _dockerBuildFreshJar=
     declare _dockerBuildVerbose=
@@ -242,6 +250,25 @@ dockerRun() (
     docker run -it "${_dockerRunEnvArgs[@]}" anime-atsume ${_dockerRunCmd}
 )
 
+dockerRunExisting() (
+    docker exec -it "$(dockerGetRunningContainer)" bash
+)
+
+dockerGetRunningContainer() (
+    declare dockerContainerName="${1:-anime-atsume}"
+
+    docker ps --format='{{.Image}} {{.Names}}' \
+        | grep "$dockerContainerName" \
+        | awk '{ print $2 }'
+)
+
+dockerGetLog() (
+    declare dockerImageName="${1:-anime-atsume}"
+    declare dockerContainerName="$(dockerGetRunningContainer)"
+
+    docker logs "$dockerContainerName"
+)
+
 dockerPullLatest() (
     declare dockerImageUrl="${1:-ghcr.io/d-pow/anime-atsume}"
     # Extract only the last, trailing word after the final `/`
@@ -266,6 +293,50 @@ dockerDeleteAllContainers() (
 
 dockerDeleteAllImages() (
     docker image rm -f $(docker images -aq)
+)
+
+dockerFindLatestImageTagFromGitLog() (
+    # Gets available Docker image tags and compares them to the git log
+    # to get the image corresponding to the latest commit.
+    #
+    # NOTE: Assumes published Docker images are tagged with the git SHA of
+    # the commit which they were created from.
+    declare dockerImageUrl="${1:-ghcr.io/d-pow/anime-atsume}"
+
+    # git log format: https://mirrors.edge.kernel.org/pub/software/scm/git/docs/git-show.html#_pretty_formats
+    #   %H = Full commit hash
+    #   %ct = Committer date UNIX timestamp (date of commit, including after rebases)
+    #   %at = Author date UNIX timestamp (date of original commit, before rebases)
+    #
+    # skopeo is a util for getting info about Docker images, usually from remote registries.
+    #
+    # GitHub doesn't have a clean HTTP API for its Docker registry currently, see:
+    #   https://github.com/orgs/community/discussions/26279#discussioncomment-3251171
+    #   https://github.com/orgs/community/discussions/26299
+    #
+    # To do this:
+    # 1. Get the git log commit hashes (since our Docker images are tagged
+    #    with commit full-SHAs) and committer dates (since images are generated from
+    #    the commit after a rebase).
+    # 2. Sort by most recent commit date.
+    # 3.a Get info about all Docker images available.
+    # 3.b Extract their tags.
+    # 3.c Remove `latest` tag (since it's not associated with a commit hash in the skopeo output).
+    # 3.d Minor formatting to remove leading/trailing square brackets and whitespace.
+    # 3.e Replace space delimiters between image tags to `|` for regex search.
+    # 4. Print the first matching commit SHA (on the first line) since it's the most recent.
+    git log --format='%H %ct' \
+    | sort -rk 2 \
+    | _egrep -i "$(
+        docker run --rm \
+            quay.io/skopeo/stable:latest \
+            inspect \
+            --format='{{.RepoTags}}' \
+            docker://ghcr.io/d-pow/anime-atsume \
+        | sed -E 's/\[|\]|latest//g; s/^ | $//g' \
+        | sed -E 's/ /|/g'
+    )" \
+    | awk '{ if (NR == 1) { print $1; } }'
 )
 
 
