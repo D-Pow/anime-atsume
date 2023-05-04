@@ -622,6 +622,16 @@ certConvertToPkcs() (
     # See:
     #   - Generating PKCS#12 from LetsEncrypt .pem files: https://stackoverflow.com/a/38873138/5771107
     #   - Password inline in command: https://stackoverflow.com/a/27497899/5771107
+    #
+    # Generates a command akin to:
+    #
+    # openssl pkcs12 -export \
+    #     -in fullchain.pem \
+    #     -inkey privkey.pem \
+    #     -out keystore.p12 \
+    #     -name tomcat \
+    #     -CAfile chain.pem \
+    #     -caname root
     sudo openssl pkcs12 -export \
         -in "$opensslInFile" \
         -inkey "$opensslInKeyFile" \
