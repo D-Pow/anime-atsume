@@ -553,7 +553,6 @@ deployServerSsh() (
         ./index.sh dockerDeleteAllContainers
         ./index.sh dockerDeleteAllImages
         ./index.sh dockerPullLatest ${dockerImageUrl}
-        ./index.sh certCopyToDockerContainer
 
         # Don't kill the created docker process upon ssh exit via \`nohup\`.
         #   This primarily disconnects the TTY (interactive part of the shell
@@ -649,9 +648,20 @@ certConvertToPkcs() (
     declare pkcsOutFilename="keystore.p12"
     declare pkcsOutFileAbs="$pemParentPathAbs/$pkcsOutFilename"
     declare pkcsOutFileRel="$pemParentPathRel/$pkcsOutFilename"
+    declare pkcsOutFileHome="$HOME/$pkcsOutFilename"
+    declare pkcsOutFileApp="$rootDir/$pkcsOutFilename"
 
-    # All SSL keystore files already exist, so no need to regenerate them
-    if [[ -f "$pkcsOutFilename" ]] && [[ -f "$pkcsOutFileAbs" ]] && [[ -f "$pkcsOutFileRel" ]]; then
+    # The file had already been created so no need to recreate it from scratch.
+    # Just make sure it's in both HOME and app dirs.
+    if [[ -f "$pkcsOutFileApp" ]] || [[ -f "$pkcsOutFileHome" ]]; then
+        if ! [[ -f "$pkcsOutFileApp" ]]; then
+            sudo cp "$pkcsOutFileHome" "$pkcsOutFileApp"
+        fi
+
+        if ! [[ -f "$pkcsOutFileHome" ]]; then
+            sudo cp "$pkcsOutFileApp" "$pkcsOutFileHome"
+        fi
+
         return
     fi
 
@@ -666,18 +676,18 @@ certConvertToPkcs() (
     # openssl pkcs12 -export \
     #     -in fullchain.pem \
     #     -inkey privkey.pem \
-    #     -out keystore.p12 \
-    #     -name tomcat \
     #     -CAfile chain.pem \
-    #     -caname root
+    #     -caname root \
+    #     -name tomcat \
+    #     -out keystore.p12
     sudo openssl pkcs12 -export \
         -in "$opensslInFile" \
         -inkey "$opensslInKeyFile" \
-        -out $pkcsOutFileAbs \
-        -name tomcat \
         -CAfile "$opensslInCaFile" \
+        -caname root \
+        -name tomcat \
         -passout pass: \
-        -caname root
+        -out "$pkcsOutFileAbs"
 
     # It'd probably be a good idea not to change ownership of the file
     # to prevent accidental modifications to it.
@@ -691,9 +701,9 @@ certConvertToPkcs() (
     sudo ln -s "$pkcsOutFileAbs" "$pkcsOutFileRel"
     # However, don't make a symlink in the current dir, rather copy the file
     # because the parent dirs of the keystore are only readable by root.
-    sudo cp "$pkcsOutFileAbs" "$pkcsOutFilename"
-    sudo chmod a+r "$pkcsOutFilename"
-    sudo cp "$pkcsOutFilename" "$HOME/$pkcsOutFilename"
+    sudo cp "$pkcsOutFileAbs" "$pkcsOutFileHome"
+    sudo chmod a+r "$pkcsOutFileHome"
+    sudo cp "$pkcsOutFileHome" "$pkcsOutFileApp"
 
     echo "$pkcsOutFileAbs"
 )
