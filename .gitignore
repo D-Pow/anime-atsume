@@ -1,8 +1,14 @@
+# App/env files
 **/*.env*
-**/*.iml
-**/.idea/
-**/.DS_Store
-.vercel
-**/*.sublime-*
 *.log
+*.log.gz
 **/*.pem
+
+# OS files
+**/.DS_Store
+
+# IDE/util files
+**/.idea/
+**/*.iml
+**/*.sublime-*
+.vercel
