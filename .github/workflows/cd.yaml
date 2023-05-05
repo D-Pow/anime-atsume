@@ -91,7 +91,7 @@ jobs:
     if: ${{ github.event.pull_request.merged || github.ref == 'refs/heads/master' }}
     outputs:
       registryUrl: ${{ steps.cd-docker-output-vars.outputs.registryUrl }}
-      imageid: ${{ steps.cd-docker-output-vars.outputs.imageid }}
+      imageId: ${{ steps.cd-docker-output-vars.outputs.imageId }}
       digest: ${{ steps.cd-docker-output-vars.outputs.digest }}
     steps:
       - name: Checkout repository branch
@@ -123,7 +123,7 @@ jobs:
         id: cd-docker-output-vars
         run: |
           echo "registryUrl=${{ env.registryUrl }}" >> $GITHUB_OUTPUT
-          echo "imageid=${{ env.imageid }}" >> $GITHUB_OUTPUT
+          echo "imageId=${{ env.imageId }}" >> $GITHUB_OUTPUT
           echo "digest=${{ env.digest }}" >> $GITHUB_OUTPUT
 
 
@@ -132,7 +132,7 @@ jobs:
     needs: [ cd-publish-docker ]
     env:
       registryUrl: ${{ needs.cd-publish-docker.outputs.registryUrl }}
-      imageid: ${{ needs.cd-publish-docker.outputs.imageid }}
+      imageId: ${{ needs.cd-publish-docker.outputs.imageId }}
       digest: ${{ needs.cd-publish-docker.outputs.digest }}
     steps:
       - name: Checkout repository branch
