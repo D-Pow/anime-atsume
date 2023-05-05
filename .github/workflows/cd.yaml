@@ -93,6 +93,7 @@ jobs:
       registryUrl: ${{ steps.cd-docker-output-vars.outputs.registryUrl }}
       imageId: ${{ steps.cd-docker-output-vars.outputs.imageId }}
       digest: ${{ steps.cd-docker-output-vars.outputs.digest }}
+      metadata: ${{ steps.cd-docker-output-vars.outputs.metadata }}
     steps:
       - name: Checkout repository branch
         uses: actions/checkout@v3
@@ -125,6 +126,7 @@ jobs:
           echo "registryUrl=${{ env.registryUrl }}" >> $GITHUB_OUTPUT
           echo "imageId=${{ env.imageId }}" >> $GITHUB_OUTPUT
           echo "digest=${{ env.digest }}" >> $GITHUB_OUTPUT
+          echo "metadata=${{ steps.cd-docker-build-and-publish-image.outputs.metadata }}" >> $GITHUB_OUTPUT
 
 
   cd-deploy:

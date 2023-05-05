@@ -27,6 +27,9 @@ outputs:
   digest:
     description: Image digest from build.
     value: ${{ steps.docker-output-vars.outputs.digest }}
+  metadata:
+    description: All Docker build result metadata in a JSON format.
+    value: ${{ steps.docker-output-vars.outputs.metadata }}
 
 
 # See:
@@ -150,3 +153,5 @@ runs:
 
         echo "digest=${{ steps.docker-build-and-push-image.outputs.digest }}" >> $GITHUB_ENV
         echo "digest=${{ env.digest }}" >> $GITHUB_OUTPUT
+
+        echo "metadata=${{ steps.docker-build-and-push-image.outputs.metadata }}" >> $GITHUB_OUTPUT
