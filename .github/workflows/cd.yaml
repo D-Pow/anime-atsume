@@ -90,10 +90,9 @@ jobs:
     # Only run on merge to master: https://github.community/t/depend-on-another-workflow/16311/3
     if: ${{ github.event.pull_request.merged || github.ref == 'refs/heads/master' }}
     outputs:
-      registryUrl: ${{ steps.cd-docker-info.outputs.registryUrl }}
-      imageid: ${{ steps.cd-docker-info.outputs.imageid }}
-      dockerImageNameAndTag: ${{ steps.cd-docker-info.outputs.dockerImageNameAndTag }}
-      digest: ${{ steps.cd-docker-info.outputs.digest }}
+      registryUrl: ${{ steps.cd-docker-output-vars.outputs.registryUrl }}
+      imageid: ${{ steps.cd-docker-output-vars.outputs.imageid }}
+      digest: ${{ steps.cd-docker-output-vars.outputs.digest }}
     steps:
       - name: Checkout repository branch
         uses: actions/checkout@v3
@@ -120,12 +119,11 @@ jobs:
           GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}
           registryUrlDomain: ${{ env.registryUrlDomain }}
 
-      - name: CD:Docker - Output publish info
-        id: cd-docker-info
+      - name: CD:Docker - Output published image info
+        id: cd-docker-output-vars
         run: |
           echo "registryUrl=${{ env.registryUrl }}" >> $GITHUB_OUTPUT
           echo "imageid=${{ env.imageid }}" >> $GITHUB_OUTPUT
-          echo "dockerImageNameAndTag=${{ env.dockerImageNameAndTag }}" >> $GITHUB_OUTPUT
           echo "digest=${{ env.digest }}" >> $GITHUB_OUTPUT
 
 
@@ -135,7 +133,6 @@ jobs:
     env:
       registryUrl: ${{ needs.cd-publish-docker.outputs.registryUrl }}
       imageid: ${{ needs.cd-publish-docker.outputs.imageid }}
-      dockerImageNameAndTag: ${{ needs.cd-publish-docker.outputs.dockerImageNameAndTag }}
       digest: ${{ needs.cd-publish-docker.outputs.digest }}
     steps:
       - name: Checkout repository branch

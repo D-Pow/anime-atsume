@@ -18,18 +18,15 @@ inputs:
 
 
 outputs:
-  dockerImageNameAndTag:
-    description: Docker image name and tag version joined by a colon.
-    value: ${{ steps.docker-metadata-extract.outputs.dockerImageNameAndTag }}
   registryUrl:
     description: Docker image registry full URL.
     value: ${{ steps.docker-output-vars.outputs.registryUrl }}
   imageid:
-    description: docker/build-push-action output - Image ID
-    value: ${{ steps.docker-build-and-push-image.outputs.imageid }}
+    description: Image ID from build.
+    value: ${{ steps.docker-output-vars.outputs.imageid }}
   digest:
-    description: docker/build-push-action output - Image digest
-    value: ${{ steps.docker-build-and-push-image.outputs.digest }}
+    description: Image digest from build.
+    value: ${{ steps.docker-output-vars.outputs.digest }}
 
 
 # See:
@@ -75,12 +72,6 @@ runs:
         echo "registryUrlDomain=${{ inputs.registryUrlDomain }}" >> $GITHUB_ENV
         echo "registryUrl=${{ inputs.registryUrlDomain }}/$imageNameFull" >> $GITHUB_ENV
         echo "imageRetentionDays=${{ inputs.imageRetentionDays }}" >> $GITHUB_ENV
-
-    - name: Docker - Output vars
-      id: docker-output-vars
-      shell: bash
-      run: |
-        echo "registryUrl=${{ env.registryUrl }}" >> $GITHUB_OUTPUT
 
     # - name: Docker - Build
     #   shell: bash
@@ -149,8 +140,13 @@ runs:
         # labels: ${{ env.imageName }}
 
     - name: Docker - Print output image info
-      id: docker-output-info
+      id: docker-output-vars
       shell: bash
       run: |
-        echo "imageid=${{ steps.docker-build-and-push-image.outputs.imageid }}" >> $GITHUB_OUTPUT
-        echo "digest=${{ steps.docker-build-and-push-image.outputs.digest }}" >> $GITHUB_OUTPUT
+        echo "registryUrl=${{ env.registryUrl }}" >> $GITHUB_OUTPUT
+
+        echo "imageid=${{ steps.docker-build-and-push-image.outputs.imageid }}" >> $GITHUB_ENV
+        echo "imageid=${{ env.imageid }}" >> $GITHUB_OUTPUT
+
+        echo "digest=${{ steps.docker-build-and-push-image.outputs.digest }}" >> $GITHUB_ENV
+        echo "digest=${{ env.digest }}" >> $GITHUB_OUTPUT
