@@ -172,6 +172,10 @@ runs:
     - name: AWS - SSH into EC2 to pull and run latest Docker image
       id: aws-pull-docker-img-and-run
       shell: bash
+      # Note: Could also use:
+      #   sed -E 's|git://|https://|' <(echo ${{ github.repositoryUrl }})
+      # which would make the repository URL less hard-coded.
+      # To do so, don't forget to also change the implementation of `index.sh deployAws`.
       run: |
         ./index.sh deployAws \
           -u "${{ env.AWS_SSH_USERNAME }}" \
