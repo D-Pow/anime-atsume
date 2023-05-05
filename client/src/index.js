@@ -25,7 +25,7 @@ ReactDOM.render(
 
 if (process.env.NODE_ENV === 'production' && window.location.hostname !== 'localhost') {
     if (window.location.protocol !== LOCATION_PROTOCOL_HTTPS) {
-        window.location.protocol = LOCATION_PROTOCOL_HTTPS;
+        // window.location.protocol = LOCATION_PROTOCOL_HTTPS;
     }
 }
 
