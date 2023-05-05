@@ -272,7 +272,7 @@ dockerRunOnProd() (
         -p 80:8080 \
         -p 443:8443 \
         -v /home/ubuntu/anime-atsume:/home/repo \
-        -e "JAVA_OPTS=-Dserver.ssl.key-store=./repo/keystore.p12 -Dserver.ssl.key-store-password=${serverKeystorePassword}" \
+        -e "JAVA_OPTS=-Dserver.ssl.key-store=/home/repo/keystore.p12 -Dserver.ssl.key-store-password=${serverKeystorePassword}" \
         anime-atsume
 )
 
@@ -508,7 +508,7 @@ deployServerSsh() (
 
     if [[ -f "$rootDir/keystore.p12" ]]; then
         # Ensure keystore file exists before trying to load it in the app
-        javaOpts="-Dserver.ssl.key-store=./repo/keystore.p12 -Dserver.ssl.key-store-password=${serverKeystorePassword}"
+        javaOpts="-Dserver.ssl.key-store=/home/repo/keystore.p12 -Dserver.ssl.key-store-password=${serverKeystorePassword}"
     fi
 
     declare javaOptsFlagForDockerContainer=
