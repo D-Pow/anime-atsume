@@ -504,6 +504,19 @@ deployServerSsh() (
         return 1
     fi
 
+    declare javaOpts=
+
+    if [[ -f "$rootDir/keystore.p12" ]]; then
+        # Ensure keystore file exists before trying to load it in the app
+        javaOpts="-Dserver.ssl.key-store=./repo/keystore.p12 -Dserver.ssl.key-store-password=${serverKeystorePassword}"
+    fi
+
+    declare javaOptsFlagForDockerContainer=
+
+    if [[ -n "$javaOpts" ]]; then
+        javaOptsFlagForDockerContainer="-e 'JAVA_OPTS=${javaOptsFlagForDockerContainer}'"
+    fi
+
     chmod 400 "$sshLoginKeyFile"
 
     # SSH into the server.
@@ -559,7 +572,7 @@ deployServerSsh() (
             -p 80:8080 \
             -p 443:8443 \
             -v \$(pwd):/home/repo \
-            -e 'JAVA_OPTS=-Dserver.ssl.key-store=./repo/keystore.p12 -Dserver.ssl.key-store-password=${serverKeystorePassword}' \
+            ${javaOptsFlagForDockerContainer} \
             anime-atsume
 
         # Before starting our potentially time-consuming polling, ensure the
