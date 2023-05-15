@@ -1,4 +1,4 @@
-# [Anime Atsume](https://anime-atsume.cloudwatch.net)
+# [Anime Atsume](http://devon.is-a.dev/anime-atsume)
 
 An overly simplistic website for finding and watching anime.
 
