@@ -1,4 +1,4 @@
-# [Anime Atsume](https://anime-atsume.azurewebsites.net)
+# [Anime Atsume](https://anime-atsume.cloudwatch.net)
 
 An overly simplistic website for finding and watching anime.
 

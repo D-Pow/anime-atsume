@@ -11,6 +11,13 @@ declare feBuildDir="$(realpath "${rootDir}/$(
     | sed -E 's/"//g; s|\.*/?|\./|'
 )")"
 
+# Obtained from https://freedns.afraid.org
+# If one doesn't work, try the other (during dev, I requested the cert too many times)
+declare domainNames=(
+    anime-atsume.letz.dev
+    anime-atsume.cloudwatch.net
+)
+
 
 _egrep() {
     declare _egrepCommandFlag='-P';
