@@ -553,6 +553,7 @@ deployServerSsh() (
         ./index.sh dockerDeleteAllContainers
         ./index.sh dockerDeleteAllImages
         ./index.sh dockerPullLatest ${dockerImageUrl}
+        ./index.sh certConvertToPkcs
 
         # Don't kill the created docker process upon ssh exit via \`nohup\`.
         #   This primarily disconnects the TTY (interactive part of the shell
