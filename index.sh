@@ -32,7 +32,7 @@ _egrep() {
 
 
 repoOwnerAndName() {
-    git remote -v | awk '{ print $2 }' | sed -E 's~.*/([^/]+/[^/]+).git$~\1~'
+    git remote -v | awk '{ print $2 }' | sed -E 's~.*/([^/]+/[^/]+).git$~\1~' | uniq
 }
 
 dockerRegistryUrl() {
