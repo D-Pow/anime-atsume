@@ -19,7 +19,7 @@ description: Builds the app in AWS for deployment and hosting
 
 inputs:
   GITHUB_TOKEN:
-    description: GitHub token required for modifying branches or artifact publishing.
+    description: GitHub token required for acting on repo within pipelines (modifying branches, publishing artifacts, etc.).
     required: true
   registryUrl:
     description: Docker image registry full URL.
