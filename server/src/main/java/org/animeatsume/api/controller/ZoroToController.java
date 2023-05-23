@@ -25,16 +25,20 @@ public class ZoroToController {
 
         try {
             titleResults = zoroToService.searchShows(request.getTitle());
+            log.info("titleResults: {}", titleResults);
 
             if (titleResults != null) {
                 List<CompletableFuture<TitlesAndEpisodes.EpisodesForTitle>> episodeSearchFutures = titleResults.getResults().stream()
                     .map(titleResult -> zoroToService.searchEpisodes(titleResult))
                     .collect(Collectors.toList());
 
-                ObjectUtils.getAllCompletableFutureResults(episodeSearchFutures);
+                List<TitlesAndEpisodes.EpisodesForTitle> allCompletableFutureResults =
+                    ObjectUtils.getAllCompletableFutureResults(episodeSearchFutures);
+
+                log.info(allCompletableFutureResults);
             }
         } catch (Exception e) {
-            log.error("Exception trying to serach 9anime:", e);
+            log.error("Exception trying to serach {}:", ZoroToService.ORIGIN, e);
         }
 
         return titleResults;
