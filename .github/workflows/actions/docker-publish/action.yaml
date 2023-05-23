@@ -6,7 +6,7 @@ description: Builds and publishes the Docker image to GitHub
 # from a workflow where it's defined
 inputs:
   GITHUB_TOKEN:
-    description: GitHub token required for modifying branches or artifact publishing.
+    description: GitHub token required for acting on repo within pipelines (modifying branches, publishing artifacts, etc.).
     required: true
   registryUrlDomain:
     description: Docker registry URL's domain.

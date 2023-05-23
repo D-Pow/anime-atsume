@@ -32,7 +32,7 @@ _egrep() {
 
 
 repoOwnerAndName() {
-    git remote -v | awk '{ print $2 }' | sed -E 's~.*/([^/]+/[^/]+).git$~\1~'
+    git remote -v | awk '{ print $2 }' | sed -E 's~.*/([^/]+/[^/]+).git$~\1~' | uniq
 }
 
 dockerRegistryUrl() {
@@ -356,7 +356,7 @@ dockerVerifyAppIsRunning() (
 )
 
 dockerPullLatest() (
-    declare dockerImageUrl="${1:-ghcr.io/d-pow/anime-atsume}"
+    declare dockerImageUrl="${1:-$(dockerRegistryUrl)}"
     # Extract only the last, trailing word after the final `/`
     declare dockerImageName="$(echo "$dockerImageUrl" | sed -E 's|.*/([^/]+)$|\1|')"
     # Prioritize arg 2 > parsed image name from arg 1 > anime-atsume
@@ -387,7 +387,7 @@ dockerFindLatestImageTagFromGitLog() (
     #
     # NOTE: Assumes published Docker images are tagged with the git SHA of
     # the commit which they were created from.
-    declare dockerImageUrl="${1:-ghcr.io/d-pow/anime-atsume}"
+    declare dockerImageUrl="${1:-$(dockerRegistryUrl)}"
 
     # git log format: https://mirrors.edge.kernel.org/pub/software/scm/git/docs/git-show.html#_pretty_formats
     #   %H = Full commit hash
@@ -418,7 +418,7 @@ dockerFindLatestImageTagFromGitLog() (
             quay.io/skopeo/stable:latest \
             inspect \
             --format='{{.RepoTags}}' \
-            docker://ghcr.io/d-pow/anime-atsume \
+            docker://$(dockerRegistryUrl) \
         | sed -E 's/\[|\]|latest//g; s/^ | $//g' \
         | sed -E 's/ /|/g'
     )" \
