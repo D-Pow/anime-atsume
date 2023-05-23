@@ -273,8 +273,7 @@ public class ZoroToService {
             URI.create(url),
             URI.create(ORIGIN),
             null,
-            getSearchHeaders(),
-            false
+            getSearchHeaders()
         ).getBody();
 
         if (episodeHtml != null) {

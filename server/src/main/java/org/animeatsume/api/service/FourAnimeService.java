@@ -127,8 +127,7 @@ public class FourAnimeService {
             URI.create(url),
             URI.create(ORIGIN),
             null,
-            getNecessaryRequestHeaders(),
-            false
+            getNecessaryRequestHeaders()
         ).getBody();
 
         if (episodeHtml != null) {

@@ -251,8 +251,7 @@ public class NineAnimeService {
             URI.create(url),
             URI.create(ORIGIN),
             null,
-            getSearchHeaders(),
-            false
+            getSearchHeaders()
         ).getBody();
 
         if (episodeHtml != null) {
