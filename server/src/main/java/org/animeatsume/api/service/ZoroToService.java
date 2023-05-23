@@ -138,7 +138,7 @@ public class ZoroToService {
         ).getBody();
 
         // TODO - HTML doesn't have the episodes until JavaScript injects elements onto the page
-        log.info("showEpisodesPageHtml: {}", showEpisodesPageHtml);
+        // log.info("showEpisodesPageHtml: {}", showEpisodesPageHtml);
 
         Document showEpisodesPageDom = Jsoup.parse(showEpisodesPageHtml);
 
