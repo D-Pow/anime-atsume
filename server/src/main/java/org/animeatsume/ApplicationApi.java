@@ -106,21 +106,29 @@ public class ApplicationApi {
         SearchAnimeResponse searchResults = null; // (SearchAnimeResponse) fourAnimeController.searchTitle(titleSearchRequest);
 
         if (searchResults == null || searchResults.getResults().size() == 0) {
-            searchResults = new SearchAnimeResponse();
-            searchResults.setResults(nineAnimeController.searchShows(titleSearchRequest).getResults());
+            TitlesAndEpisodes searchResultsObj = nineAnimeController.searchShows(titleSearchRequest);
+
+            if (searchResultsObj != null && !searchResultsObj.getResults().isEmpty()) {
+                searchResults = new SearchAnimeResponse(searchResultsObj.getResults());
+            }
+        }
+
+        if (searchResults == null || searchResults.getResults().isEmpty()) {
+            TitlesAndEpisodes searchResultsObj = zoroToController.searchShows(titleSearchRequest);
+
+            if (searchResultsObj != null && !searchResultsObj.getResults().isEmpty()) {
+                searchResults = new SearchAnimeResponse(searchResultsObj.getResults());
+            }
         }
 
         if (searchResults == null || searchResults.getResults().size() == 0) {
-            searchResults = new SearchAnimeResponse();
-            searchResults.setResults(zoroToController.searchShows(titleSearchRequest).getResults());
+            searchResults = new SearchAnimeResponse("Anime servers are currently down :/");
         }
 
-        if (searchResults == null || searchResults.getResults().size() == 0) {
-            searchResults.setError("Anime servers are currently down :/");
-        }
-
-        if (searchResults == null || searchResults.getResults().size() == 0) {
-            searchResults = nineAnimeController.searchShows(titleSearchRequest);
+        if (!searchResults.getError().isEmpty()) {
+            return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(searchResults);
         }
 
         return ResponseEntity
