@@ -1,30 +1,87 @@
 package org.animeatsume.api.utils.http;
 
+import lombok.extern.log4j.Log4j2;
 import org.springframework.http.*;
 import org.springframework.http.converter.FormHttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
 
+import javax.annotation.Nullable;
 import java.net.URI;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 
+@Log4j2
 public class CorsProxy {
+    private static final boolean defaultFollowRedirects = true;
+
     public static ResponseEntity<?> doCorsRequest(
         HttpMethod method,
-        URI url,
-        URI origin,
-        Object body,
-        HttpHeaders headers
+        String url,
+        @Nullable String origin,
+        @Nullable Object body,
+        @Nullable HttpHeaders headers
     ) {
-        return doCorsRequest(method, url, origin, body, headers, true);
+        return doCorsRequest(
+            method,
+            url,
+            origin,
+            body,
+            headers,
+            defaultFollowRedirects
+        );
+    }
+
+    public static ResponseEntity<?> doCorsRequest(
+        HttpMethod method,
+        String url,
+        @Nullable String origin,
+        @Nullable Object body,
+        @Nullable HttpHeaders headers,
+        boolean noFollowRedirects
+    ) {
+        URI urlParsed;
+
+        /**
+         * @see <a href="https://stackoverflow.com/questions/5019210/java-url-encoding-leaving-allowed-character-intact">SO post about URL-encoding</a>
+         */
+        try {
+            urlParsed = URI.create(url);
+        } catch (Exception invalidUrlFormatException) {
+            try {
+                urlParsed = new URI(url);
+            } catch (Exception e) {
+                urlParsed = URI.create(URLEncoder.encode(url, StandardCharsets.ISO_8859_1));
+            }
+        }
+
+        return doCorsRequest(
+            method,
+            urlParsed,
+            origin == null ? null : URI.create(origin),
+            body,
+            headers,
+            noFollowRedirects
+        );
     }
 
     public static ResponseEntity<?> doCorsRequest(
         HttpMethod method,
         URI url,
-        URI origin,
-        Object body,
-        HttpHeaders headers,
+        @Nullable URI origin,
+        @Nullable Object body,
+        @Nullable HttpHeaders headers
+    ) {
+        return doCorsRequest(method, url, origin, body, headers, defaultFollowRedirects);
+    }
+
+    public static ResponseEntity<?> doCorsRequest(
+        HttpMethod method,
+        URI url,
+        @Nullable URI origin,
+        @Nullable Object body,
+        @Nullable HttpHeaders headers,
         boolean noFollowRedirects
     ) {
         String corsOrigin = origin != null ? origin.toString() : UriParser.getOrigin(url);
@@ -88,7 +145,7 @@ public class CorsProxy {
     }
 
     public static <T> HttpEntity<T> getCorsEntity(
-        T body,
+        @Nullable T body,
         String origin,
         String referer,
         String cookie,
