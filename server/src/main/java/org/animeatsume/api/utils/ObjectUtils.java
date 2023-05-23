@@ -142,6 +142,10 @@ public class ObjectUtils {
         return null;
     }
 
+    public static <T> T classFromJson(String json, Class<T> parseToClass) {
+        return sanitizeAndParseJsonToClass(json, parseToClass);
+    }
+
     public static String classToJson(Object obj) {
         try {
             return Jackson2ObjectMapperBuilder.json().build().writeValueAsString(obj);
