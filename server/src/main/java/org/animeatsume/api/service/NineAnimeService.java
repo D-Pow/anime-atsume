@@ -4,6 +4,7 @@ import lombok.extern.log4j.Log4j2;
 import org.animeatsume.api.model.TitlesAndEpisodes;
 import org.animeatsume.api.model.TitlesAndEpisodes.EpisodesForTitle;
 import org.animeatsume.api.model.VideoSearchResult;
+import org.animeatsume.api.model.nineanime.NineAnimeSearch;
 import org.animeatsume.api.utils.ObjectUtils;
 import org.animeatsume.api.utils.http.CorsProxy;
 import org.animeatsume.api.utils.http.Requests;
@@ -16,6 +17,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -31,9 +33,9 @@ import java.util.stream.Collectors;
 @Log4j2
 @Service
 public class NineAnimeService {
-    private static final String ORIGIN = "https://123anime.to";
-    private static final String SEARCH_URL = ORIGIN + "/livesearch";
-    private static final String SHOW_RESULTS_SELECTOR = "a.nav-item";
+    private static final String ORIGIN = "https://123anime.info";
+    private static final String SEARCH_URL = ORIGIN + "/ajax/film/search?sort=year:desc&keyword=";
+    private static final String SHOW_RESULTS_SELECTOR = "a.name";
     private static final String SHOW_NAVIGATE_SELECTOR = "a.btn-play";
     private static final String EPISODES_SELECTOR = "#episodes-content a";
     private static final String DOWNLOAD_ANCHOR_SELECTOR = "a.pc-download";  // The "Download" link that redirects to a different page
@@ -46,15 +48,13 @@ public class NineAnimeService {
     private static HttpHeaders getSearchHeaders() {
         HttpHeaders headers = new HttpHeaders();
 
-        headers.add(HttpHeaders.ACCEPT, "text/html");
+        headers.add(HttpHeaders.ACCEPT, MediaType.TEXT_HTML_VALUE);
 
         return headers;
     }
 
-    private static String[][] getSearchPostRequestBody(String searchQuery) {
-        return new String[][] {
-            { "value", searchQuery }
-        };
+    private static String getSearchUrl(String searchQuery) {
+        return SEARCH_URL + searchQuery;
     }
 
     private static String getUrlWithOrigin(String... suffixes) {
@@ -68,19 +68,17 @@ public class NineAnimeService {
     public TitlesAndEpisodes searchShows(String title) {
         log.info("Searching <{}> for title ({}) ...", ORIGIN, title);
 
-        String[][] titleSearchFormData = getSearchPostRequestBody(title);
-        HttpEntity titleSearchHttpEntity = Requests.getFormDataHttpEntity(getSearchHeaders(), titleSearchFormData);
+        String titleSearch = getSearchUrl(title);
 
-        String searchResponseHtml = (String) CorsProxy.doCorsRequest(
-            HttpMethod.POST,
-            URI.create(SEARCH_URL),
-            URI.create(ORIGIN),
-            titleSearchHttpEntity.getBody(),
-            titleSearchHttpEntity.getHeaders()
+        String searchResponseJson = (String) CorsProxy.doCorsRequest(
+            HttpMethod.GET,
+            titleSearch,
+            ORIGIN,
+            null,
+            null
         ).getBody();
 
-        // TODO - Delete this
-        // log.info("searchResponseHtml: {}", searchResponseHtml);
+        String searchResponseHtml = NineAnimeSearch.fromString(searchResponseJson).getHtml();
 
         if (searchResponseHtml != null) {
             Document showResultsDocument = Jsoup.parse(searchResponseHtml);
@@ -89,7 +87,7 @@ public class NineAnimeService {
                 .stream()
                 .map(element -> new EpisodesForTitle(
                     getUrlWithOrigin(element.attr("href")),
-                    element.select("h3.film-name").text()
+                    element.text()
                 ))
                 .collect(Collectors.toList());
 
@@ -112,8 +110,8 @@ public class NineAnimeService {
             null,
             getSearchHeaders()
         ).getBody();
-
-        Elements showParentListOfLength1 = Jsoup.parse(showSplashPage).select(".anisc-detail");
+        "https://123anime.info/ajax/episode/info?epr=boruto-naruto-next-generations/001/5"
+        Elements showParentListOfLength1 = Jsoup.parse(showSplashPage).select(".episodes.range li");
         log.info("First Elem: size ({})", showParentListOfLength1.size());
 
         if (showParentListOfLength1.size() < 1) {
