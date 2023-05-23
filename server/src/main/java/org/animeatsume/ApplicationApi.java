@@ -147,6 +147,10 @@ public class ApplicationApi {
             videosForEpisode = nineAnimeController.getVideoForEpisode(kissanimeEpisodeRequest.getEpisodeUrl());
         }
 
+        if (videosForEpisode == null || videosForEpisode.getEpisodes().size() == 0) {
+            videosForEpisode = zoroToController.getVideoForEpisode(kissanimeEpisodeRequest.getEpisodeUrl());
+        }
+
         if (videosForEpisode != null && videosForEpisode.getEpisodes().size() > 0) {
             return ResponseEntity.ok(videosForEpisode);
         }
