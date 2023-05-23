@@ -3,10 +3,12 @@ package org.animeatsume.api.model;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
 public class VideoSearchResult extends Anchor {
     private boolean directSource = false;
 

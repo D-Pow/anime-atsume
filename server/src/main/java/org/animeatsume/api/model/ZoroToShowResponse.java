@@ -1,17 +1,17 @@
 package org.animeatsume.api.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.animeatsume.api.utils.ObjectUtils;
-import org.gradle.internal.impldep.com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.util.Map;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@JsonIgnoreProperties
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ZoroToShowResponse {
     private String html;
     private boolean status;
