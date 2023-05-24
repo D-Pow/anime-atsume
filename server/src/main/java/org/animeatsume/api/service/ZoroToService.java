@@ -121,14 +121,14 @@ public class ZoroToService {
                 // Remove null show search results
                 .filter(Objects::nonNull)
                 // Remove empty show search results
-//                .filter(show -> show.getEpisodes().size() > 0)
+                .filter(show -> show.getEpisodes().size() > 0)
                 .collect(Collectors.toList());
 
             log.info("Obtained {} show(s) for ({})", showResults.size(), title);
 
-//            if (showResults.size() <= 0) {
-//                return null;
-//            }
+            if (showResults.size() <= 0) {
+                return null;
+            }
 
             return new TitlesAndEpisodes(showResults);
         }
