@@ -75,12 +75,12 @@ build() (
             v)
                 _buildVerbose=true
 
-                ./gradlew printSrcInfo
-                ./gradlew printSrcFiles
-                ./gradlew printDependencies
+                ${serverDir}/gradlew printSrcInfo
+                ${serverDir}/gradlew printSrcFiles
+                ${serverDir}/gradlew printDependencies
                 ;;
             h)
-                ./gradlew printCommands
+                ${serverDir}/gradlew printCommands
 
                 return
                 ;;
