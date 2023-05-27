@@ -50,6 +50,15 @@ clean() (
 )
 
 
+config() (
+    cd "${serverDir}"
+
+    ./gradlew printSrcInfo
+    ./gradlew printSrcFiles
+    ./gradlew printDependencies
+)
+
+
 build() (
     declare _buildCleanFirst=
     declare _buildCopyFilesToRootDir=
@@ -74,10 +83,6 @@ build() (
                 ;;
             v)
                 _buildVerbose=true
-
-                ${serverDir}/gradlew printSrcInfo
-                ${serverDir}/gradlew printSrcFiles
-                ${serverDir}/gradlew printDependencies
                 ;;
             h)
                 ${serverDir}/gradlew printCommands
