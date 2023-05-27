@@ -23,6 +23,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -54,7 +56,7 @@ public class NineAnimeService {
     }
 
     private static String getSearchUrl(String searchQuery) {
-        return SEARCH_URL + searchQuery;
+        return SEARCH_URL + URLEncoder.encode(searchQuery, StandardCharsets.UTF_8);
     }
 
     private static String getUrlWithOrigin(String... suffixes) {
