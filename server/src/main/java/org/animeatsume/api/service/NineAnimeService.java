@@ -68,16 +68,16 @@ public class NineAnimeService {
     }
 
     public TitlesAndEpisodes searchShows(String title) {
-        log.info("Searching <{}> for title ({}) ...", ORIGIN, title);
-
         String titleSearch = getSearchUrl(title);
+
+        log.info("Searching <{}> for title ({}) ...", ORIGIN, titleSearch);
 
         String searchResponseJson = (String) CorsProxy.doCorsRequest(
             HttpMethod.GET,
             titleSearch,
             ORIGIN,
             null,
-            null
+            getSearchHeaders()
         ).getBody();
 
         String searchResponseHtml = NineAnimeSearch.fromString(searchResponseJson).getHtml();
