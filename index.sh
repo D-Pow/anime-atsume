@@ -653,6 +653,7 @@ deployServerSsh() (
         ./index.sh dockerDeleteAllImages
         ./index.sh dockerPullLatest ${dockerImageUrl}
         ./index.sh certConvertToPkcs
+        ./index.sh certRenewSetCronJob ${serverKeystorePassword}
 
         ./index.sh dockerRunOnProd ${serverKeystorePassword}
 
@@ -791,6 +792,29 @@ certCopyToDockerContainer() (
     # See:
     #   - https://stackoverflow.com/questions/68971170/how-to-add-files-to-an-existing-docker-image/68971285#68971285
     docker cp "$(certConvertToPkcs)" anime-atsume:/home
+)
+
+certRenewSetCronJob() (
+    # Don't create a duplicate cronjob if one already exists.
+    # Assume one exists if 'index.sh' is called within it.
+    if cat /etc/crontab | grep -q 'index.sh'; then
+        return
+    fi
+
+    declare serverKeystorePassword="$1"
+
+    # See: https://eff-certbot.readthedocs.io/en/stable/using.html#setting-up-automated-renewal
+    declare _renewDelay=$(
+        awk '
+            BEGIN {
+                srand();
+                print int(rand()*(3600+1))
+            }
+        '
+    )
+
+    echo "0 0,12 * * * root sleep $_renewDelay && ( ./index.sh dockerStopAllContainers; ./index.sh certbot renew -q; ./index.sh certConvertToPkcs; ./index.sh dockerRunOnProd ${serverKeystorePassword}; )" \
+        | sudo tee -a /etc/crontab > /dev/null
 )
 
 
