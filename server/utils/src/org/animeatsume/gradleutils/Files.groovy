@@ -143,7 +143,7 @@ tasks.register("printCommands") {
 
 tasks.register("printSrcFiles") {
     doLast {
-        println(getSourceFiles(sourceSets, true));
+        println(getSourceFiles());
     }
 }
 
