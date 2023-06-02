@@ -352,12 +352,44 @@ dockerRunExisting() (
 dockerRunOnProd() (
     declare serverKeystorePassword="$1"
 
+    declare javaOpts=
+
+    if [[ -f "$rootDir/keystore.p12" ]]; then
+        # Ensure keystore file exists before trying to load it in the app
+        javaOpts="-Dserver.ssl.key-store=/home/repo/keystore.p12 -Dserver.ssl.key-store-password=${serverKeystorePassword}"
+    fi
+
+    declare javaOptsFlagForDockerContainer=
+
+    if [[ -n "$javaOpts" ]]; then
+        javaOptsFlagForDockerContainer="-e 'JAVA_OPTS=${javaOptsFlagForDockerContainer}'"
+    fi
+
+    # Don't kill the created docker process upon ssh exit via \`nohup\`.
+    #   This primarily disconnects the TTY (interactive part of the shell
+    #   that processes which interact with \`/dev/tty\`, which can handle
+    #   input and output regardless of how STDIN/OUT/ERR was redirected),
+    #   which means signals generated from IO, e.g. Ctrl+C, no longer
+    #   affect it.
+    #   See: https://superuser.com/questions/1557557/how-why-does-ssh-output-to-tty-when-both-stdout-and-stderr-are-redirected/1557724#1557724
+    # It's also common to send the \`nohup CMD\` process to the background via \`&\`
+    # so that it more thoroughly blocks user interaction, ensuring that the process
+    # will still run after shell exit.
+    #   However, in our case, we're verifying the grandchild (\`CMD\` within Docker
+    #   container, e.g. source code error) doesn't error out, nor does the child
+    #   (\`docker run\`, e.g. if the ports are already in use).
+    #   To do so, we don't want to send the command to the background because then
+    #   we'd have to manually poll \`jobs -l\`, \`ps\`, etc. output to check the status.
+    #   Instead, since we want to check the success of both Docker and its
+    #   underlying CMD, we use our own custom polling script logic.
+    # Run Docker in 'detached mode' (similar to background but in Docker rather than Bash)
+    # via \`-d\` to remove the \`CMD\` command's STDOUT during boot.
     nohup docker run \
         -d \
         -p 80:8080 \
         -p 443:8443 \
-        -v /home/ubuntu/anime-atsume:/home/repo \
-        -e "JAVA_OPTS=-Dserver.ssl.key-store=/home/repo/keystore.p12 -Dserver.ssl.key-store-password=${serverKeystorePassword}" \
+        -v ${rootDir}:/home/repo \
+        ${javaOptsFlagForDockerContainer} \
         anime-atsume
 )
 
@@ -589,18 +621,7 @@ deployServerSsh() (
         return 1
     fi
 
-    declare javaOpts=
 
-    if [[ -f "$rootDir/keystore.p12" ]]; then
-        # Ensure keystore file exists before trying to load it in the app
-        javaOpts="-Dserver.ssl.key-store=/home/repo/keystore.p12 -Dserver.ssl.key-store-password=${serverKeystorePassword}"
-    fi
-
-    declare javaOptsFlagForDockerContainer=
-
-    if [[ -n "$javaOpts" ]]; then
-        javaOptsFlagForDockerContainer="-e 'JAVA_OPTS=${javaOptsFlagForDockerContainer}'"
-    fi
 
     chmod 400 "$sshLoginKeyFile"
 
@@ -633,32 +654,7 @@ deployServerSsh() (
         ./index.sh dockerPullLatest ${dockerImageUrl}
         ./index.sh certConvertToPkcs
 
-        # Don't kill the created docker process upon ssh exit via \`nohup\`.
-        #   This primarily disconnects the TTY (interactive part of the shell
-        #   that processes which interact with \`/dev/tty\`, which can handle
-        #   input and output regardless of how STDIN/OUT/ERR was redirected),
-        #   which means signals generated from IO, e.g. Ctrl+C, no longer
-        #   affect it.
-        #   See: https://superuser.com/questions/1557557/how-why-does-ssh-output-to-tty-when-both-stdout-and-stderr-are-redirected/1557724#1557724
-        # It's also common to send the \`nohup CMD\` process to the background via \`&\`
-        # so that it more thoroughly blocks user interaction, ensuring that the process
-        # will still run after shell exit.
-        #   However, in our case, we're verifying the grandchild (\`CMD\` within Docker
-        #   container, e.g. source code error) doesn't error out, nor does the child
-        #   (\`docker run\`, e.g. if the ports are already in use).
-        #   To do so, we don't want to send the command to the background because then
-        #   we'd have to manually poll \`jobs -l\`, \`ps\`, etc. output to check the status.
-        #   Instead, since we want to check the success of both Docker and its
-        #   underlying CMD, we use our own custom polling script logic.
-        # Run Docker in 'detached mode' (similar to background but in Docker rather than Bash)
-        # via \`-d\` to remove the \`CMD\` command's STDOUT during boot.
-        nohup docker run \
-            -d \
-            -p 80:8080 \
-            -p 443:8443 \
-            -v \$(pwd):/home/repo \
-            ${javaOptsFlagForDockerContainer} \
-            anime-atsume
+        ./index.sh dockerRunOnProd ${serverKeystorePassword}
 
         # Before starting our potentially time-consuming polling, ensure the
         # \`docker run\` command itself didn't fail (e.g. if ports were already in
