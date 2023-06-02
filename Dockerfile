@@ -63,6 +63,9 @@ ENV DB_FILE_NAME="anime_atsume.db"
 ENV DB_FILE_BUILD_PATH="${BUILD_DIR}/${DB_FILE_NAME}"
 ENV DB_FILE_FINAL_PATH="./${DB_FILE_NAME}"
 
+ENV HTTP_PORT=8080
+ENV HTTPS_PORT=8443
+
 # Copy the entire app (server/client) from the local filesystem to the Docker image
 COPY . .
 
@@ -77,10 +80,10 @@ RUN if ! [[ -f "${WAR_FILE_FINAL_PATH}" ]]; then \
         fi; \
     fi;
 
-EXPOSE 8080
-EXPOSE 8443
+EXPOSE ${HTTP_PORT}
+EXPOSE ${HTTPS_PORT}
 
 # Limit memory usage in website host via `JAVA_OPTS=-Xmx640m` (replace number with MB of RAM desired).
 # Modify Spring .properties with `-Dmy.prop.name=myVal` if running directly from `java`
 # or `-e JAVA_OPTS=-Dmy.prop.name=myVal` if running from `docker run`.
-CMD java ${JAVA_OPTS} -Dglass.platform=Monocle -Dmonocle.platform=Headless -jar "${WAR_FILE_FINAL_PATH}" --server.http.port=${HTTP_PORT:-8080} --server.https.port=${HTTPS_PORT:-8443}
+CMD java ${JAVA_OPTS} -Dglass.platform=Monocle -Dmonocle.platform=Headless -jar "${WAR_FILE_FINAL_PATH}" --server.http.port=${HTTP_PORT} --server.https.port=${HTTPS_PORT}
