@@ -59,6 +59,74 @@ config() (
 )
 
 
+run() {
+    declare _runFrontend=
+    declare _runBackend=
+    declare OPTIND=1
+
+    while getopts ":fb" opt; do
+        case "$opt" in
+            f)
+                _runFrontend=true
+                ;;
+            b)
+                _runBackend=true
+                ;;
+            *)
+                # Forward options to underlying command
+                break
+                ;;
+        esac
+    done
+
+    shift $(( OPTIND - 1 ))
+
+    if [[ -z "$_runFrontend" ]] && [[ -z "$_runBackend" ]]; then
+        _runBackend=true
+    fi
+
+    declare _runChildPids=()
+    declare _runChildExitCodes=()
+    declare _runChildExitCodesSum=0
+
+    if [[ -n "$_runFrontend" ]]; then
+        (
+            cd "${clientDir}"
+            npm start
+        ) &
+
+        _runChildPids+=("$!")
+    fi
+
+    if [[ -n "$_runBackend" ]]; then
+        (
+            cd "${serverDir}"
+            ./gradlew clean bootRun
+        ) &
+
+        _runChildPids+=("$!")
+    fi
+
+    declare _runChildPid=
+    for _runChildPid in "${_runChildPids[@]}"; do
+        wait "$_runChildPid"
+
+        _runChildExitCodes+=("$?")
+
+        (( _runChildExitCodesSum += ${_runChildExitCodes[${#_runChildExitCodes[@]}-1]} ))
+    done
+
+    # Doesn't work, likely due to `set -m` not being used at the top of this script.
+    # However, setting it causes issues with the `wait` call, so leave it as-is for now.
+    # Goal was to make Ctrl-C kill all child processes, but alas, while I've done this
+    # before, it's failing now, so I'll just live with the double Ctrl-C for now.
+    #
+    # trap "kill ${_runChildPids[@]}" EXIT QUIT INT TERM
+
+    return $_runChildExitCodesSum
+}
+
+
 build() (
     declare _buildCleanFirst=
     declare _buildCopyFilesToRootDir=
