@@ -82,6 +82,7 @@ run() {
     shift $(( OPTIND - 1 ))
 
     if [[ -z "$_runFrontend" ]] && [[ -z "$_runBackend" ]]; then
+        _runFrontend=true
         _runBackend=true
     fi
 
