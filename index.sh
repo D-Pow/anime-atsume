@@ -53,9 +53,9 @@ clean() (
 config() (
     cd "${serverDir}"
 
-    ./gradlew printSrcInfo
-    ./gradlew printSrcFiles
-    ./gradlew printDependencies
+    ./gradlew -q printSrcInfo
+    ./gradlew -q printSrcFiles
+    ./gradlew -q printDependencies
 )
 
 
