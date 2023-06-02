@@ -87,7 +87,8 @@ build() (
             h)
                 (
                     cd "${serverDir}"
-                    ./gradlew printCommands
+                    # Same as `./gradlew printCommands` except with colored output
+                    ./gradlew -q tasks --all
                 )
 
                 return
