@@ -85,7 +85,10 @@ build() (
                 _buildVerbose=true
                 ;;
             h)
-                ${serverDir}/gradlew printCommands
+                (
+                    cd "${serverDir}"
+                    ./gradlew printCommands
+                )
 
                 return
                 ;;
