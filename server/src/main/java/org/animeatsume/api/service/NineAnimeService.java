@@ -7,17 +7,16 @@ import org.animeatsume.api.model.VideoSearchResult;
 import org.animeatsume.api.model.nineanime.NineAnimeSearch;
 import org.animeatsume.api.utils.ObjectUtils;
 import org.animeatsume.api.utils.http.CorsProxy;
-import org.animeatsume.api.utils.http.Requests;
 import org.animeatsume.api.utils.regex.RegexUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -28,8 +27,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 @Log4j2
@@ -47,24 +46,70 @@ public class NineAnimeService {
     @Value("${org.animeatsume.mock-firefox-user-agent}")
     private String mockFirefoxUserAgent;
 
-    private static HttpHeaders getSearchHeaders() {
+    private static HttpHeaders getHeaders(String[][] headersToAdd) {
         HttpHeaders headers = new HttpHeaders();
 
-        headers.add(HttpHeaders.ACCEPT, MediaType.TEXT_HTML_VALUE);
+        Arrays.asList(headersToAdd).forEach(header -> {
+            headers.add(header[0], header[1]);
+        });
 
         return headers;
+    }
+
+    private static HttpHeaders getSearchHeaders() {
+        return getSearchHeaders(false);
+    }
+
+    private static HttpHeaders getSearchHeaders(boolean withCookie) {
+        if (withCookie) {
+            return getHeaders(new String[][] {
+                { HttpHeaders.ACCEPT, MediaType.TEXT_HTML_VALUE },
+                { HttpHeaders.COOKIE, getCookie() }
+            });
+        }
+
+        return getHeaders(new String[][] {{ HttpHeaders.ACCEPT, MediaType.TEXT_HTML_VALUE }});
+    }
+
+    private static HttpHeaders getSearchHeadersJson() {
+        return getHeaders(new String[][] {{ HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE }});
     }
 
     private static String getSearchUrl(String searchQuery) {
         return SEARCH_URL + URLEncoder.encode(searchQuery, StandardCharsets.UTF_8);
     }
 
+    private static String getEpisodeSearchUrl(String showUrl) {
+        // e.g. `https://website.com/my-show` -> `my-show`
+        String showSlug = showUrl.replaceAll("[^/]+/", "");
+
+        return ORIGIN + "/ajax/film/sv?id=" + URLEncoder.encode(showSlug, StandardCharsets.UTF_8);
+    }
+
     private static String getUrlWithOrigin(String... suffixes) {
         List<String> urlPaths = new ArrayList<>(Arrays.asList(suffixes));
         urlPaths.add(0, ORIGIN);
-        String joinedUrl = String.join("/", urlPaths).replaceAll("[\\\\/]\"(?=(\\\\|/|$))", "");
+        String joinedUrl = String.join("/", urlPaths)
+            .replaceAll("[\\\\/]\"(?=(\\\\|/|$))", "")
+            .replaceAll("(?<!:)//", "/");
 
         return joinedUrl;
+    }
+
+    private static String getCookie() {
+        List<String> setCookieHeader = CorsProxy.doCorsRequest(
+            HttpMethod.GET,
+            ORIGIN + "/state?ts=001&_=744",
+            ORIGIN,
+            null,
+            getSearchHeadersJson()
+        ).getHeaders().get(HttpHeaders.SET_COOKIE);
+
+        if (setCookieHeader != null && setCookieHeader.size() > 0) {
+            return setCookieHeader.get(0);
+        }
+
+        return "";
     }
 
     public TitlesAndEpisodes searchShows(String title) {
@@ -72,18 +117,16 @@ public class NineAnimeService {
 
         log.info("Searching <{}> for title ({}) ...", ORIGIN, titleSearch);
 
-        HttpHeaders searchShowsHeaders = new HttpHeaders();
-        searchShowsHeaders.add(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE);
-
-        String searchResponseJson = (String) CorsProxy.doCorsRequest(
+        ResponseEntity<?> showSearchResponse = CorsProxy.doCorsRequest(
             HttpMethod.GET,
             titleSearch,
             ORIGIN,
             null,
-            searchShowsHeaders
-        ).getBody();
+            getSearchHeadersJson()
+        );
 
-        String searchResponseHtml = NineAnimeSearch.fromString(searchResponseJson).getHtml();
+        Map<String, String> searchResponseJson = (Map<String, String>) showSearchResponse.getBody();
+        String searchResponseHtml = searchResponseJson.get("html");
 
         if (searchResponseHtml != null) {
             Document showResultsDocument = Jsoup.parse(searchResponseHtml);
@@ -108,38 +151,38 @@ public class NineAnimeService {
     public CompletableFuture<EpisodesForTitle> searchEpisodes(EpisodesForTitle episodesForTitle) {
         log.info("Searching <{}> for episode list at ({}) ...", ORIGIN, episodesForTitle.getUrl());
 
+        String episodeSlug = getEpisodeSearchUrl(episodesForTitle.getUrl());
         String showSplashPage = (String) CorsProxy.doCorsRequest(
             HttpMethod.GET,
-            URI.create(episodesForTitle.getUrl()),
+            URI.create(episodeSlug),
             URI.create(ORIGIN),
             null,
-            getSearchHeaders()
+            getSearchHeaders(true)
         ).getBody();
         String todo = "https://123anime.info/ajax/episode/info?epr=boruto-naruto-next-generations/001/5";
-        Elements showParentListOfLength1 = Jsoup.parse(showSplashPage).select(".episodes.range li");
-        log.info("First Elem: size ({})", showParentListOfLength1.size());
+        Document showSearchHtml = Jsoup.parse(NineAnimeSearch.fromString(showSplashPage).getHtml());
+        Elements servers = showSearchHtml.select(".tip.tab");
+        String server = showSearchHtml.select(".server.mass").attr("data-id");
+        Elements episodeAnchorElems = showSearchHtml.select(".episodes.range li a");
+        log.info("episodeAnchorElems size ({})", episodeAnchorElems.size());
 
-        if (showParentListOfLength1.size() < 1) {
+        if (episodeAnchorElems.size() < 1) {
             return null;
         };
 
-        Element showParent = showParentListOfLength1.first();
-        String showName = showParent.select("h2.film-name").text();
-
-        List<VideoSearchResult> showSplashPageWatchButtons = showParent
-            .select("a.btn-play")
+        List<VideoSearchResult> episodeResults = episodeAnchorElems
             .stream()
             .map(element -> new VideoSearchResult(
                 getUrlWithOrigin(element.attr("href")),
-                showName
+                element.text()
             ))
             .collect(Collectors.toList());
 
-        if (showSplashPageWatchButtons == null || showSplashPageWatchButtons.size() == 0) {
+        if (episodeResults == null || episodeResults.size() == 0) {
             return null;
         }
 
-        String showWatchUrl = getUrlWithOrigin(showSplashPageWatchButtons.get(0).getUrl());
+        String showWatchUrl = getUrlWithOrigin(episodeResults.get(0).getUrl());
 
         log.info("Attempting to request: {}", showWatchUrl);
 
@@ -148,7 +191,7 @@ public class NineAnimeService {
             URI.create(showWatchUrl),
             URI.create(ORIGIN),
             null,
-            getSearchHeaders()
+            getSearchHeaders(true)
         ).getBody();
 
         if (showHtml == null || showHtml.length() == 0) {
