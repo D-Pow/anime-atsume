@@ -5,6 +5,7 @@ import org.animeatsume.api.model.TitlesAndEpisodes;
 import org.animeatsume.api.model.TitlesAndEpisodes.EpisodesForTitle;
 import org.animeatsume.api.model.VideoSearchResult;
 import org.animeatsume.api.model.nineanime.NineAnimeSearch;
+import org.animeatsume.api.model.nineanime.NineAnimeVideoHostIframe;
 import org.animeatsume.api.utils.ObjectUtils;
 import org.animeatsume.api.utils.http.CorsProxy;
 import org.animeatsume.api.utils.regex.RegexUtils;
@@ -24,12 +25,15 @@ import org.springframework.web.client.RestTemplate;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
+
+import static org.animeatsume.api.utils.ObjectUtils.sanitizeAndParseJsonToClass;
 
 @Log4j2
 @Service
@@ -99,7 +103,7 @@ public class NineAnimeService {
     private static String getCookie() {
         List<String> setCookieHeader = CorsProxy.doCorsRequest(
             HttpMethod.GET,
-            ORIGIN + "/state?ts=001&_=744",
+            ORIGIN + "/state",
             ORIGIN,
             null,
             getSearchHeadersJson()
@@ -110,6 +114,17 @@ public class NineAnimeService {
         }
 
         return "";
+    }
+
+    private String getEpisodeHost(String episodeUrl) {
+        // e.g. "https://123anime.info/ajax/episode/info?epr=boruto-naruto-next-generations/002&ts=002&_=<timestamp>"
+        return getUrlWithOrigin(
+            "/ajax/episode/info?epr="
+            + episodeUrl.replaceAll(".*?/anime/+", "")
+            + "&ts=" + episodeUrl.replaceAll(".*?/episode/+", "")
+            + "&_="
+            + Instant.now().getEpochSecond()
+        );
     }
 
     public TitlesAndEpisodes searchShows(String title) {
@@ -159,21 +174,20 @@ public class NineAnimeService {
             null,
             getSearchHeaders(true)
         ).getBody();
-        String todo = "https://123anime.info/ajax/episode/info?epr=boruto-naruto-next-generations/001/5";
+
         Document showSearchHtml = Jsoup.parse(NineAnimeSearch.fromString(showSplashPage).getHtml());
         Elements servers = showSearchHtml.select(".tip.tab");
         String server = showSearchHtml.select(".server.mass").attr("data-id");
         Elements episodeAnchorElems = showSearchHtml.select(".episodes.range li a");
-        log.info("episodeAnchorElems size ({})", episodeAnchorElems.size());
 
         if (episodeAnchorElems.size() < 1) {
             return null;
-        };
+        }
 
         List<VideoSearchResult> episodeResults = episodeAnchorElems
             .stream()
             .map(element -> new VideoSearchResult(
-                getUrlWithOrigin(element.attr("href")),
+                getEpisodeHost(element.attr("href")),
                 element.text()
             ))
             .collect(Collectors.toList());
@@ -182,11 +196,12 @@ public class NineAnimeService {
             return null;
         }
 
-        String showWatchUrl = getUrlWithOrigin(episodeResults.get(0).getUrl());
+        // TODO - Move this to separate method and parse all episodes, not just the first one
+        String showWatchUrl = episodeResults.get(0).getUrl();
 
-        log.info("Attempting to request: {}", showWatchUrl);
+        log.info("Getting episode host site info from: {}", showWatchUrl);
 
-        String showHtml = (String) CorsProxy.doCorsRequest(
+        String episodeHostString = (String) CorsProxy.doCorsRequest(
             HttpMethod.GET,
             URI.create(showWatchUrl),
             URI.create(ORIGIN),
@@ -194,30 +209,18 @@ public class NineAnimeService {
             getSearchHeaders(true)
         ).getBody();
 
-        if (showHtml == null || showHtml.length() == 0) {
+        if (episodeHostString == null || episodeHostString.length() == 0) {
             return null;
         }
 
-        List<VideoSearchResult> episodeAnchors = Jsoup.parse(showHtml)
-            .select(EPISODES_SELECTOR)
-            .stream()
-            .map(element -> new VideoSearchResult(
-                String.format("%s/%s", ORIGIN, element.attr("href")),
-                element.attr("title")
-            ))
-            .collect(Collectors.toList());
+        NineAnimeVideoHostIframe episodeHost = sanitizeAndParseJsonToClass(episodeHostString, NineAnimeVideoHostIframe.class);
+        String episodeHostIframeSrcUrl = episodeHost.getIframeSrcUrl();
 
-        // TODO - I think this is unnecessary code leftover from merge conflict
-        // episodesForTitle.setEpisodes(getDirectVideoUrls(episodeAnchors));
+        log.info("episodeHost: {}", episodeHostIframeSrcUrl);
+
+//        getDirectVideoUrls(episodeAnchors);
 
         log.info("Obtained {} episodes for ({})",
-            episodesForTitle.getEpisodes().size(),
-            episodesForTitle.getTitle()
-        );
-
-        getDirectVideoUrls(episodeAnchors);
-
-        log.info("Determined URLs for {} episodes for ({})",
             episodesForTitle.getEpisodes().size(),
             episodesForTitle.getTitle()
         );
