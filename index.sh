@@ -356,7 +356,7 @@ dockerRunOnProd() (
 
     if [[ -f "$rootDir/keystore.p12" ]]; then
         # Ensure keystore file exists before trying to load it in the app
-        javaOpts="-Dserver.ssl.key-store=/home/repo/keystore.p12 -Dserver.ssl.key-store-password=${serverKeystorePassword}"
+        javaOpts="-Dserver.ssl.key-store=${rootDir}/keystore.p12 -Dserver.ssl.key-store-password=${serverKeystorePassword}"
     fi
 
     declare javaOptsFlagForDockerContainer=
