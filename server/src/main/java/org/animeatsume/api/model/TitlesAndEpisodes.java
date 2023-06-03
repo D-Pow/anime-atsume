@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,6 +16,7 @@ import java.util.stream.Collectors;
 public class TitlesAndEpisodes {
     @Data
     @EqualsAndHashCode(callSuper = true)
+    @ToString(callSuper = true)
     public static class EpisodesForTitle extends VideoSearchResult {
         private List<VideoSearchResult> episodes;
 
