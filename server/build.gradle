@@ -273,7 +273,10 @@ dependencies {
      * Using v3.1.0 because it ironically has more features than 4.0.0
      * (see https://github.com/webfolderio/ui4j/tree/3.0.0)
      */
-    implementation 'io.webfolder:ui4j-webkit:3.1.0'
+    implementation 'io.webfolder:ui4j-webkit:4.0.0'
+    // Alternative: Use Selenium directly:
+    // https://mvnrepository.com/artifact/org.seleniumhq.selenium/selenium-java
+    // implementation 'org.seleniumhq.selenium:selenium-java:4.10.0'
 
     providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
 
