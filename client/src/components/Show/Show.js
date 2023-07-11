@@ -68,7 +68,9 @@ function Show(props) {
         fetchShowAndEpisodesList();
     }, []);
 
-    const getShowTitle = (showIndex = selectedShow) => (episodeResults && Number.isInteger(showIndex)) ? episodeResults.results[showIndex].title : '';
+    const getShowTitle = (showIndex = selectedShow) => (episodeResults && Number.isInteger(showIndex))
+        ? episodeResults.results[showIndex].title
+        : '';
     const getAllShowsProgressForShowMatches = () => (
         episodeResults.results
             ? episodeResults.results

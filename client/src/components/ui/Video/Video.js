@@ -91,6 +91,17 @@ function Video(props) {
         }
     }, [ videoRef ]);
 
+    if (props.isIframe) {
+        return (
+            <iframe
+                className={props.className}
+                ref={videoRef}
+                src={props.src}
+                {...props.videoElementProps}
+            />
+        );
+    }
+
     return (
         <video className={props.className} controls autoPlay ref={videoRef} {...props.videoElementProps}>
             <source src={props.src} type={props.type} />
@@ -101,6 +112,7 @@ function Video(props) {
 Video.propTypes = {
     className: PropTypes.string,
     src: PropTypes.string,
+    isIframe: PropTypes.bool,
     type: PropTypes.string,
     videoElementProps: PropTypes.object,
     videoRef: PropTypes.object
@@ -109,6 +121,7 @@ Video.propTypes = {
 Video.defaultProps = {
     className: '',
     src: '',
+    isIframe: false,
     type: 'video/mp4',
     videoElementProps: {}
 };

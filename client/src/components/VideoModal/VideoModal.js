@@ -197,13 +197,20 @@ function VideoModal(props) {
             return;
         }
 
-        const { title, url, directSource } = videoOptions[0];
+        const { title, url, directSource, iframeSource } = videoOptions[0];
+
+        getVideoSrcPath(props.showTitle, props.episodeTitle, title, url);
+
+        const videoSource = directSource || iframeSource
+            ? url
+            : getVideoSrcPath(props.showTitle, props.episodeTitle, title, url)
 
         return (
             <div>
                 <Video
                     className={'w-100'}
-                    src={directSource ? url : getVideoSrcPath(props.showTitle, props.episodeTitle, title, url)}
+                    src={videoSource}
+                    isIframe={iframeSource}
                     videoElementProps={{
                         ...props.videoElementProps,
                         onError: handleVideoLoadError
