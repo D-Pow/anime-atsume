@@ -7,7 +7,11 @@ import lombok.extern.log4j.Log4j2;
 public class PageUtils {
 
     public static String getTitle(Page page) {
-        return page.getDocument().getTitle().orElse("");
+        String title = page.getDocument().getTitle();
+
+        return title != null && !title.isBlank()
+            ? title
+            : "";
     }
 
     public static String getInnerText(Page page) {

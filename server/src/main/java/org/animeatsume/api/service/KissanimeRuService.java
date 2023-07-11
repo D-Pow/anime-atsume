@@ -73,6 +73,7 @@ public class KissanimeRuService {
         setup();
     }
 
+    // TODO - Make this and all related logic use the new `SeleniumService` class
     public void setup() {
         // Load Kissanime on app startup to avoid having to wait for
         // Cloudflare's DDoS delay

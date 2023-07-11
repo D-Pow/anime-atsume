@@ -1,23 +1,26 @@
 package org.animeatsume.api.service;
 
 import lombok.extern.log4j.Log4j2;
+import org.animeatsume.api.model.Anchor;
 import org.animeatsume.api.model.TitlesAndEpisodes;
 import org.animeatsume.api.model.TitlesAndEpisodes.EpisodesForTitle;
 import org.animeatsume.api.model.VideoSearchResult;
-import org.animeatsume.api.model.nineanime.NineAnimeSearch;
+import org.animeatsume.api.model.nineanime.NineAnimeEpisodeHostResponse;
+import org.animeatsume.api.model.nineanime.NineAnimeSearchResponse;
 import org.animeatsume.api.utils.ObjectUtils;
+import org.animeatsume.api.utils.SeleniumService;
 import org.animeatsume.api.utils.http.CorsProxy;
-import org.animeatsume.api.utils.http.Requests;
+import org.animeatsume.api.utils.http.UriParser;
 import org.animeatsume.api.utils.regex.RegexUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -28,8 +31,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 @Log4j2
@@ -37,6 +40,8 @@ import java.util.stream.Collectors;
 public class NineAnimeService {
     private static final String ORIGIN = "https://123anime.info";
     private static final String SEARCH_URL = ORIGIN + "/ajax/film/search?sort=year:desc&keyword=";
+    private static final String SHOW_INFO_URL = ORIGIN + "/ajax/film/sv?id=";
+    private static final String EPISODES_INFO_URL = ORIGIN + "/ajax/episode/info?epr=";
     private static final String SHOW_RESULTS_SELECTOR = "a.name";
     private static final String SHOW_NAVIGATE_SELECTOR = "a.btn-play";
     private static final String EPISODES_SELECTOR = "#episodes-content a";
@@ -44,8 +49,14 @@ public class NineAnimeService {
     private static final String DOWNLOAD_BUTTON_SELECTOR = ".dowload a";  // The different download links of varying video resolutions. Yes, they made a typo
     private static final String EPISODE_VIDEO_SOURCE_SELECTOR = "video source";
 
-    @Value("${org.animeatsume.mock-firefox-user-agent}")
-    private String mockFirefoxUserAgent;
+    @Autowired
+    private SeleniumService seleniumService; // = new SeleniumService();
+
+//    private SeleniumService seleniumService; // = new SeleniumService();
+
+//    public NineAnimeService() {
+//        seleniumService = new SeleniumService();
+//    }
 
     private static HttpHeaders getSearchHeaders() {
         HttpHeaders headers = new HttpHeaders();
@@ -59,10 +70,46 @@ public class NineAnimeService {
         return SEARCH_URL + URLEncoder.encode(searchQuery, StandardCharsets.UTF_8);
     }
 
+    private static String getShowInfoUrl(String searchQuery) {
+        return SHOW_INFO_URL + URLEncoder.encode(searchQuery, StandardCharsets.UTF_8);
+    }
+
+    private static URI getEpisodePageUrl(String showId, String episodeId) {
+        return getEpisodePageUrl(showId, episodeId, "0");
+    }
+
+    /**
+     * e.g.
+     * <pre>
+     * input: "/anime/naruto-shippuden/episode/001", "5" ->
+     *  showId = "naruto-shippuden"
+     *  episodeId = "001"
+     *  videoHostIndex = "0" (default)
+     *
+     * output: "/ajax/episode/info?epr=naruto-shippuden/001/5"
+     * </pre>
+     *
+     * @param showId - Show name/ID.
+     * @param episodeId - Episode number (e.g. "001").
+     * @param videoHostIndex - Video host (e.g. "0").
+     * @return URL of the actual video host (a third-party unassociated with {@code ORIGIN}).
+     */
+    private static URI getEpisodePageUrl(String showId, String episodeId, String videoHostIndex) {
+        String episodeBaseUrl = EPISODES_INFO_URL + showId;
+        String episodePageUrl = String.join("/", episodeBaseUrl, episodeId, videoHostIndex)
+            .replaceAll("(?<!https:)/{2,}", "/");
+
+        return URI.create(episodePageUrl);
+    }
+
     private static String getUrlWithOrigin(String... suffixes) {
         List<String> urlPaths = new ArrayList<>(Arrays.asList(suffixes));
+
         urlPaths.add(0, ORIGIN);
-        String joinedUrl = String.join("/", urlPaths).replaceAll("[\\\\/]\"(?=(\\\\|/|$))", "");
+
+        String joinedUrl = String.join("/", urlPaths)
+            .replaceAll("(?<!https:)/{2,}", "/")
+            .replaceAll("[\\\\/]\"(?=(\\\\|/|$))", "");
 
         return joinedUrl;
     }
@@ -75,7 +122,7 @@ public class NineAnimeService {
         HttpHeaders searchShowsHeaders = new HttpHeaders();
         searchShowsHeaders.add(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE);
 
-        String searchResponseJson = (String) CorsProxy.doCorsRequest(
+        Map<String, String> searchResponseJson = (Map) CorsProxy.doCorsRequest(
             HttpMethod.GET,
             titleSearch,
             ORIGIN,
@@ -83,7 +130,7 @@ public class NineAnimeService {
             searchShowsHeaders
         ).getBody();
 
-        String searchResponseHtml = NineAnimeSearch.fromString(searchResponseJson).getHtml();
+        String searchResponseHtml = searchResponseJson.getOrDefault("html", null);
 
         if (searchResponseHtml != null) {
             Document showResultsDocument = Jsoup.parse(searchResponseHtml);
@@ -106,24 +153,160 @@ public class NineAnimeService {
 
     @Async
     public CompletableFuture<EpisodesForTitle> searchEpisodes(EpisodesForTitle episodesForTitle) {
-        log.info("Searching <{}> for episode list at ({}) ...", ORIGIN, episodesForTitle.getUrl());
+        /*
+         * e.g. "https://123anime.info/ajax/episode/info?epr=naruto-shippuden/001/5"
+         *  episodesForTitle.getUrl() & showSearchUrl = https://123anime.info/anime/naruto-shippuden
+         *  showInfoUrl = https://123anime.info/ajax/film/sv?id=naruto-shippuden
+         *  showSearchUrl = /anime/naruto-shippuden/episode/001
+         *  showId = naruto-shippuden
+         *  episodeId = 001
+         *  videoPlayerIndex = 5
+         */
+        URI showSearchUrl = URI.create(episodesForTitle.getUrl());
+        String showId = UriParser.getPathSegment(showSearchUrl, -1);
+        URI showInfoUrl = URI.create(getShowInfoUrl(showId));
 
-        String showSplashPage = (String) CorsProxy.doCorsRequest(
+        log.info("Searching <{}> for episode list at ({}) ...", episodesForTitle.getUrl(), showInfoUrl);
+
+        String showSplashPageResponse = (String) CorsProxy.doCorsRequest(
             HttpMethod.GET,
-            URI.create(episodesForTitle.getUrl()),
+            showInfoUrl,
             URI.create(ORIGIN),
             null,
             getSearchHeaders()
         ).getBody();
-        String todo = "https://123anime.info/ajax/episode/info?epr=boruto-naruto-next-generations/001/5";
-        Elements showParentListOfLength1 = Jsoup.parse(showSplashPage).select(".episodes.range li");
-        log.info("First Elem: size ({})", showParentListOfLength1.size());
 
-        if (showParentListOfLength1.size() < 1) {
+        NineAnimeSearchResponse showSplashPage = NineAnimeSearchResponse.fromString(showSplashPageResponse);
+        Elements showEpisodesAnchors = Jsoup.parse(showSplashPage.getHtml()).select(".episodes.range li a");
+
+        log.info("Num episodes found at <{}>: {}", showInfoUrl, showEpisodesAnchors.size());
+
+        if (showEpisodesAnchors.size() < 1) {
             return null;
-        };
+        }
 
-        Element showParent = showParentListOfLength1.first();
+        List<Anchor> episodeAnchors = showEpisodesAnchors.stream().map(anchor -> {
+            // e.g. "001"
+            String episodeId = anchor.text();
+            // e.g. "/anime/naruto-shippuden/episode/001"
+            String episodeUrl = getUrlWithOrigin(anchor.attr("href"));
+
+            // e.g. "naruto-shippuden/001/5"
+            Anchor episodeAnchor = new Anchor(episodeUrl, episodeId);
+
+            return episodeAnchor;
+        }).toList();
+
+        List<VideoSearchResult> episodeHosts = episodeAnchors.stream().map(anchor -> {
+            // Remove leading zeros via casting to int, e.g. "001" -> "1"
+            String episodeTitle = String.valueOf(Integer.parseInt(anchor.getTitle()));
+            String episodeInfoSearchUrl = getEpisodePageUrl(showId, anchor.getTitle()).toString();
+
+            return new VideoSearchResult(episodeInfoSearchUrl, episodeTitle);
+        }).toList();
+
+        episodesForTitle.setEpisodes(episodeHosts);
+
+        log.info("episodesForTitle: {}", episodesForTitle);
+
+        return CompletableFuture.completedFuture(episodesForTitle);
+    }
+
+    public VideoSearchResult getVideosForShow(String url) {
+        String episodeHostResponseJson = (String) CorsProxy.doCorsRequest(
+            HttpMethod.GET,
+            URI.create(url),
+            URI.create(ORIGIN),
+            null,
+            getSearchHeaders()
+        ).getBody();
+
+        NineAnimeEpisodeHostResponse episodeHost = NineAnimeEpisodeHostResponse.fromString(episodeHostResponseJson);
+        String episodeHostUrl = episodeHost.getTarget();
+
+        HttpHeaders getVideoUrlFromHostHeaders = getSearchHeaders();
+        getVideoUrlFromHostHeaders.add(HttpHeaders.REFERER, UriParser.getOrigin(url));
+
+        // `Location` header excludes "https:" but maintains "//website.com"
+        String videoUrl = "https:" + CorsProxy.doCorsRequest(
+            HttpMethod.GET,
+            URI.create(episodeHostUrl),
+            URI.create(UriParser.getOrigin(episodeHostUrl)),
+            null,
+            getVideoUrlFromHostHeaders
+        ).getHeaders().getLocation().toString();
+
+        ResponseEntity<String> videoResponse = (ResponseEntity<String>) CorsProxy.doCorsRequest(
+            HttpMethod.GET,
+            URI.create(videoUrl),
+            URI.create(UriParser.getOrigin(videoUrl)),
+            null,
+            getVideoUrlFromHostHeaders
+        );
+
+        if (videoResponse.getHeaders().getLocation() != null) {
+            videoUrl = videoResponse.getHeaders().getLocation().toString();
+
+            videoResponse = (ResponseEntity<String>) CorsProxy.doCorsRequest(
+                HttpMethod.GET,
+                URI.create(videoUrl),
+                URI.create(UriParser.getOrigin(videoUrl)),
+                null,
+                getVideoUrlFromHostHeaders
+            );
+        }
+
+        String episodeHostResponseHtml = videoResponse.getBody();
+
+        List<String> hostUrls = Jsoup.parse(episodeHostResponseHtml).select("li.linkserver").stream()
+            .map(li -> li.attr("data-video"))
+            .filter(videoHostUrl -> !videoHostUrl.isBlank())
+            .toList();
+        String primaryHostUrl = hostUrls.get(0);
+
+        io.webfolder.ui4j.api.dom.Element videoElem = this.seleniumService.clickOn(primaryHostUrl, "video");
+        String videoElemSrc = videoElem.getAttribute("src");
+        String videoUrlDirect = videoElemSrc != null && !videoElemSrc.isBlank()
+            ? videoElemSrc
+            : primaryHostUrl;
+
+//        videoUrlDirect
+
+        log.info("BEFORE WHILE: videoElem.getAttribute(\"src\"): {}", videoUrlDirect);
+
+        while (
+            videoElemSrc == null
+            || videoElemSrc.isBlank()
+        ) {
+            videoElemSrc = videoElem.getAttribute("src");
+
+            log.info("IN WHILE: videoElem.getAttribute(\"src\"): {}", videoElemSrc);
+
+            try {
+                videoUrlDirect = videoElemSrc;
+
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                log.error("Thread.sleep() error: {}", e.getMessage());
+            }
+        }
+
+        log.info("Obtained video host: <{}>  ->  <{}>  ->  <{}>  ->  <{}>  ->  <{}>",
+            url,
+            episodeHostUrl,
+            videoUrl,
+            primaryHostUrl,
+            videoUrlDirect
+        );
+
+        return new VideoSearchResult(videoUrlDirect, UriParser.getQueryParams(url).get("epr").get(0), false, true);
+    }
+
+    @Async
+    public CompletableFuture<EpisodesForTitle> searchEpisodes_orig(EpisodesForTitle episodesForTitle) {
+        Elements showEpisodesAnchors = Jsoup.parse("").select(".episodes.range li a");
+
+        Element showParent = showEpisodesAnchors.first();
         String showName = showParent.select("h2.film-name").text();
 
         List<VideoSearchResult> showSplashPageWatchButtons = showParent
@@ -248,7 +431,7 @@ public class NineAnimeService {
         return ObjectUtils.getAllCompletableFutureResults(allEpisodesAndDownloadUrls);
     }
 
-    public VideoSearchResult getVideosForShow(String url) {
+    public VideoSearchResult getVideosForShow_orig(String url) {
         String episodeHtml = (String) CorsProxy.doCorsRequest(
             HttpMethod.GET,
             URI.create(url),

@@ -10,10 +10,11 @@ import org.animeatsume.api.utils.ObjectUtils;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class NineAnimeSearch {
-    private String html;
+public class NineAnimeEpisodeHostResponse {
+    private String grabber;
+    private String target;
 
-    public static NineAnimeSearch fromString(String json) {
-        return ObjectUtils.classFromJson(json, NineAnimeSearch.class);
+    public static NineAnimeEpisodeHostResponse fromString(String json) {
+        return ObjectUtils.classFromJson(json, NineAnimeEpisodeHostResponse.class);
     }
 }

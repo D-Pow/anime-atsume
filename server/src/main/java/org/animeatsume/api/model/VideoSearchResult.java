@@ -11,6 +11,7 @@ import lombok.ToString;
 @ToString(callSuper = true)
 public class VideoSearchResult extends Anchor {
     private boolean directSource = false;
+    private boolean iframeSource = false;
 
     public VideoSearchResult(String url, String title) {
         super(url, title);
@@ -19,5 +20,11 @@ public class VideoSearchResult extends Anchor {
     public VideoSearchResult(String url, String title, boolean directSource) {
         super(url, title);
         this.directSource = directSource;
+    }
+
+    public VideoSearchResult(String url, String title, boolean directSource, boolean iframeSource) {
+        super(url, title);
+        this.directSource = directSource;
+        this.iframeSource = iframeSource;
     }
 }

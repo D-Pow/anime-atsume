@@ -41,7 +41,13 @@ public class FourAnimeController {
     }
 
     public TitlesAndEpisodes.EpisodesForTitle getVideoForEpisode(String url) {
-        VideoSearchResult video = fourAnimeService.getVideoForEpisode(url);
+        VideoSearchResult video = null;
+
+        try {
+            video = fourAnimeService.getVideoForEpisode(url);
+        } catch (Exception e) {
+            log.error("Could not fetch video for episode from <{}>", url);
+        }
 
         if (video == null) {
             return null;
