@@ -129,6 +129,17 @@ run() {
 
 
 build() (
+    declare USAGE="${FUNCNAME[0]} [OPTIONS...]
+    Builds the app.
+
+    Options:
+        -c  |   Clean build-output files before building.
+        -f  |   Clean resources as well as build-output files.
+        -r  |   Copy build output files to app root directory.
+        -m  |   Builds app with headless Selenium instance.
+        -v  |   Verbose build output.
+        -h  |   Print this help message and exit.
+    "
     declare _buildCleanFirst=
     declare _buildCopyFilesToRootDir=
     declare _buildHeadless=
@@ -137,10 +148,10 @@ build() (
 
     while getopts ":fcrvmh" opt; do
         case "$opt" in
-            f)
+            c)
                 clean
                 ;;
-            c)
+            f)
                 _buildCleanFirst=true
                 ;;
             r)
@@ -154,13 +165,14 @@ build() (
                 _buildVerbose=true
                 ;;
             h)
+                echo "$USAGE" >&2
                 (
                     cd "${serverDir}"
                     # Same as `./gradlew printCommands` except with colored output
                     ./gradlew -q tasks --all
                 )
 
-                return
+                return 1
                 ;;
 
             *)
