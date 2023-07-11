@@ -278,6 +278,10 @@ dependencies {
     // https://mvnrepository.com/artifact/org.seleniumhq.selenium/selenium-java
     // implementation 'org.seleniumhq.selenium:selenium-java:4.10.0'
 
+    implementation 'net.lightbody.bmp:browsermob-core:2.1.5'
+    implementation 'io.github.qiwang97:browsermob-core:2.2.3-release'
+//    implementation 'com.arthenica:ffmpeg-kit-full:5.1'
+
     providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
 
     /**
