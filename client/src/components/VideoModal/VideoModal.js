@@ -199,11 +199,9 @@ function VideoModal(props) {
 
         const { title, url, directSource, iframeSource } = videoOptions[0];
 
-        getVideoSrcPath(props.showTitle, props.episodeTitle, title, url);
-
-        const videoSource = directSource || iframeSource
+        const videoSource = (directSource || iframeSource)
             ? url
-            : getVideoSrcPath(props.showTitle, props.episodeTitle, title, url)
+            : getVideoSrcPath(props.showTitle, props.episodeTitle, title, url);
 
         return (
             <div>
