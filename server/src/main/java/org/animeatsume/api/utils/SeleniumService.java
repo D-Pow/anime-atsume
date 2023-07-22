@@ -4,12 +4,10 @@ import com.sun.webkit.network.URLs;
 import com.sun.webkit.network.about.Handler;
 import io.webfolder.ui4j.api.browser.BrowserEngine;
 import io.webfolder.ui4j.api.browser.BrowserFactory;
-import io.webfolder.ui4j.api.browser.BrowserType;
 import io.webfolder.ui4j.api.browser.Page;
 import io.webfolder.ui4j.api.browser.PageConfiguration;
 import io.webfolder.ui4j.api.dom.Element;
 import io.webfolder.ui4j.api.util.Ui4jException;
-import io.webfolder.ui4j.webkit.WebKitBrowserProvider;
 import lombok.Data;
 import lombok.extern.log4j.Log4j2;
 import net.lightbody.bmp.BrowserMobProxy;
@@ -18,13 +16,12 @@ import net.lightbody.bmp.client.ClientUtil;
 import net.lightbody.bmp.core.har.Har;
 import net.lightbody.bmp.proxy.CaptureType;
 import org.animeatsume.api.utils.ui4j.PageUtils;
-import org.openqa.selenium.Proxy;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.remote.CapabilityType;
+import org.openqa.selenium.remote.DesiredCapabilities;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Field;
@@ -42,7 +39,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Data
 @Log4j2
-//@Component
 @Service
 public class SeleniumService {
     private static final String CLOUDFLARE_TITLE = "Just a moment";
@@ -54,8 +50,11 @@ public class SeleniumService {
 
     private static PageConfiguration pageConfiguration;
 
+//    private BrowserEngine browser = BrowserFactory.getWebKit(); // Or: BrowserFactory.getBrowser(BrowserType.WebKit);
     private BrowserEngine browser;
-//    private BrowserEngine browser = BrowserFactory.getBrowser(BrowserType.WebKit);
+    private WebDriver subBrowser;
+
+    private BrowserMobProxy harProxy;
 
     @Value("${server.port}")
     private int port;
@@ -71,45 +70,72 @@ public class SeleniumService {
 //        this.setup();
 //    }
 
-//    @Autowired
     public SeleniumService(
         @Value("${org.animeatsume.mock-firefox-user-agent}") String mockUserAgent,
         @Value("${org.animeatsume.num-attempts-to-bypass-cloudflare}") Integer numAttemptsToBypassCloudflare,
         @Value("${server.port}") int port
     ) {
-//        this();
-
         this.userAgent = mockUserAgent;
         this.numAttemptsToBypassCloudflare = numAttemptsToBypassCloudflare;
         this.port = port;
 
         this.setup();
-//        browser = BrowserFactory.getWebKit();
 
         log.info("SeleniumService INIT, {}", this.browser);
     }
 
-    public void setup() {
+    private void setup() {
+        this.setup(null);
+    }
+
+    private void setup(DesiredCapabilities desiredCapabilities) {
         log.info("CALLING this.setup()!!!");
 //        log.info("com.sun.webkit.network.URLs.class.getDeclaredField(\"handlerMap\"): {}", com.sun.webkit.network.URLs.class.getDeclaredField("handlerMap"));
 //        browser = BrowserFactory.getBrowser(BrowserType.WebKit);
 //        this.browser = BrowserFactory.getBrowser(BrowserType.JxBrowser);
 //        browser = BrowserFactory.getJxBrowser();
-        browser = BrowserFactory.getWebKit();
-        log.info("INSTANTIATED browser!!!");
+        if (desiredCapabilities == null) {
+            desiredCapabilities = new DesiredCapabilities();
+        }
 
         // Setup cookie jar so browser can retain/reuse cookies
         CookieHandler.setDefault(new CookieManager());
 
+        // Set user agent for browser
+        // PageConfiguration is used for BrowserEngine.navigate(url, pageConfiguration)
         PageConfiguration pageConfig = new PageConfiguration();
         pageConfig.setUserAgent(this.userAgent);
-
         pageConfiguration = pageConfig;
 
-//        enableGetMp4FromM3u8File();
+        // Inject HAR proxy into Selenium WebDriver capabilities
+        enableGetMp4FromM3u8File();
+        desiredCapabilities.setCapability(CapabilityType.PROXY, this.harProxy);
+
+        /* START - Selenium WebDriver instantiation logic */
+
+        // Convert to ChromeOptions since DesiredCapabilities isn't a valid constructor arg
+        ChromeOptions chromeOptions = new ChromeOptions();
+
+        // Copy DesiredCapabilities to ChromeOptions
+        desiredCapabilities.setCapability(ChromeOptions.CAPABILITY, chromeOptions);
+        DesiredCapabilities chromeDesiredCapabilities = desiredCapabilities; // Needs to be final for ChromeOptions.setCapability()
+        desiredCapabilities.getCapabilityNames().forEach(capabilityName -> {
+            chromeOptions.setCapability(capabilityName, chromeDesiredCapabilities.getCapability(capabilityName));
+        });
+
+        // Start the WebDriver maximized for easy processing
+        chromeOptions.addArguments("start-maximized");
+        chromeOptions.addArguments("--user-agent=\"" + pageConfiguration.getUserAgent() + "\"");
+
+        /* END - Selenium WebDriver instantiation logic */
+
+        browser = BrowserFactory.getWebKit();
+//        subBrowser = new ChromeDriver(chromeOptions);
+
+        log.info("INSTANTIATED browser!!!");
     }
 
-    public Har enableGetMp4FromM3u8File(String url) {
+    private BrowserMobProxy enableGetMp4FromM3u8File() {
         BrowserMobProxy proxy = new BrowserMobProxyServer();
 
         proxy.start(this.port + 1);
@@ -127,19 +153,38 @@ public class SeleniumService {
             CaptureType.RESPONSE_BINARY_CONTENT
         );
 
-        // Create HTTP Archive (HAR) file for http tracing.
-        // Script will attempt to capture all m3u8 requests produced from website loading.
-        Har proxyHar = proxy.newHar(url == null ? "" : url);
+        this.harProxy = proxy;
 
-        Har har = proxy.getHar();
-
-        log.info("proxyHar: {}\nhar: {}", proxyHar, har);
-
-        return har;
+        return proxy;
     }
 
     public Har getMp4FromM3u8File(String url) {
-        return enableGetMp4FromM3u8File(url);
+        // Create HTTP Archive (HAR) file for http tracing.
+        // Script will attempt to capture all m3u8 requests produced from website loading.
+        Har proxyHar = this.harProxy.newHar(url == null ? "" : url);
+
+//        this.subBrowser.get(url);
+
+        Har har = this.harProxy.getHar();
+
+        log.info("proxyHar: {}\nhar: {}", proxyHar, har);
+        log.info("har.getLog(): {}," +
+                 "getVersion(): {}\n" +
+                 "getCreator(): {}\n" +
+                 "getBrowser(): {}\n" +
+                 "getPages(): {}\n" +
+                 "getEntries(): {}\n" +
+                 "getComment(): {}",
+            har.getLog(),
+            har.getLog().getVersion(),
+            har.getLog().getCreator(),
+            har.getLog().getBrowser(),
+            har.getLog().getPages(),
+            har.getLog().getEntries(),
+            har.getLog().getComment()
+        );
+
+        return har;
     }
 
     private void patch() {
@@ -295,8 +340,6 @@ public class SeleniumService {
     }
 
     public Page navigateTo(String url) {
-        this.getMp4FromM3u8File(url);
-
         return browser.navigate(url, pageConfiguration);
     }
 
