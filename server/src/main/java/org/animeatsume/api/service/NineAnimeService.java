@@ -212,7 +212,7 @@ public class NineAnimeService {
         return CompletableFuture.completedFuture(episodesForTitle);
     }
 
-    public VideoSearchResult getVideosForShow(String url) {
+    public VideoSearchResult getVideosForEpisode(String url) {
         String episodeHostResponseJson = (String) CorsProxy.doCorsRequest(
             HttpMethod.GET,
             URI.create(url),

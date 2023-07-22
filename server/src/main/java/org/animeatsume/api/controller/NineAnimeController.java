@@ -42,7 +42,7 @@ public class NineAnimeController {
     }
 
     public TitlesAndEpisodes.EpisodesForTitle getVideoForEpisode(String url) {
-        VideoSearchResult video = nineAnimeService.getVideosForShow(url);
+        VideoSearchResult video = nineAnimeService.getVideosForEpisode(url);
 
         if (video == null) {
             return null;

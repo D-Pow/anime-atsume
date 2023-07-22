@@ -104,7 +104,7 @@ public class SeleniumService {
 //        enableGetMp4FromM3u8File();
     }
 
-    public void enableGetMp4FromM3u8File(String url) {
+    public Har enableGetMp4FromM3u8File(String url) {
         BrowserMobProxy proxy = new BrowserMobProxyServer();
 
         proxy.start(0);
@@ -129,10 +129,12 @@ public class SeleniumService {
         Har har = proxy.getHar();
 
         log.info("proxyHar: {}\nhar: {}", proxyHar, har);
+
+        return har;
     }
 
-    public void getMp4FromM3u8File(String url) {
-        enableGetMp4FromM3u8File(url);
+    public Har getMp4FromM3u8File(String url) {
+        return enableGetMp4FromM3u8File(url);
     }
 
     private void patch() {
