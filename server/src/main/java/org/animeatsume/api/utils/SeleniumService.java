@@ -57,10 +57,13 @@ public class SeleniumService {
     private BrowserEngine browser;
 //    private BrowserEngine browser = BrowserFactory.getBrowser(BrowserType.WebKit);
 
-//    @Value("${org.animeatsume.mock-firefox-user-agent}")
+    @Value("${server.port}")
+    private int port;
+
+    @Value("${org.animeatsume.mock-firefox-user-agent}")
     private String userAgent;
 
-//    @Value("${org.animeatsume.num-attempts-to-bypass-cloudflare}")
+    @Value("${org.animeatsume.num-attempts-to-bypass-cloudflare}")
     private int numAttemptsToBypassCloudflare;
 
 //    public SeleniumService() {
@@ -71,12 +74,14 @@ public class SeleniumService {
 //    @Autowired
     public SeleniumService(
         @Value("${org.animeatsume.mock-firefox-user-agent}") String mockUserAgent,
-        @Value("${org.animeatsume.num-attempts-to-bypass-cloudflare}") Integer numAttemptsToBypassCloudflare
+        @Value("${org.animeatsume.num-attempts-to-bypass-cloudflare}") Integer numAttemptsToBypassCloudflare,
+        @Value("${server.port}") int port
     ) {
 //        this();
 
         this.userAgent = mockUserAgent;
         this.numAttemptsToBypassCloudflare = numAttemptsToBypassCloudflare;
+        this.port = port;
 
         this.setup();
 //        browser = BrowserFactory.getWebKit();
@@ -107,8 +112,8 @@ public class SeleniumService {
     public Har enableGetMp4FromM3u8File(String url) {
         BrowserMobProxy proxy = new BrowserMobProxyServer();
 
-        proxy.start(0);
-        int port = proxy.getPort();
+        proxy.start(this.port + 1);
+
         ClientUtil.createSeleniumProxy(proxy);
 
         proxy.enableHarCaptureTypes(
