@@ -281,6 +281,7 @@ dependencies {
     implementation 'net.lightbody.bmp:browsermob-core:2.1.5'
     implementation 'io.github.qiwang97:browsermob-core:2.2.3-release'
 //    implementation 'com.arthenica:ffmpeg-kit-full:5.1'
+//    implementation 'com.arthenica:ffmpeg-kit-full-gpl:5.1.LTS'
 
     providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
 
