@@ -124,7 +124,7 @@ public class SeleniumService {
 
         // Create HTTP Archive (HAR) file for http tracing.
         // Script will attempt to capture all m3u8 requests produced from website loading.
-        Har proxyHar = proxy.newHar(url);
+        Har proxyHar = proxy.newHar(url == null ? "" : url);
 
         Har har = proxy.getHar();
 
