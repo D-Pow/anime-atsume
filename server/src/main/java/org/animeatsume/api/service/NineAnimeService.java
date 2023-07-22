@@ -207,7 +207,7 @@ public class NineAnimeService {
 
         episodesForTitle.setEpisodes(episodeHosts);
 
-        log.info("episodesForTitle: {}", episodesForTitle);
+        log.info("episodesForTitle length: {}", episodesForTitle.getEpisodes().size());
 
         return CompletableFuture.completedFuture(episodesForTitle);
     }
