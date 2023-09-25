@@ -1,4 +1,4 @@
-import { isObject, deepCopyObj, diffObjects, objEquals, validateObjNestedFields } from 'utils/Objects';
+import { isObject, deepCopyObj, diffObjects, objEquals, validateObjNestedFields } from '@/utils/Objects';
 
 describe('Object utils', () => {
     class SampleCustomClass {

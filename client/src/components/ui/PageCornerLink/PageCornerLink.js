@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Anchor from 'components/ui/Anchor';
-import Image from 'components/ui/Image';
-import { isMobileBrowser } from 'utils/BrowserIdentification';
+import Anchor from '@/components/ui/Anchor';
+import Image from '@/components/ui/Image';
+import { isMobileBrowser } from '@/utils/BrowserIdentification';
 
 function PageCornerLink(props) {
     const isMobile = isMobileBrowser({ onlyXsScreenSizes: true });
@@ -49,12 +49,14 @@ function PageCornerLink(props) {
         >
             <Anchor
                 href={props.href}
-                className={'d-inline-block position-relative w-40 h-40'}
+                className={'d-inline-block position-relative w-40 h-40 ' + props.className}
                 aria={{
+                    ...props.aria,
                     style: {
                         top: 6,
-                        [props.side]: 6
-                    }
+                        [props.side]: 6,
+                        ...props.aria?.style,
+                    },
                 }}
             >
                 {renderChildren()}
@@ -69,16 +71,20 @@ PageCornerLink.Sides = {
 };
 
 PageCornerLink.propTypes = {
+    className: PropTypes.string,
     bgColor: PropTypes.string,
     href: PropTypes.string,
     image: PropTypes.string,
     side: PropTypes.oneOf(Object.values(PageCornerLink.Sides)),
     sizePx: PropTypes.number,
     sizePxDecreaseOnMobile: PropTypes.number,
-    children: PropTypes.node
+    children: PropTypes.node,
+    aria: PropTypes.object,
 };
 
 PageCornerLink.defaultProps = {
+    className: '',
+    aria: {},
     bgColor: 'black',
     href: '',
     side: PageCornerLink.Sides.RIGHT,

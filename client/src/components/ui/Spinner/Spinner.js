@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { isFirefoxBrowser } from 'utils/BrowserIdentification';
+import { isFirefoxBrowser } from '@/utils/BrowserIdentification';
 
 function Spinner(props) {
     if (!props.show) {

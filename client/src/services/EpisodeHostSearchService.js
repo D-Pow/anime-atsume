@@ -1,4 +1,4 @@
-import { EPISODE_HOST_SEARCH_URL } from 'services/Urls';
+import { EPISODE_HOST_SEARCH_URL } from '@/services/Urls';
 
 /**
  * @typedef {Object} KissanimeEpisodeHostResponse

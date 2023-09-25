@@ -1,5 +1,5 @@
-import { fetchKitsuTitleSearch } from 'services/KitsuAnimeSearchService';
-import { kimiNoNaWaSearchQuery } from '../../mocks/UrlResponseMappings';
+import { fetchKitsuTitleSearch } from '@/services/KitsuAnimeSearchService';
+import { kimiNoNaWaSearchQuery } from '~/mocks/UrlResponseMappings';
 
 // Mock network requests using default MockRequests configuration in mocks/MockConfig.js
 import '../../mocks/MockConfig';

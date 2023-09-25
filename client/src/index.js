@@ -1,12 +1,16 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import App from 'components/App';
-import { LOCATION_PROTOCOL_HTTPS } from 'utils/Constants';
-import AppContext from 'utils/AppContext';
-import registerServiceWorker from './registerServiceWorker';
 import '@fortawesome/fontawesome-free/js/fontawesome';
 import '@fortawesome/fontawesome-free/js/solid';
-import 'styles/index.scss';
+
+import App from '@/components/App';
+import { LOCATION_PROTOCOL_HTTPS } from '@/utils/Constants';
+import AppContext from '@/utils/AppContext';
+import registerServiceWorker from '@/registerServiceWorker';
+import '@/styles/index.scss';
+
+
+registerServiceWorker();
 
 const { Provider } = AppContext;
 const renderedApp = (
@@ -32,8 +36,8 @@ if (process.env.NODE_ENV === 'production' && window.location.hostname !== 'local
 // hot reloading
 if (process.env.NODE_ENV !== 'production' && module.hot) {
     console.log('hot reloading active');
-    module.hot.accept('components/App', () => {
-        const NextApp = require('components/App').default;
+    module.hot.accept('@/components/App', () => {
+        const NextApp = require('@/components/App').default;
         ReactDOM.render(
             <NextApp />,
             rootDiv

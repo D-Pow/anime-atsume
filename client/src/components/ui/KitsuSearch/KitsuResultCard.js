@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Anchor from 'components/ui/Anchor';
-import { getMyAnimeListSearchUrl } from 'services/Urls';
+import Anchor from '@/components/ui/Anchor';
+import { getMyAnimeListSearchUrl } from '@/services/Urls';
 
 function KitsuResultCard({
     anchorImageFunc,
@@ -31,7 +31,7 @@ function KitsuResultCard({
                     <img className={'align-self-center img-thumbnail'} src={small} alt={canonicalTitle} />
                 </Anchor>
             </div>
-            <div className={'media-body align-self-center ml-2 mt-2'}>
+            <div className={'col-sm-12 col-md-6 media-body align-self-center ml-2 mt-2'}>
                 <h5>
                     <Anchor target={anchorTitleTarget} href={anchorTitleFunc(canonicalTitle)}>
                         {canonicalTitle}

@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Spinner from 'components/ui/Spinner';
-import { useKeyboardEvent } from 'utils/Hooks';
+import Spinner from '@/components/ui/Spinner';
+import { useKeyboardEvent } from '@/utils/Hooks';
 
 function SearchBar(props) {
     const handleTyping = ({ target: { value }}) => {

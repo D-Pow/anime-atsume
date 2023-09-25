@@ -1,15 +1,15 @@
 import React, { useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
-import Modal from 'components/ui/Modal';
-import Video from 'components/ui/Video';
-import Spinner from 'components/ui/Spinner';
-import ErrorDisplay from 'components/ui/ErrorDisplay';
-import Anchor from 'components/ui/Anchor';
-import IncompatibleBrowserFallback from 'components/IncompatibleBrowserFallback';
-import { searchForEpisodeHost } from 'services/EpisodeHostSearchService';
-import { getImageSrcPath, getVideoSrcPath } from 'services/Urls';
-import { isSafariBrowser } from 'utils/BrowserIdentification';
-import { asNumber } from 'utils/Numbers';
+import Modal from '@/components/ui/Modal';
+import Video from '@/components/ui/Video';
+import Spinner from '@/components/ui/Spinner';
+import ErrorDisplay from '@/components/ui/ErrorDisplay';
+import Anchor from '@/components/ui/Anchor';
+import IncompatibleBrowserFallback from '@/components/IncompatibleBrowserFallback';
+import { searchForEpisodeHost } from '@/services/EpisodeHostSearchService';
+import { getImageSrcPath, getVideoSrcPath } from '@/services/Urls';
+import { isSafariBrowser } from '@/utils/BrowserIdentification';
+import { asNumber } from '@/utils/Numbers';
 
 function VideoModal(props) {
     const defaultStateValues = {

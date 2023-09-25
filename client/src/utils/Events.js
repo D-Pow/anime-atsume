@@ -1,17 +1,17 @@
 /**
- * Asynchronously imports the specified image from the 'assets/' folder.
+ * Asynchronously imports the specified image from the '@/assets' folder.
  * Optionally returns the resolved image data encoded with Base64.
  * Since this uses dynamic imports, images are cached, so multiple calls
  * for the same asset don't need to be memoized.
  *
- * @param {string} image - Image file name under 'assets/'
+ * @param {string} image - Image file name under '@/assets'
  * @param {boolean} [base64=false] - Return base64-encoded image data instead of image src path
  * @returns {Promise<string>} - Path of the image (base64=false) or Base64-encoded image data (base64=true)
  */
 export async function importImageAsync(image, base64 = false) {
     if (image != null && image !== '') {
         try {
-            const module = await import(`assets/${image}`);
+            const module = await import(`@/assets/${image}`);
             const imageSrc = module.default;
 
             if (base64) {

@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Header from 'components/Header';
-import Anchor from 'components/ui/Anchor';
-import Image from 'components/ui/Image';
-import { LINKS } from 'utils/Constants';
+import Header from '@/components/Header';
+import Anchor from '@/components/ui/Anchor';
+import Image from '@/components/ui/Image';
+import { LINKS } from '@/utils/Constants';
 
 function About(props) {
     const handleStorageClearButtonClick = () => {

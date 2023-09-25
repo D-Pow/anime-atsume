@@ -1,16 +1,16 @@
 import React, { useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
-import { fetchKitsuTitleSearch } from 'services/KitsuAnimeSearchService';
-import { searchForShow } from 'services/ShowSearchService';
-import { getMyAnimeListSearchUrl } from 'services/Urls';
-import { useStorage } from 'utils/Hooks';
-import { debounce } from 'utils/Events';
-import { isSafariBrowser } from 'utils/BrowserIdentification';
-import { asNumber } from 'utils/Numbers';
-import Spinner from 'components/ui/Spinner';
-import VideoModal from 'components/VideoModal';
-import Anchor from 'components/ui/Anchor';
-import ErrorDisplay from 'components/ui/ErrorDisplay';
+import { fetchKitsuTitleSearch } from '@/services/KitsuAnimeSearchService';
+import { searchForShow } from '@/services/ShowSearchService';
+import { getMyAnimeListSearchUrl } from '@/services/Urls';
+import { useStorage } from '@/utils/Hooks';
+import { debounce } from '@/utils/Events';
+import { isSafariBrowser } from '@/utils/BrowserIdentification';
+import { asNumber } from '@/utils/Numbers';
+import Spinner from '@/components/ui/Spinner';
+import VideoModal from '@/components/VideoModal';
+import Anchor from '@/components/ui/Anchor';
+import ErrorDisplay from '@/components/ui/ErrorDisplay';
 
 function Show(props) {
     const title = decodeURIComponent(props.title);
@@ -153,7 +153,7 @@ function Show(props) {
         return episodeResults.results.map(({ title: showTitle, episodes: showEpisodes}, i) => {
             const renderedEpisodeCountBadge = (
                 <h4>
-                    <span className={`ml-1 badge badge-pill badge-${selectedShow === i ? 'dark' : 'primary'}`}>
+                    <span className={`ml-1 badge badge-pill rounded-pill bg-${selectedShow === i ? 'dark' : 'primary'}`}>
                         {showEpisodes.length}
                     </span>
                 </h4>

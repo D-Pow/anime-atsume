@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { importImageAsync } from 'utils/Events';
+import { importImageAsync } from '@/utils/Events';
 
 function Image(props) {
     const [ imageSrc, setImageSrc ] = useState('');

@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { fetchKitsuTitleSearch } from 'services/KitsuAnimeSearchService';
-import PageCornerLink from 'components/ui/PageCornerLink';
-import SearchBar from 'components/ui/SearchBar';
-import KitsuSearchResults from 'components/ui/KitsuSearch/KitsuSearchResults';
-import { useQueryParams } from 'utils/Hooks';
-import { LINKS } from 'utils/Constants';
-import { ReactComponent as GitHubLogo } from 'assets/github_logo.svg';
+import { fetchKitsuTitleSearch } from '@/services/KitsuAnimeSearchService';
+import PageCornerLink from '@/components/ui/PageCornerLink';
+import SearchBar from '@/components/ui/SearchBar';
+import KitsuSearchResults from '@/components/ui/KitsuSearch/KitsuSearchResults';
+import { useQueryParams } from '@/utils/Hooks';
+import { LINKS } from '@/utils/Constants';
+import { ReactComponent as GitHubLogo } from '@/assets/github_logo.svg';
 
 function Home() {
     const pageText = {
@@ -77,7 +77,7 @@ function Home() {
 
     return (
         <div className={'text-center mx-auto col-12'}>
-            <PageCornerLink href={LINKS.AnimeAtsume}>
+            <PageCornerLink href={LINKS.AnimeAtsume} aria={{ style: { marginLeft: '50%' }}}>
                 <GitHubLogo fill={'white'} />
             </PageCornerLink>
             {renderedTitle}

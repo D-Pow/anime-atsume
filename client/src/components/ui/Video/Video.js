@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
-import { useWindowEvent } from 'utils/Hooks';
+import { useWindowEvent } from '@/utils/Hooks';
 
 function Video(props) {
     const maxVideoVolume = 1;

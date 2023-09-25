@@ -1,3 +1,5 @@
+//@use "~bootstrap/scss/bootstrap";
+
 .header {
     position: fixed;
     width: fit-content;
@@ -8,8 +10,8 @@
 }
 
 .header-border {
-    @extend .border;
-    @extend .border-primary;
+    @extend .border !optional;
+    @extend .border-primary !optional;
     border-width: 2px !important;
 }
 

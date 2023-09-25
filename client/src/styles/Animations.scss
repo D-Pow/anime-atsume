@@ -1,4 +1,6 @@
-@import "Animations/Spin";
+@use "sass:math";
+
+@use "Animations/Spin";
 
 .animated {
     opacity: 0;
@@ -14,7 +16,7 @@
 }
 
 @for $time from 1 through 20 {
-    $duration: $time/10 * 1s;
+    $duration: math.div($time, 10) * 1s;
     .duration-#{$time} {
         animation-duration: $duration !important;
         transition-duration: $duration !important;

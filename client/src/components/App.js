@@ -1,6 +1,6 @@
 import React from 'react';
 import { HashRouter as Router, Route, Redirect } from 'react-router-dom';
-import Spinner from 'components/ui/Spinner';
+import Spinner from '@/components/ui/Spinner';
 
 /**
  * Lazy-load components so the page spinner is prioritized, loaded quickly, and unblocked from animating.
@@ -13,13 +13,13 @@ import Spinner from 'components/ui/Spinner';
  * be loaded until the user traverses to /about.
  */
 
-const homeImportPromise = import(/* webpackChunkName: 'Home' */ 'components/Home');
+const homeImportPromise = import(/* webpackChunkName: 'Home' */ '@/components/Home');
 const Home = React.lazy(() => homeImportPromise);
 
-const aboutImportPromise = import(/* webpackChunkName: 'About' */ 'components/About');
+const aboutImportPromise = import(/* webpackChunkName: 'About' */ '@/components/About');
 const About = React.lazy(() => aboutImportPromise);
 
-const showImportPromise = import(/* webpackChunkName: 'Show' */ 'components/Show');
+const showImportPromise = import(/* webpackChunkName: 'Show' */ '@/components/Show');
 const Show = React.lazy(() => showImportPromise);
 
 const routes = [

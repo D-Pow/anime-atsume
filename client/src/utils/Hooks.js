@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
-import { elementIsInClickPath, getClickPath } from 'utils/Events';
-import { getQueryParams, pushQueryParamOnHistory } from 'utils/BrowserNavigation';
-import { objEquals } from 'utils/Objects';
+import { elementIsInClickPath, getClickPath } from '@/utils/Events';
+import { getQueryParams, pushQueryParamOnHistory } from '@/utils/BrowserNavigation';
+import { objEquals } from '@/utils/Objects';
 
 /**
  * Valid JSON primitive types.
