@@ -40,6 +40,10 @@ dockerRegistryUrl() {
     echo "ghcr.io/$(repoOwnerAndName | awk '{ print tolower($0) }')"
 }
 
+dockerImageExists() {
+    docker manifest inspect "$1" &>/dev/null
+}
+
 
 clean() (
     cd "${clientDir}"
