@@ -157,6 +157,13 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ env.GITHUB_TOKEN }}
 
+      - name: CD:Deploy - Abort without fail if Docker image unchanged
+        shell: bash
+        run: |
+          if [[ -z "${{ env.imageId }}" ]]; then
+            exit
+          fi
+
       - name: CD:AWS - Deploy
         id: cd-aws-deploy
         uses: ./.github/workflows/actions/deploy-aws

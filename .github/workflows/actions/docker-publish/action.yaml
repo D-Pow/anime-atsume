@@ -123,6 +123,7 @@ runs:
 
     - name: Docker - Build and push image
       id: docker-build-and-push-image
+      continue-on-error: true
       uses: docker/build-push-action@v4
       with:
         # Explicitly define GitHub token as an input var since the default is `github.token`
@@ -159,6 +160,13 @@ runs:
 
         echo "imageId=${{ steps.docker-build-and-push-image.outputs.imageid }}" >> $GITHUB_ENV
         echo "imageId=${{ env.imageId }}" >> $GITHUB_OUTPUT
+
+        # Keep `imageId` empty to abort deployment to host in CD
+        #
+        # if [[ -z "${{ env.imageId }}" ]]; then
+        #   echo "imageId=latest" >> $GITHUB_ENV
+        #   echo "imageId=latest" >> $GITHUB_OUTPUT
+        # fi
 
         echo "digest=${{ steps.docker-build-and-push-image.outputs.digest }}" >> $GITHUB_ENV
         echo "digest=${{ env.digest }}" >> $GITHUB_OUTPUT
