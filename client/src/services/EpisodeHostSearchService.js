@@ -1,4 +1,4 @@
-import { EPISODE_HOST_SEARCH_URL } from 'services/Urls';
+import { EPISODE_HOST_SEARCH_URL } from '@/services/Urls';
 
 /**
  * @typedef {Object} KissanimeEpisodeHostResponse
@@ -40,11 +40,11 @@ export async function searchForEpisodeHost(episodeUrl, captchaAnswers = null) {
     return await fetch(EPISODE_HOST_SEARCH_URL, {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
         },
         body: JSON.stringify({
             episodeUrl,
-            captchaAnswers
-        })
+            captchaAnswers,
+        }),
     }).then(res => res.json());
 }

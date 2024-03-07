@@ -1,5 +1,7 @@
 import MockRequests from 'mock-requests';
-import { kitsuTitleSearchUrl } from 'services/Urls';
+
+import { kitsuTitleSearchUrl } from '@/services/Urls';
+
 import { staticUrlResponseConfig } from './UrlResponseMappings';
 import { chooseMockBasedOnQuery } from './DynamicResponses';
 
@@ -37,7 +39,7 @@ if (useStaticMock) {
     MockRequests.configureDynamicResponses({
         [kitsuTitleSearchUrl]: {
             dynamicResponseModFn: chooseMockBasedOnQuery,
-            usePathnameForAllQueries: true
-        }
+            usePathnameForAllQueries: true,
+        },
     });
 }

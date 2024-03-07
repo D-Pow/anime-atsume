@@ -4,7 +4,7 @@
  * @returns {Object} - All query param key-value pairs.
  */
 export function getQueryParams() {
-    return [...new URLSearchParams(window.location.search).entries()]
+    return [ ...new URLSearchParams(window.location.search).entries() ]
         .reduce((queryParams, nextQueryParam) => {
             const [ key, value ] = nextQueryParam;
             queryParams[key] = value;
@@ -57,6 +57,6 @@ export function pushQueryParamOnHistory(key, value) {
     history.pushState(
         null,
         null,
-        newUrl
+        newUrl,
     );
 }

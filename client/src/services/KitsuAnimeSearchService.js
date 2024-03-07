@@ -1,4 +1,4 @@
-import { getCorsProxyUrl, getKitsuTitleSearchUrl, kitsuTitleSearchUrl } from 'services/Urls';
+import { getCorsProxyUrl, getKitsuTitleSearchUrl, kitsuTitleSearchUrl } from '@/services/Urls';
 
 export async function fetchKitsuTitleSearch(searchText) {
     try {

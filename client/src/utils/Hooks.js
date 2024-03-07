@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
-import { elementIsInClickPath, getClickPath } from 'utils/Events';
-import { getQueryParams, pushQueryParamOnHistory } from 'utils/BrowserNavigation';
-import { objEquals } from 'utils/Objects';
+
+import { elementIsInClickPath, getClickPath } from '@/utils/Events';
+import { getQueryParams, pushQueryParamOnHistory } from '@/utils/BrowserNavigation';
+import { objEquals } from '@/utils/Objects';
 
 /**
  * Valid JSON primitive types.
@@ -37,7 +38,7 @@ import { objEquals } from 'utils/Objects';
  * @returns {React.Component} - Children rendered using the hook() return values
  */
 export function Hooked({ hook, hookArgs, children }) {
-    return children(hook(hookArgs))
+    return children(hook(hookArgs));
 }
 
 /**
@@ -76,7 +77,7 @@ export function useStorage(key, { initialValue = null, type = 'local' } = {}) {
         } catch (e) {
             console.error(`Could not store value (${value}) to ${type}Storage. Error =`, e);
         }
-    }
+    };
 
     return [ storedState, setState ];
 }
@@ -93,7 +94,7 @@ export function useQueryParams() {
 
     const setQueryParam = (key, value) => {
         if (typeof key === typeof {}) {
-            const newQueryParams = {...key};
+            const newQueryParams = { ...key };
 
             setQueryParamsObj(newQueryParams);
             pushQueryParamOnHistory(newQueryParams);
@@ -101,7 +102,7 @@ export function useQueryParams() {
             return;
         }
 
-        const newQueryParams = {...queryParamsObj};
+        const newQueryParams = { ...queryParamsObj };
         let valueToStore = value;
 
         if (typeof value === functionType) {
@@ -151,8 +152,8 @@ export function useWindowEvent(
         nestedEventField = null,
         initialEventState = null,
         handleEvent = null,
-        useEffectInputs = []
-    } = {}
+        useEffectInputs = [],
+    } = {},
 ) {
     const [ eventState, setEventState ] = useState(initialEventState);
     const isUsingOwnEventHandler = typeof handleEvent === typeof (() => {});
@@ -224,27 +225,27 @@ export function useWindowResize() {
     const initialState = {
         wasResized: false,
         width: window.innerWidth,
-        height: window.innerHeight
+        height: window.innerHeight,
     };
 
     function handleResize(prevState, setState) {
         setState({
             wasResized: true,
             width: window.innerWidth,
-            height: window.innerHeight
+            height: window.innerHeight,
         });
     }
 
     const [ windowSizeState, setWindowSizeState ] = useWindowEvent('resize', {
         initialEventState: initialState,
-        handleEvent: handleResize
+        handleEvent: handleResize,
     });
 
     function resetWasSized() {
         setWindowSizeState(prevState => ({
             ...prevState,
-            wasResized: false
-        }))
+            wasResized: false,
+        }));
     }
 
     return { windowSizeState, setWindowSizeState, resetWasSized };
@@ -320,7 +321,7 @@ export function useHover(overrideBoundingClientRect) {
     const [ isHovered ] = useWindowEvent('mousemove', {
         initialEventState: false,
         handleEvent: handleMouseMove,
-        useEffectInputs: [ref.current]
+        useEffectInputs: [ ref.current ],
     });
 
     return [ ref, isHovered ];

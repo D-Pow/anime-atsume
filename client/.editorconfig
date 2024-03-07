@@ -1,0 +1,29 @@
+# Generic code style rules for all editors.
+# See: https://editorconfig.org/
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+indent_style = space
+indent_size = 4
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_brace_style = 1tbs
+spaces_around_brackets = inside
+
+[*.{sh,profile,bash,*rc,properties,env,*conf,*config}]
+spaces_around_brackets = none
+
+[{package.json,.yaml,.yml}]
+indent_size = 2
+
+# Ignored directories
+# See:
+#   - https://stackoverflow.com/questions/30310396/possible-to-ignore-exclude-file-folder-from-editorconfig
+[*public*]
+ij_formatter_enabled = false
+indent_style = unset
+indent_size = unset
+insert_final_newline = unset
+trim_trailing_whitespace = unset

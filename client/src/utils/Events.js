@@ -11,7 +11,7 @@
 export async function importImageAsync(image, base64 = false) {
     if (image != null && image !== '') {
         try {
-            const module = await import(`assets/${image}`);
+            const module = await import(`@/assets/${image}`);
             const imageSrc = module.default;
 
             if (base64) {
@@ -28,7 +28,7 @@ export async function importImageAsync(image, base64 = false) {
             }
 
             return imageSrc;
-        } catch(error) {
+        } catch (error) {
             // default return below handles error case
         }
     }
@@ -131,7 +131,7 @@ export function getClickPath(event) {
 export function elementIsInClickPath({ attribute, value }, clickPath) {
     let elementIsInPath = false;
 
-    for (let element of clickPath) {
+    for (const element of clickPath) {
         if (element instanceof HTMLElement) {
             const elemAttr = element.getAttribute(attribute);
 
@@ -142,7 +142,7 @@ export function elementIsInClickPath({ attribute, value }, clickPath) {
         }
     }
 
-    return elementIsInPath
+    return elementIsInPath;
 }
 
 /**

@@ -1,8 +1,8 @@
-@import "Common";
-@import "Header";
-@import "Animations";
-@import "Fonts";
-@import "Grid";
+@use "Common";
+@use "Header";
+@use "Animations";
+@use "Fonts";
+@use "Grid";
 
 * {
   @extend .scroll-smooth;

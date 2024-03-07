@@ -1,5 +1,7 @@
 @use "sass:math";
-@use "utils/json";
+@use "sass:map";
+
+@use "utils";
 
 @import "~bootstrap/scss/functions";
 @import "~bootstrap/scss/variables";
@@ -208,6 +210,6 @@ input.text-white::placeholder, textarea.text-white::placeholder {
 @import "~bootstrap/scss/bootstrap";
 
 :export {
-  themeColors: json.json-stringify($theme-colors);
-  gridBreakpoints: json.json-stringify($grid-breakpoints);
+  themeColors: utils.json-stringify($theme-colors);
+  gridBreakpoints: utils.json-stringify($grid-breakpoints);
 }

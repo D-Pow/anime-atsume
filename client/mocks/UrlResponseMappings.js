@@ -1,10 +1,11 @@
-import { kitsuTitleSearchUrl, getSearchUrl } from 'services/Urls';
+import { kitsuTitleSearchUrl, getSearchUrl } from '@/services/Urls';
+
 import {
     kimiNoNaWaResponse,
     narutoResponse,
     bleachResponse,
     fullmetalResponse,
-    attackOnTitanResponse
+    attackOnTitanResponse,
 } from './StaticResponses';
 
 export function getKitsuTitleSearchUrl(searchText) {
@@ -24,7 +25,7 @@ export const queryParamResponseMap = {
     [narutoSearchQuery]: narutoResponse,
     [bleachSearchQuery]: bleachResponse,
     [fullmetalSearchQuery]: fullmetalResponse,
-    [attackOnTitanSearchQuery]: attackOnTitanResponse
+    [attackOnTitanSearchQuery]: attackOnTitanResponse,
 };
 
 export const staticUrlResponseConfig = Object.keys(queryParamResponseMap).reduce((fullUrlConfig, searchQuery) => {

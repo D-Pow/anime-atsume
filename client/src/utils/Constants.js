@@ -20,7 +20,7 @@ export const COLORS = [
     'rosybrown',
     'royalblue',
     'salmon',
-    'sandybrown'
+    'sandybrown',
 ];
 
 const mobileBrowserRegexBase = '(android|bb\\d+|meego){}|avantgo|bada\\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\\.(browser|link)|vodafone|wap|windows ce|xda|xiino';
@@ -32,5 +32,5 @@ export const EMAIL_REGEX = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-z
 
 export const LINKS = {
     GitHub: 'https://github.com/',
-    AnimeAtsume: 'https://github.com/D-Pow/anime-atsume'
+    AnimeAtsume: 'https://github.com/D-Pow/anime-atsume',
 };

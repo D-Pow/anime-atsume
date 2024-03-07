@@ -25,6 +25,6 @@ export function getVideoNameDataFromUrl(kissanimeEpisodeUrl) {
 
     return {
         showName,
-        episodeName
+        episodeName,
     };
 }

@@ -8,8 +8,10 @@
 }
 
 .header-border {
-    @extend .border;
-    @extend .border-primary;
+    // TODO: Fix `.border` not being imported from Bootstrap
+    //  since Bootstrap doesn't use latest SASS syntax.
+    @extend .border !optional;
+    @extend .border-primary !optional;
     border-width: 2px !important;
 }
 

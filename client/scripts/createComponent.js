@@ -54,7 +54,7 @@ function createClass(componentName, dirName = 'components', functionalComponent 
     const indexText = `import ${componentName} from './${componentName}';\n\nexport default ${componentName};\n`;
     const componentText = getComponentText(componentName, functionalComponent);
 
-    fs.mkdir(`${dir}`, {recursive: true}, err => {
+    fs.mkdir(`${dir}`, { recursive: true }, err => {
         if (err) {
             error(err);
         } else {
@@ -77,8 +77,8 @@ function createClass(componentName, dirName = 'components', functionalComponent 
 
 
 function printUsage() {
-    const usage = "Creates a component inside its own folder in the src/ directory along with an index.js file" +
-        "\nUsage: createComponent NAME [directory under src/] [func|make functional component]";
+    const usage = 'Creates a component inside its own folder in the src/ directory along with an index.js file' +
+        '\nUsage: createComponent NAME [directory under src/] [func|make functional component]';
     console.log(usage);
     process.exit(0);
 }

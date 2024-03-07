@@ -10,7 +10,7 @@ function removeOldCaches() {
                 }).map(function(cacheName) {
                     console.log('Outdated cache', cacheName, 'will be removed');
                     return caches.delete(cacheName);
-                })
+                }),
             );
         });
 }
@@ -39,13 +39,13 @@ self.addEventListener('install', function(event) {
             })
             .then(function() {
                 return self.skipWaiting(); // needed to force new service workers to overwrite old ones
-            })
+            }),
     );
 });
 
 self.addEventListener('activate', function(event) {
     event.waitUntil(
-        removeOldCaches()
+        removeOldCaches(),
     );
 });
 
@@ -71,10 +71,11 @@ self.addEventListener('fetch', event => {
                     }
 
                     return response;
-                } else { // Not cached - fetch it and then store for future network requests
-                    return fetchAndCache(event, cache);
                 }
+
+                // Not cached - fetch it and then store for future network requests
+                return fetchAndCache(event, cache);
             });
-        })
+        }),
     );
 });
