@@ -1,6 +1,6 @@
 def installNvmAndNodeJsIfNotPresent() {
     // Native Bash command: ( ( command -v 'node' || [[ -n "${!1}" ]] ) &> /dev/null; if (( $? == 0 )); then echo 'NodeJS is installed'; fi; )
-    String nodeJsIsInstalledStdOut = cliCmd("command -v node");
+    String nodeJsIsInstalledStdOut = cliCmd("node --version");
     boolean nodeJsIsInstalled = nodeJsIsInstalledStdOut != null && nodeJsIsInstalledStdOut.length() > 0;
 
     if (!nodeJsIsInstalled) {
