@@ -99,15 +99,21 @@ def copyDbToBuildDir() {
 
 
 tasks.register("cleanResources") {
+    description "Deletes the server's web asset directory (${gradle.rootProject.serverWebAssetDirPath}).";
+
     doLast {
         delete(gradle.rootProject.serverWebAssetDirPath);
     }
 }
 tasks.register("cleanAll") {
+    description "Deletes all build directories and resources.";
+
     dependsOn("clean", "cleanResources");
 }
 
 tasks.register("printSrcInfo") {
+    description "Prints project source code files (-Ps for long list).";
+
     doLast {
         println("project.files:\n${objToJson(project.files("src", "buildSrc"))}\n\n");
         println("files:\n${objToJson(files("src", "buildSrc"))}\n\n");
@@ -122,6 +128,8 @@ tasks.register("printSrcInfo") {
 }
 
 tasks.register("printCommands") {
+    description "Prints all Gradle commands.";
+
     /**
      * Alternatives:
      *  - {@code configurations.forEach(config -> { println(config.name); });}
@@ -142,6 +150,8 @@ tasks.register("printCommands") {
 }
 
 tasks.register("printSrcFiles") {
+    description "Prints project source code files.";
+
     doLast {
         println(getSourceFiles());
     }
@@ -152,6 +162,8 @@ tasks.register("printSrcFiles") {
  * @see <a href="https://stackoverflow.com/questions/21645071/using-gradle-to-find-dependency-tree">SO: Listing Gradle dependency tree</a>
  */
 tasks.register("printDependencies") {
+    description "Prints all project dependencies.";
+
     doLast {
         cliCmd("./gradlew dependencies");
     }

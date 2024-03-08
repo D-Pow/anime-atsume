@@ -167,7 +167,8 @@ ext {
     clientDirPath = "${repoRootDirPath}/client";
     clientDirDepsPath = "${clientDirPath}/node_modules";
     serverDirPath = "${projectDir}";
-    serverWebAssetDirPath = "${serverDirPath}/src/main/resources/public";
+    serverWebAssetDirPathRelative = "src/main/resources/public"
+    serverWebAssetDirPath = "${serverDirPath}/${serverWebAssetDirPathRelative}";
     warOutputDir = "${project.buildDir}/${project.libsDirName}";  // `currentDir/build/libs/` by default
     dbName = 'anime_atsume.db';
     buildUtilsDir = "${serverDirPath}/utils";
@@ -492,12 +493,16 @@ gradle.taskGraph.whenReady {
  * {@inheritDoc}
  */
 tasks.register("preCompile") {
+    description "Runs required checks and logic before compiling Java code.";
+
     dependsOn "buildFrontend";  // Same as `tasks.<my-task>.dependsOn([ "someTask" ])`
 }
 tasks.compileJava.dependsOn([ "preCompile" ]);
 
 
 tasks.register("buildFrontend") {
+    description "Builds the front-end (outputs to ${serverWebAssetDirPathRelative})";
+
     doLast {
         buildFrontendIfNotPresent();
     }
@@ -626,6 +631,8 @@ wrapper {
 }
 
 tasks.register("wrapperVersion") {
+    description "Prints current Gradle wrapper version, updates the version (-Pu|-Pupgrade[=desiredVersion], default: latest), or lists available versions (-Pl).";
+
     doLast {
         String wrapperVersionNumber = null;
 
