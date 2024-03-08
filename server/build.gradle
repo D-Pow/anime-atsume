@@ -627,14 +627,25 @@ wrapper {
 
 tasks.register("wrapperVersion") {
     doLast {
-        boolean shouldUpgrade = (
-            (
-                project.hasProperty("u")
-                || project.hasProperty("upgrade")
-            )
-            && (String) project.getProperties().get("u") != "false"
-            && (String) project.getProperties().get("upgrade") != "false"
-        );
+        String wrapperVersionNumber = null;
+
+        if (project.hasProperty("u")) {
+            wrapperVersionNumber = project.property("u");
+        } else if (project.hasProperty("upgrade")) {
+            wrapperVersionNumber = project.property("upgrade");
+        }
+
+        if (wrapperVersionNumber == null && !project.hasProperty("l")) {
+            String gradleWrapperProperties = new File("gradle/wrapper/gradle-wrapper.properties").text;
+
+            gradleWrapperProperties.eachMatch("distributionUrl.*", { match ->
+                match.eachMatch("\\d[\\d.]+", { versionMatch ->
+                    println("Current Gradle wrapper version: ${versionMatch}");
+                });
+            });
+
+            return;
+        }
 
         /*
          * CLI cmd:
@@ -648,26 +659,22 @@ tasks.register("wrapperVersion") {
 
         if (project.hasProperty("l")) {
             println("Available Gradle versions:\n${allGradleVersions}");
-        }
 
-        if (!shouldUpgrade) {
             return;
         }
 
         String wrapperVersionNumberDefault = allGradleVersions.get(0);
-        String wrapperVersionNumber;
 
-        if (project.hasProperty("v")) {
-            wrapperVersionNumber = project.property("v");
-        } else if (System.hasProperty("v")) {
-            wrapperVersionNumber = System.getProperty("v");
+        if (wrapperVersionNumber.isEmpty()) {
+            // Upgrade flag was passed but version was unspecified. Default to latest Gradle version.
+            wrapperVersionNumber = wrapperVersionNumberDefault;
         }
 
         if (!allGradleVersions.contains(wrapperVersionNumber)) {
-            println("Specified Gradle wrapper version ${wrapperVersionNumber} doesn't exist. Choosing lower version matching ${wrapperVersionNumber}...");
+            println("Specified Gradle wrapper version ${wrapperVersionNumber} doesn't exist. Choosing closest version matching ${wrapperVersionNumber}...");
 
             wrapperVersionNumber = allGradleVersions.stream()
-                .filter(existingVersion -> "${wrapperVersionNumber}".matches("^${existingVersion}.*"))
+                .filter(version -> "${version}".matches("^${wrapperVersionNumber}.*"))
                 .findFirst()
                 .orElse(wrapperVersionNumberDefault);
         }
