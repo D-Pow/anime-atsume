@@ -99,6 +99,9 @@ Notes:
     - Add the user to the Docker group so it can run commands without root:
         + `sudo groupadd docker`
         + `sudo usermod -aG docker $(whoami)`
+    - (Optional) Enable Docker service:
+        + `systemctl start docker`
+        + `systemctl enable docker`
     - Log out to reflect changes.
 
 
