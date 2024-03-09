@@ -46,6 +46,55 @@ Notes:
 
 
 
+### Deploying to AWS
+
+* Create IAM user:
+    - Name: `root` (arbitrary).
+    - Check "Provide user access to the AWS Management Console" box.
+    - Uncheck "Users must create a new password at next sign-in" box.
+    - "I want to create an IAM user" (not "Specify a user in Identity Center").
+    - Finish.
+* Modify IAM user:
+    - Navigate to: IAM --> Users --> `root` --> Security Credentials.
+    - Create access key.
+    - CLI.
+    - Copy access key ID and secret access key.
+* Grant IAM user permissions:
+    - Create a group with these permissions:
+        + AdministratorAccess
+        + AmazonAPIGatewayAdministrator
+        + AmazonAPIGatewayPushToCloudWatchLogs
+        + AmazonAppFlowFullAccess
+        + Optional:
+        + AdministratorAccess-Amplify
+        + AdministratorAccess-AWSElasticBeanstalk
+        + AmazonAppStreamFullAccess
+        + AmazonChimeSDK
+        + AmazonCloudDirectoryFullAccess
+        + AmazonAppFlowReadOnlyAccess
+        + AmazonAthenaFullAccess
+        + AmazonAugmentedAIFullAccess
+        + AmazonBraketFullAccess
+        + AmazonBraketJobsExecutionPolicy
+* Launch an EC2 instance.
+    - Name: `web-server` (arbitrary).
+    - Quick Start: Search for "Ubuntu".
+        + Alternative: `Amazon Linux 2023 AMI` (Fedora).
+    - Instance type: `t2.micro` (may change in the future).
+    - Key pair:
+        + Create new pair.
+        + Name: `aws-ssh-key`.
+        + Type: `RSA`.
+        + Key file format: `.pem`.
+    - Network Settings:
+        + Create security group.
+        + Allow SSH, HTTP, and HTTPS traffic from anywhere.
+    - Advanced details: Leave everything as default.
+* Log in using AWS CLI:
+    - `aws configure`.
+
+
+
 ### Deploying to Heroku
 
 * General
