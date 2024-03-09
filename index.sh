@@ -941,6 +941,7 @@ awsGetInstancesUrls() {
 
     aws ec2 describe-instances \
         --query 'Reservations[*].Instances[*].PublicDnsName' \
+        --filter 'Name=instance-state-name,Values=running' \
         --output text \
         ${awsCmdOpts[@]}
 }
@@ -960,6 +961,7 @@ awsGetInstancesIds() {
 
     aws ec2 describe-instances \
         --query 'Reservations[*].Instances[*].InstanceId' \
+        --filter 'Name=instance-state-name,Values=running' \
         --output text \
         ${awsCmdOpts[@]}
 }
