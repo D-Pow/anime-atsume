@@ -651,7 +651,7 @@ deployServerSsh() (
         -i "$sshLoginKeyFile" \
         -oStrictHostKeyChecking=accept-new \
         -oExitOnForwardFailure=yes \
-        ${sshUser}@${sshHost} \
+        "${sshUser}@${sshHost}" \
     "
         # Allows for background/foreground job control, e.g. bg, fg, jobs -l, etc.
         set -m
