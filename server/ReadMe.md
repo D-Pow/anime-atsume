@@ -4,7 +4,10 @@ Simple search engine for anime that includes links for watching episodes
 
 Notes:
 
+
+
 ### General
+
 * To run on specific port, `server.port` option is necessary, either in application.properties or via command line
     * CMD: `java -jar anime-atsume.war --server.port=80`
     * Port 80 for HTTP, 443 for HTTPS
@@ -13,7 +16,10 @@ Notes:
     * e.g. `nohup java -jar anime-atsume.war --server.port=80 &`
 * [DNS types](http://freedns.afraid.org/faq/type.php).
 
+
+
 ### Docker
+
 * Build image: `docker build -t app .`
     * Builds new image named "app" using the Dockerfile at root dir "."
     * Needs to be run in same directory where the Dockerfile is (in this case, server/).
@@ -38,7 +44,10 @@ Notes:
     * Stop container: `docker stop <container_id>`
     * Stop all containers: `docker stop $(docker container ls -q)`
 
+
+
 ### Deploying to Heroku
+
 * General
     * View logs:
         * `heroku logs -n <num_lines>` view latest `n` lines.
@@ -80,7 +89,10 @@ Notes:
             * JAVA_OPTS doesn't have to be set to run the container since CMD is in 'shell' form instead of 'exec' form.
         * Since Heroku's memory cap is a soft limit (will only kill the app if you go too much above the limit), `-Xmx640m` will likely work, giving the app more memory without triggering Heroku's kill switch.
 
+
+
 ### Deploying to gcloud
+
 * If all else fails, rewrite code with Selenium and allow it via [this method](https://medium.com/@CapitalTerefe/selenium-grid-in-docker-using-serenity-in-google-cloud-47b57deab5d)
 * Only deploying .war file has worked so far.
     * Requires app.yaml file to be present in the root dir of where you're deploying
