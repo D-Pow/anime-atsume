@@ -12,17 +12,19 @@ Anime Atsume is intended to be the exact opposite: overly simplistic, easy to us
 
 
 
-### Running locally
+### Running Locally
+
+Most needs can be met using [./index.sh](./index.sh), including building/running the app, generating a Docker image, deployment, etc.
 
 
-##### Client
+##### [Client](./client/ReadMe.md)
 
 * `cd client/`
 * `npm i`
 * `npm start`
 
 
-##### Server
+##### [Server](./server/ReadMe.md)
 
 * `cd server/`
 * `./gradlew bootRun`
