@@ -980,7 +980,7 @@ awsSsh() {
 
 
 main() {
-    declare USAGE="${rootDir}/${BASH_SOURCE[0]} [OPTIONS...] <cmd>
+    declare USAGE="${BASH_SOURCE[0]} [OPTIONS...] <cmd> [CMD_OPTIONS...]
     Run commands for both Anime Atsume's client and server directories.
 
     Options:
@@ -1002,8 +1002,13 @@ $(
     while getopts ":ih" opt; do
         case "$opt" in
             h)
-                echo -e "$USAGE"
-                return 1
+                if (( $# == 1 )); then
+                    # User ran `thisFile -h` rather than `thisFile command -h`
+                    # so print `main()` help message.
+                    # The latter format's command should handle flags itself.
+                    echo -e "$USAGE"
+                    return 1
+                fi
                 ;;
             i)
                 "${rootDir}/nvm-install.sh"
