@@ -92,6 +92,14 @@ Notes:
     - Advanced details: Leave everything as default.
 * Log in using AWS CLI:
     - `aws configure`.
+* SSH into the server and install Docker:
+    - (Optional) Remove previous Docker packages: `sudo apt-get remove docker docker-engine docker.io containerd runc`
+    - Add GPG key (Debian): `curl -fsSL https://download.docker.com/linux/debian/gpg | sudo apt-key add -`
+    - Add the repository source: `sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"`
+    - Add the user to the Docker group so it can run commands without root:
+        + `sudo groupadd docker`
+        + `sudo usermod -aG docker $(whoami)`
+    - Log out to reflect changes.
 
 
 
