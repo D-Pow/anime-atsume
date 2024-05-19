@@ -64,17 +64,30 @@ config() (
 
 
 run() {
+    declare USAGE="${FUNCNAME[0]} [OPTIONS...]
+    Runs the app locally.
+    Defaults to running both front-/back-end together.
+
+    Options:
+        -f  |   Runs front-end.
+        -b  |   Runs back-end.
+        -h  |   Print this help message and exit.
+    "
     declare _runFrontend=
     declare _runBackend=
     declare OPTIND=1
 
-    while getopts ":fb" opt; do
+    while getopts ":fbh" opt; do
         case "$opt" in
             f)
                 _runFrontend=true
                 ;;
             b)
                 _runBackend=true
+                ;;
+            h)
+                echo -e "$USAGE"
+                return 1
                 ;;
             *)
                 # Forward options to underlying command
@@ -170,11 +183,6 @@ build() (
                 ;;
             h)
                 echo "$USAGE" >&2
-                (
-                    cd "${serverDir}"
-                    # Same as `./gradlew printCommands` except with colored output
-                    ./gradlew -q tasks --all
-                )
 
                 return 1
                 ;;
@@ -220,17 +228,29 @@ hashJar() (
 
 
 dockerBuild() (
+    declare USAGE="${FUNCNAME[0]} [OPTIONS...]
+    Builds a Docker image of the app.
+
+    Options:
+        -b  |   Builds a fresh .jar file (ignoring existing .jar files from manual builds).
+        -v  |   Verbose output.
+        -h  |   Print this help message and exit.
+    "
     declare _dockerBuildFreshJar=
     declare _dockerBuildVerbose=
     declare OPTIND=1
 
-    while getopts ":bv" opt; do
+    while getopts ":bvh" opt; do
         case "$opt" in
             b)
                 _dockerBuildFreshJar=true
                 ;;
             v)
                 _dockerBuildVerbose=true
+                ;;
+            h)
+                echo -e "$USAGE"
+                return 1
                 ;;
             *)
                 # Forward options to `docker` command
@@ -985,6 +1005,7 @@ main() {
 
     Options:
         -i  |   Install build-script dependencies if not present (e.g. \`nvm\`).
+        -v  |   Verbose help output for both client and server.
         -h  |   Print this help message and exit.
 
     Commands:
@@ -997,18 +1018,17 @@ $(
 )
     "
 
+    declare _printHelp=
+    declare _verboseHelpOutput=
     declare OPTIND=1
 
-    while getopts ":ih" opt; do
+    while getopts ":ivh" opt; do
         case "$opt" in
+            v)
+                _verboseHelpOutput=true
+                ;;
             h)
-                if (( $# == 1 )); then
-                    # User ran `thisFile -h` rather than `thisFile command -h`
-                    # so print `main()` help message.
-                    # The latter format's command should handle flags itself.
-                    echo -e "$USAGE"
-                    return 1
-                fi
+                _printHelp=true
                 ;;
             i)
                 "${rootDir}/nvm-install.sh"
@@ -1020,6 +1040,31 @@ $(
     done
 
     shift $(( OPTIND - 1 ))
+
+    if [[ -n "$_printHelp" ]] || (( $# == 1 )); then
+        # `(( $# == 1 ))` means user ran `thisFile -h` rather than `thisFile command -h`.
+        # The latter format's command should handle flags itself.
+        echo -e "$USAGE"
+
+        if [[ -n "$_verboseHelpOutput" ]]; then
+            declare clientDirRelative="$(realpath --relative-to="$rootDir" "$clientDir")"
+            echo -e "\n\n$clientDirRelative npm tasks:\n"
+            (
+                cd "${clientDir}"
+                npm run
+            )
+
+            declare serverDirRelative="$(realpath --relative-to="$rootDir" "$serverDir")"
+            echo -e "\n\n$serverDirRelative Gradle tasks:"
+            (
+                cd "${serverDir}"
+                # Same as `./gradlew printCommands` except with colored output
+                ./gradlew -q tasks --all
+            )
+        fi
+
+        return 1
+    fi
 
     declare cmd="$1"  # First arg = command to run. Last arg = `${@:$#}``
     declare cmdArgs=("${@:2}")
