@@ -119,7 +119,7 @@ run() {
     if [[ -n "$_runBackend" ]]; then
         (
             cd "${serverDir}"
-            ./gradlew clean bootRun
+            ./gradlew clean bootRun "$@"
         ) &
 
         _runChildPids+=("$!")
