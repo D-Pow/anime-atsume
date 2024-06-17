@@ -85,6 +85,8 @@ jobs:
           gitUserName: ${{ env.gitUserName }}
           gitUserEmail: ${{ env.gitUserEmail }}
           nodeVersion: ${{ env.nodeVersion }}
+        with:
+          clientVersion: ${{ env.clientVersion }}
 
       # Env vars are always accessible between jobs of the same workflow.
       #   - $CLIENT_CACHE_ID
