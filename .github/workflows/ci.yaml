@@ -61,20 +61,43 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - name: Checkout repository branch
+      - name: CI:Client - Checkout repository branch
         uses: actions/checkout@v3
 
-      - name: CI:Cache name - Init
-        uses: ./.github/workflows/actions/cache-name
+      - name: CI:Client - Set NodeJS version
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.nodeVersion }}
 
-      - name: CI - Output client cache ID
-        id: ci-export-cache-id
+      - name: CI:Client - Run all
+        id: ci-client-all
+        # Import reusable GitHub Action logic via `uses`
+        uses: ./.github/workflows/actions/client
+        # Set env vars for all nested composite actions.
+        # Any env vars set within composite actions apply to the parent job.
+        #
+        # See:
+        #   - https://github.com/orgs/community/discussions/27088
+        #   - https://stackoverflow.com/questions/70098241/using-secrets-in-composite-actions-github/70111134#70111134
+        #   - https://stackoverflow.com/questions/63663436/what-is-difference-between-with-and-env
+        env:
+          GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}
+          gitUserName: ${{ env.gitUserName }}
+          gitUserEmail: ${{ env.gitUserEmail }}
+          nodeVersion: ${{ env.nodeVersion }}
+
+      # Env vars are always accessible between jobs of the same workflow.
+      #   - $CLIENT_CACHE_ID
+      #   - ${{ env.CLIENT_CACHE_ID }}
+      # Adding an output var means we can reference the job ID in subsequent jobs:
+      #   - ${{ needs.ci-client.outputs.CLIENT_CACHE_ID }}
+      # If a nested composite action forwards its child/(doubly-)nested composite action's outputs in its own
+      # root-level `outputs` block, then we can also reference the job's specific step in subsequent jobs:
+      #   - ${{ needs.ci-client-output-cache-id.outputs.CLIENT_CACHE_ID }}
+      - name: CI:Client - Output cache ID
+        id: ci-client-output-cache-id
         run: |
           echo "CLIENT_CACHE_ID=${{ env.CLIENT_CACHE_ID }}" >> $GITHUB_OUTPUT
-
-      - name: Client Verify
-        # Import pipeline logic via `uses`
-        uses: ./.github/workflows/actions/client
 
 
   ci-server-verify:
