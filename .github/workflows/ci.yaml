@@ -24,6 +24,21 @@ defaults:
     working-directory: ./
 
 
+# Set GitHub user info for ease of use of `gh` CLI commands.
+#
+# See:
+#   - https://docs.npmjs.com/cli/v9/commands/npm-run-script#ignore-scripts
+#   - https://stackoverflow.com/questions/59471962/how-does-npm-behave-differently-with-ignore-scripts-set-to-true
+#   - https://github.com/tschaub/gh-pages#optionsuser
+#   - https://github.com/actions/checkout/issues/13
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  gitUserName: ${{ github.actor }}
+  gitUserEmail: ${{ github.actor }}@users.noreply.github.com
+  nodeVersion: 18
+  clientVersion: ""
+
+
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # Job 1. Handles everything related to the client/ folder
