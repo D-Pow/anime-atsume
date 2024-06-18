@@ -676,13 +676,15 @@ deployServerSsh() (
         # Allows for background/foreground job control, e.g. bg, fg, jobs -l, etc.
         set -m
 
-        [[ -d anime-atsume ]] && rm -rf anime-atsume
-        git clone https://github.com/${repoPath}.git
+        if ! [[ -f ./index.sh ]]; then
+            [[ -d anime-atsume ]] && rm -rf anime-atsume
+            git clone https://github.com/${repoPath}.git
 
-        # Stay in the cloned repo's dir to gain access to our helpful index.sh commands.
-        #   Note: This means the server's volume mounted to Docker needs to be relative
-        #   to the repo dir, not the \`WORKDIR\` or \`HOME\`.
-        cd anime-atsume
+            # Stay in the cloned repo's dir to gain access to our helpful index.sh commands.
+            #   Note: This means the server's volume mounted to Docker needs to be relative
+            #   to the repo dir, not the \`WORKDIR\` or \`HOME\`.
+            cd anime-atsume
+        fi
 
         ./index.sh dockerStopAllContainers
         ./index.sh dockerDeleteAllContainers

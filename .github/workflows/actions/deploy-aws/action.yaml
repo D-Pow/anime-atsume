@@ -177,8 +177,6 @@ runs:
       # which would make the repository URL less hard-coded.
       # To do so, don't forget to also change the implementation of `index.sh deployAws`.
       run: |
-        ls -FlAh .
-        ls -FlAh anime-atsume
         ./index.sh deployAws \
           -u "${{ env.AWS_SSH_USERNAME }}" \
           -h "${{ env.AWS_INSTANCE_URL }}" \
