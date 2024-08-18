@@ -71,6 +71,15 @@ ENV HTTPS_PORT=8443
 # Copy the entire app (server/client) from the local filesystem to the Docker image
 COPY . .
 
+# Even if we add nvm vars to .bashrc and set SHELL to `bash -l -c`, Docker won't
+# pick them up so node won't be on PATH.
+# Thus, manually set them here.
+RUN ./nvm-install.sh
+ENV NVM_DIR="$HOME/.nvm"  # Note: HOME isn't defined during image-building, so we defined it above
+ENV NVM_SYMLINK_CURRENT=true
+ENV NVM_CURRENT_HOME="$NVM_DIR/current"
+ENV PATH="$NVM_CURRENT_HOME/bin:$PATH"
+
 # Build the app if not already done before attempting Docker image generation
 # Copy build-output files to root dir for ease of use
 RUN if ! [[ -f "${WAR_FILE_FINAL_PATH}" ]]; then \
