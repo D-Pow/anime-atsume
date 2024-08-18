@@ -1043,8 +1043,8 @@ $(
 
     shift $(( OPTIND - 1 ))
 
-    if [[ -n "$_printHelp" ]] || (( $# == 1 )); then
-        # `(( $# == 1 ))` means user ran `thisFile -h` rather than `thisFile command -h`.
+    if [[ -n "$_printHelp" ]] || (( $# == 0 )); then
+        # `(( $# == 0 ))` means user ran `thisFile` or `thisFile [OPTIONS...]` rather than `thisFile command -h`.
         # The latter format's command should handle flags itself.
         echo -e "$USAGE"
 
