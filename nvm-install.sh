@@ -87,7 +87,7 @@ export NVM_DIR=\"\$([[ -n \"\$XDG_CONFIG_HOME\" ]] && echo \"\$XDG_CONFIG_HOME/n
 export NVM_SYMLINK_CURRENT=true  # Makes a symlink at ~/.nvm/current/bin/node so you don't have to change IDEs' configurations when changing node versions
 export NVM_CURRENT_HOME=\"\$NVM_DIR/current\"
 export PATH=\"\$NVM_CURRENT_HOME/bin:\$PATH\"
-" >> $HOME/.bashrc
+" >> $HOME/.profile
 
 
 # Create `.nvm/current/` dir

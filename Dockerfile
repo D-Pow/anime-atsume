@@ -13,7 +13,13 @@ FROM ubuntu:20.04
 # Change default shell to Bash for better feature support/easier usage.
 # Note: Removes the need for specifying an `ENTRYPOINT` since Bash will now
 # be the default fallback.
-SHELL [ "/bin/bash", "-c" ]
+#
+# Login shells will correctly source `$HOME/.profile` but the if-statements
+# for sourcing .bashrc don't work as expected within Docker. Thus, any modifications
+# to the environment should be done within .profile (e.g. installing nvm).
+# See:
+#   - https://stackoverflow.com/questions/55206227/why-bashrc-is-not-executed-when-run-docker-container/74017557#74017557
+SHELL [ "/bin/bash", "-lc" ]
 ENV SHELL=/bin/bash
 
 # `docker` flags useful for debugging:
@@ -56,15 +62,14 @@ WORKDIR /home
 # Copy the entire app (server/client) from the local filesystem to the Docker image
 COPY . .
 
-# Even if we add nvm vars to .bashrc and set SHELL to `bash -l -c`, Docker won't
-# pick them up so node won't be on PATH.
-# Thus, manually set them here.
-RUN ./nvm-install.sh
+# Install nvm. Either set vars in .profile and use `bash -lc` as SHELL in Docker,
+# or set the vars below in Dockerfile.
 # Note: HOME isn't defined during image-building, so we defined it above
-ENV NVM_DIR="$HOME/.nvm"
-ENV NVM_SYMLINK_CURRENT=true
-ENV NVM_CURRENT_HOME="$NVM_DIR/current"
-ENV PATH="$NVM_CURRENT_HOME/bin:$PATH"
+# ENV NVM_DIR="$HOME/.nvm"
+# ENV NVM_SYMLINK_CURRENT=true
+# ENV NVM_CURRENT_HOME="$NVM_DIR/current"
+# ENV PATH="$NVM_CURRENT_HOME/bin:$PATH"
+RUN ./nvm-install.sh
 
 ENV ROOT_DIR=./
 ENV CLIENT_DIR="${ROOT_DIR}/client"
