@@ -67,7 +67,6 @@ ENV NVM_CURRENT_HOME="$NVM_DIR/current"
 ENV PATH="$NVM_CURRENT_HOME/bin:$PATH"
 
 ENV ROOT_DIR=./
-RUN export ROOT_DIR="$(realpath -se .)"
 ENV CLIENT_DIR="${ROOT_DIR}/client"
 ENV SERVER_DIR="${ROOT_DIR}/server"
 ENV BUILD_DIR="${SERVER_DIR}/build/libs"
