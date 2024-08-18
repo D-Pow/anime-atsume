@@ -48,7 +48,9 @@ RUN apt-get clean && \
         openjdk-17-jdk \
         openjfx
 
-# Change CWD from <root> to $HOME
+# HOME isn't defined during image-building
+ENV HOME=/root
+# Change CWD from /root to /home (but don't modify `HOME` since user is root)
 WORKDIR /home
 
 ENV ROOT_DIR=./
