@@ -232,19 +232,14 @@ dockerBuild() (
     Builds a Docker image of the app.
 
     Options:
-        -b  |   Builds a fresh .jar file (ignoring existing .jar files from manual builds).
         -v  |   Verbose output.
         -h  |   Print this help message and exit.
     "
-    declare _dockerBuildFreshJar=
     declare _dockerBuildVerbose=
     declare OPTIND=1
 
-    while getopts ":bvh" opt; do
+    while getopts ":vh" opt; do
         case "$opt" in
-            b)
-                _dockerBuildFreshJar=true
-                ;;
             v)
                 _dockerBuildVerbose=true
                 ;;
@@ -260,8 +255,6 @@ dockerBuild() (
     done
 
     shift $(( OPTIND - 1 ))
-
-    build -rm ${_dockerBuildFreshJar:+-c}
 
     (
         command -v docker &>/dev/null && \
