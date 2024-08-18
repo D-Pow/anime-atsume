@@ -33,9 +33,12 @@ import java.net.HttpCookie;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 @Data
 @Log4j2
@@ -300,19 +303,47 @@ public class SeleniumService {
         log.info("All cookies cleared.");
     }
 
-    public HttpCookie getAuthCookie(String hostUrl, String cookieAuthName) {
+    public List<HttpCookie> getCookiesList(String hostUrl) {
         CookieManager cookieManager = (CookieManager) CookieHandler.getDefault();
-        List<HttpCookie> websiteCookies = cookieManager.getCookieStore().get(URI.create(hostUrl));
+        return cookieManager.getCookieStore().get(URI.create(hostUrl));
+    }
 
-        HttpCookie placeholderCookie = new HttpCookie(cookieAuthName, "");
+    public String getCookiesString(String hostUrl) {
+        List<HttpCookie> cookies = getCookiesList(hostUrl);
+
+        return cookies.stream()
+            .map(HttpCookie::toString)
+            .collect(Collectors.joining(";"));
+    }
+
+    public Map<String, HttpCookie> getCookiesMap(String hostUrl) {
+        List<HttpCookie> cookies = getCookiesList(hostUrl);
+
+        Map<String, HttpCookie> cookiesMap = cookies.stream().reduce(new HashMap<>(), (map, cookie) -> {
+            map.put(cookie.getName(), cookie);
+
+            return map;
+        }, (mapIterationA, mapIterationB) -> {
+            mapIterationA.putAll(mapIterationB);
+
+            return mapIterationA;
+        });
+
+        return cookiesMap;
+    }
+
+    public HttpCookie getCookie(String hostUrl, String cookieName) {
+        List<HttpCookie> websiteCookies = getCookiesList(hostUrl);
+
+        HttpCookie placeholderCookie = new HttpCookie(cookieName, "");
         placeholderCookie.setMaxAge(0);
 
-        HttpCookie authCookie = websiteCookies.stream()
-            .filter(cookieKeyVal -> cookieKeyVal.getName().equals(cookieAuthName))
+        HttpCookie cookie = websiteCookies.stream()
+            .filter(cookieKeyVal -> cookieKeyVal.getName().equals(cookieName))
             .findFirst()
             .orElse(placeholderCookie);
 
-        return authCookie;
+        return cookie;
     }
 
     public void waitForCloudflareToAllowAccess(String hostUrl, String hostTitleOfLoadedPage, String cookieAuthName) {
@@ -324,7 +355,7 @@ public class SeleniumService {
      * Origin, etc. doesn't
      */
     public void waitForCloudflareToAllowAccess(String hostUrl, String hostTitleOfLoadedPage, String cookieAuthName, boolean forceRefresh) {
-        if (getAuthCookie(hostUrl, cookieAuthName).hasExpired() || forceRefresh) {
+        if (getCookie(hostUrl, cookieAuthName).hasExpired() || forceRefresh) {
             log.info("Cookie has expired. Refreshing now...");
 
             try {
