@@ -204,7 +204,7 @@ build() (
     )
 
     if [[ -n "$_buildCopyFilesToRootDir" ]]; then
-        cp -R "${buildDir}/*" "${rootDir}"
+        cp -R "${buildDir}"/* "${rootDir}"
     fi
 )
 
