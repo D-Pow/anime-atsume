@@ -10,13 +10,6 @@ declare feBuildDir="$(realpath -m "${rootDir}/$(
     | awk '{ print $2 }' \
     | sed -E 's/"//g; s|\.*/?|\./|'
 )")"
-echo "
-rootDir: $rootDir
-clientDir: $clientDir
-serverDir: $serverDir
-buildDir: $buildDir
-feBuildDir: $feBuildDir
-"
 
 # Obtained from https://freedns.afraid.org
 # If one doesn't work, try the other (during dev, I requested the cert too many times)
