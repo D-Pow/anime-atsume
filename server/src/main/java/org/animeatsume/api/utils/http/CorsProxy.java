@@ -16,7 +16,23 @@ import java.util.Map;
 public class CorsProxy {
     private static final boolean defaultFollowRedirects = true;
 
-    public static ResponseEntity<?> doCorsRequest(
+    public static <T> ResponseEntity<T> doCorsRequest(
+        HttpMethod method,
+        String url,
+        @Nullable String origin,
+        @Nullable Object body
+    ) {
+        return doCorsRequest(
+            method,
+            url,
+            origin,
+            body,
+            null,
+            defaultFollowRedirects
+        );
+    }
+
+    public static <T> ResponseEntity<T> doCorsRequest(
         HttpMethod method,
         String url,
         @Nullable String origin,
@@ -33,7 +49,7 @@ public class CorsProxy {
         );
     }
 
-    public static ResponseEntity<?> doCorsRequest(
+    public static <T> ResponseEntity<T> doCorsRequest(
         HttpMethod method,
         String url,
         @Nullable String origin,
@@ -66,7 +82,7 @@ public class CorsProxy {
         );
     }
 
-    public static ResponseEntity<?> doCorsRequest(
+    public static <T> ResponseEntity<T> doCorsRequest(
         HttpMethod method,
         URI url,
         @Nullable URI origin,
@@ -76,7 +92,7 @@ public class CorsProxy {
         return doCorsRequest(method, url, origin, body, headers, defaultFollowRedirects);
     }
 
-    public static ResponseEntity<?> doCorsRequest(
+    public static <T> ResponseEntity<T> doCorsRequest(
         HttpMethod method,
         URI url,
         @Nullable URI origin,
@@ -89,7 +105,7 @@ public class CorsProxy {
         List<MediaType> requestAcceptHeaders = corsEntity.getHeaders().getAccept();
 
         if (requestAcceptHeaders.size() == 0) {
-            return ResponseEntity
+            return (ResponseEntity<T>) ResponseEntity
                 .status(HttpStatus.NOT_ACCEPTABLE)
                 .body("You must add a value for the 'Accept' header");
         }
@@ -101,7 +117,7 @@ public class CorsProxy {
         Requests.addAcceptableMediaTypes(restTemplate, MediaType.APPLICATION_FORM_URLENCODED);
         restTemplate.getMessageConverters().add(new FormHttpMessageConverter());
 
-        ResponseEntity<?> response = Requests.doRequestWithFallback(restTemplate, url, method, corsEntity, responseClass);
+        ResponseEntity<T> response = Requests.<T>doRequestWithFallback(restTemplate, url, method, corsEntity, responseClass);
         Object responseBody = response.getBody();
         HttpHeaders responseHeaders = Requests.copyHttpHeaders(response.getHeaders());
 
@@ -111,7 +127,7 @@ public class CorsProxy {
         responseHeaders.remove(HttpHeaders.CONTENT_ENCODING);
         responseHeaders.remove(HttpHeaders.TRANSFER_ENCODING);
 
-        return new ResponseEntity<>(responseBody, responseHeaders, HttpStatus.OK);
+        return new ResponseEntity<T>((T) responseBody, responseHeaders, HttpStatus.OK);
     }
 
     public static <T> HttpEntity<T> getCorsEntity(T body, String origin, String referer) {

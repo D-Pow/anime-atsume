@@ -236,7 +236,7 @@ public class NineAnimeService {
             getVideoUrlFromHostHeaders
         ).getHeaders().getLocation().toString();
 
-        ResponseEntity<String> videoResponse = (ResponseEntity<String>) CorsProxy.doCorsRequest(
+        ResponseEntity<String> videoResponse = CorsProxy.doCorsRequest(
             HttpMethod.GET,
             URI.create(videoUrl),
             URI.create(UriParser.getOrigin(videoUrl)),
@@ -247,7 +247,7 @@ public class NineAnimeService {
         if (videoResponse.getHeaders().getLocation() != null) {
             videoUrl = videoResponse.getHeaders().getLocation().toString();
 
-            videoResponse = (ResponseEntity<String>) CorsProxy.doCorsRequest(
+            videoResponse = CorsProxy.doCorsRequest(
                 HttpMethod.GET,
                 URI.create(videoUrl),
                 URI.create(UriParser.getOrigin(videoUrl)),

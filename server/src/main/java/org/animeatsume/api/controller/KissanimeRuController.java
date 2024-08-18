@@ -294,7 +294,7 @@ public class KissanimeRuController {
             proxyHeaders.set(HttpHeaders.ACCEPT_RANGES, "bytes");
             proxyHeaders.set(HttpHeaders.RANGE, String.format("bytes=%d-%d", ranges.get(0), ranges.get(1)));
 
-            return (ResponseEntity<Resource>) CorsProxy.doCorsRequest(
+            return CorsProxy.doCorsRequest(
                 HttpMethod.GET,
                 URI.create(videoUrl),
                 null,

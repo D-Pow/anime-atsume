@@ -162,7 +162,7 @@ public class Requests {
         return Resource.class;
     }
 
-    public static ResponseEntity<?> doRequestWithFallback(
+    public static <T> ResponseEntity<T> doRequestWithFallback(
         RestTemplate restTemplate,
         URI url,
         HttpMethod method,
@@ -190,9 +190,11 @@ public class Requests {
 
                 HttpHeaders responseHeaders = headForHeadersWithAcceptAllFallback(url, restTemplate, requestEntity);
                 List<MediaType> headersAccept = responseHeaders.getAccept();
-                String contentTypeHeader = headersAccept
-                    .get(headersAccept.size() - 1)
-                    .toString();
+                String contentTypeHeader = headersAccept.isEmpty()
+                    ? MediaType.TEXT_PLAIN_VALUE
+                    : headersAccept
+                        .get(headersAccept.size() - 1)
+                        .toString();
                 Class<?> actualResponseTypeClass = getClassFromContentTypeHeader(contentTypeHeader);
 
                 response = restTemplate.exchange(
@@ -222,10 +224,10 @@ public class Requests {
                 e.getMessage()
             );
 
-            return new ResponseEntity<>(e.getResponseBodyAsString(), e.getResponseHeaders(), e.getStatusCode());
+            return new ResponseEntity<>((T) e.getResponseBodyAsString(), e.getResponseHeaders(), e.getStatusCode());
         }
 
-        return new ResponseEntity<>(body, response.getHeaders(), response.getStatusCode());
+        return new ResponseEntity<>((T) body, response.getHeaders(), response.getStatusCode());
     }
 
     /**
