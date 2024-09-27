@@ -94,7 +94,7 @@ public class ApplicationApi {
     //  - https://stackoverflow.com/questions/39013894/reading-from-application-properties-attribute-value-must-be-constant/39013994#39013994
     //@Cacheable(cacheNames = "${org.animeatsume.cache.anime-title-search}")
     @Cacheable(cacheNames = ApplicationConfig.ANIME_TITLE_SEARCH_CACHE_NAME)
-    @PostMapping(value = "/searchAnime", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/searchAnime", consumes = { MediaType.APPLICATION_JSON_VALUE, MediaType.TEXT_PLAIN_VALUE })
     public ResponseEntity<SearchAnimeResponse> searchAnime(@RequestBody TitleSearchRequest titleSearchRequest) {
         titleSearchRequest.setTitle(RegexUtils.removeNonAlphanumericChars(titleSearchRequest.getTitle()));
 
@@ -160,7 +160,7 @@ public class ApplicationApi {
             .build();
     }
 
-    @PostMapping(value = "/getNovelPlanetSources", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/getNovelPlanetSources", consumes = { MediaType.APPLICATION_JSON_VALUE, MediaType.TEXT_PLAIN_VALUE })
     public ResponseEntity<TitlesAndEpisodes.EpisodesForTitle> getNovelPlanetSources(@RequestBody NovelPlanetUrlRequest novelPlanetRequest) {
         return ResponseEntity
             .ok(kissanimeRuController.normalizeNovelPlanetSources(
