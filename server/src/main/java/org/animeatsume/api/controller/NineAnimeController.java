@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 
 @Log4j2
 @Controller
-public class NineAnimeController {
+public class NineAnimeController implements ShowSearchController {
     @Autowired
     NineAnimeService nineAnimeService;
 
@@ -29,7 +29,7 @@ public class NineAnimeController {
 
             if (titleResults != null) {
                 List<CompletableFuture<TitlesAndEpisodes.EpisodesForTitle>> episodeSearchFutures = titleResults.getResults().stream()
-                    .map(titleResult -> nineAnimeService.searchEpisodes(titleResult))
+                    .map(titleResult -> nineAnimeService.searchEpisodes((TitlesAndEpisodes.EpisodesForTitle) titleResult))
                     .collect(Collectors.toList());
 
                 ObjectUtils.getAllCompletableFutureResults(episodeSearchFutures);
@@ -41,7 +41,7 @@ public class NineAnimeController {
         return titleResults;
     }
 
-    public TitlesAndEpisodes.EpisodesForTitle getVideoForEpisode(String url) {
+    public TitlesAndEpisodes.EpisodesForTitle getVideosForEpisode(String url) {
         VideoSearchResult video = nineAnimeService.getVideosForEpisode(url);
 
         if (video == null) {

@@ -39,7 +39,7 @@ import java.util.stream.Collectors;
 
 @Controller
 @Log4j2
-public class KissanimeRuController {
+public class KissanimeRuController implements ShowSearchController {
     @Value("${org.animeatsume.download-videos}")
     private Boolean downloadVideos;
 
@@ -58,7 +58,7 @@ public class KissanimeRuController {
     @Autowired
     AnimeAtsumeDao dao;
 
-    public TitlesAndEpisodes searchKissanimeTitles(TitleSearchRequest titleSearchRequest) {
+    public TitlesAndEpisodes searchShows(TitleSearchRequest titleSearchRequest) {
         TitlesAndEpisodes titlesAndEpisodes = kissanimeService.searchKissanimeTitles(titleSearchRequest);
         List<TitlesAndEpisodes.EpisodesForTitle> titleSearchResults = titlesAndEpisodes.getResults();
 
@@ -80,7 +80,11 @@ public class KissanimeRuController {
         return titlesAndEpisodes;
     }
 
-    public ResponseEntity<Object> getVideosForKissanimeEpisode(KissanimeVideoHostRequest request) {
+    public TitlesAndEpisodes.EpisodesForTitle getVideosForEpisode(String url) {
+        return getVideosForEpisode(new KissanimeVideoHostRequest(url, null));
+    }
+
+    public TitlesAndEpisodes.EpisodesForTitle getVideosForEpisode(KissanimeVideoHostRequest request) {
         KissanimeVideoHostResponse videoHost = getVideoHostUrlForKissanimeEpisode(request);
         String videoHostUrl = videoHost.getVideoHostUrl();
         Object body = videoHost;
@@ -101,9 +105,7 @@ public class KissanimeRuController {
             }
         }
 
-        return ResponseEntity
-            .status(HttpStatus.OK)
-            .body(body);
+        return (TitlesAndEpisodes.EpisodesForTitle) body;
     }
 
     private KissanimeVideoHostResponse getVideoHostUrlForKissanimeEpisode(KissanimeVideoHostRequest request) {

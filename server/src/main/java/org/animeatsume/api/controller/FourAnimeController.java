@@ -16,11 +16,11 @@ import java.util.stream.Collectors;
 
 @Controller
 @Log4j2
-public class FourAnimeController {
+public class FourAnimeController implements ShowSearchController {
     @Autowired
     FourAnimeService fourAnimeService;
 
-    public TitlesAndEpisodes searchTitle(TitleSearchRequest request) {
+    public TitlesAndEpisodes searchShows(TitleSearchRequest request) {
         TitlesAndEpisodes titleResults = null;
 
         try {
@@ -31,7 +31,7 @@ public class FourAnimeController {
 
         if (titleResults != null) {
             List<CompletableFuture<Void>> episodeSearchFutures = titleResults.getResults().stream()
-                .map(titleResult -> fourAnimeService.searchEpisodes(titleResult))
+                .map(titleResult -> fourAnimeService.searchEpisodes((TitlesAndEpisodes.EpisodesForTitle) titleResult))
                 .collect(Collectors.toList());
 
             ObjectUtils.getAllCompletableFutureResults(episodeSearchFutures);
@@ -40,7 +40,7 @@ public class FourAnimeController {
         return titleResults;
     }
 
-    public TitlesAndEpisodes.EpisodesForTitle getVideoForEpisode(String url) {
+    public TitlesAndEpisodes.EpisodesForTitle getVideosForEpisode(String url) {
         VideoSearchResult video = null;
 
         try {

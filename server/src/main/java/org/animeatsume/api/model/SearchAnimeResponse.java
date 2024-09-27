@@ -15,7 +15,7 @@ import java.util.List;
 public class SearchAnimeResponse extends TitlesAndEpisodes {
     private String error = "";
 
-    public SearchAnimeResponse(List<EpisodesForTitle> episodes) {
+    public SearchAnimeResponse(List<? extends Anchor> episodes) {
         super(episodes);
     }
 

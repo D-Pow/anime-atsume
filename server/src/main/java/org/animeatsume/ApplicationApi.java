@@ -100,7 +100,7 @@ public class ApplicationApi {
 
         if (activateKissanime) {
             return ResponseEntity
-                .ok((SearchAnimeResponse) kissanimeRuController.searchKissanimeTitles(titleSearchRequest));
+                .ok((SearchAnimeResponse) kissanimeRuController.searchShows(titleSearchRequest));
         }
 
         SearchAnimeResponse searchResults = null; // (SearchAnimeResponse) fourAnimeController.searchTitle(titleSearchRequest);
@@ -137,18 +137,22 @@ public class ApplicationApi {
 
     @PostMapping(value = "/getVideosForEpisode")
     public ResponseEntity<Object> getVideosForEpisode(@RequestBody KissanimeVideoHostRequest kissanimeEpisodeRequest) {
+        TitlesAndEpisodes.EpisodesForTitle videosForEpisode = null;
+
         if (activateKissanime) {
-            return kissanimeRuController.getVideosForKissanimeEpisode(kissanimeEpisodeRequest);
-        }
-
-        TitlesAndEpisodes.EpisodesForTitle videosForEpisode = fourAnimeController.getVideoForEpisode(kissanimeEpisodeRequest.getEpisodeUrl());
-
-        if (videosForEpisode == null || videosForEpisode.getEpisodes().size() == 0) {
-            videosForEpisode = nineAnimeController.getVideoForEpisode(kissanimeEpisodeRequest.getEpisodeUrl());
+            videosForEpisode = kissanimeRuController.getVideosForEpisode(kissanimeEpisodeRequest);
         }
 
         if (videosForEpisode == null || videosForEpisode.getEpisodes().size() == 0) {
-            videosForEpisode = zoroToController.getVideoForEpisode(kissanimeEpisodeRequest.getEpisodeUrl());
+            videosForEpisode = fourAnimeController.getVideosForEpisode(kissanimeEpisodeRequest.getEpisodeUrl());
+        }
+
+        if (videosForEpisode == null || videosForEpisode.getEpisodes().size() == 0) {
+            videosForEpisode = nineAnimeController.getVideosForEpisode(kissanimeEpisodeRequest.getEpisodeUrl());
+        }
+
+        if (videosForEpisode == null || videosForEpisode.getEpisodes().size() == 0) {
+            videosForEpisode = zoroToController.getVideosForEpisode(kissanimeEpisodeRequest.getEpisodeUrl());
         }
 
         if (videosForEpisode != null && videosForEpisode.getEpisodes().size() > 0) {

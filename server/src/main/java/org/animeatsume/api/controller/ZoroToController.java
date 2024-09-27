@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 
 @Log4j2
 @Controller
-public class ZoroToController {
+public class ZoroToController implements ShowSearchController {
     @Autowired
     ZoroToService zoroToService;
 
@@ -29,7 +29,7 @@ public class ZoroToController {
 
             if (titleResults != null) {
                 List<CompletableFuture<TitlesAndEpisodes.EpisodesForTitle>> episodeSearchFutures = titleResults.getResults().stream()
-                    .map(titleResult -> zoroToService.searchEpisodes(titleResult))
+                    .map(titleResult -> zoroToService.searchEpisodes((TitlesAndEpisodes.EpisodesForTitle) titleResult))
                     .collect(Collectors.toList());
 
                 List<TitlesAndEpisodes.EpisodesForTitle> allCompletableFutureResults =
@@ -44,7 +44,7 @@ public class ZoroToController {
         return titleResults;
     }
 
-    public TitlesAndEpisodes.EpisodesForTitle getVideoForEpisode(String url) {
+    public TitlesAndEpisodes.EpisodesForTitle getVideosForEpisode(String url) {
         VideoSearchResult video = zoroToService.getVideosForShow(url);
 
         if (video == null) {
