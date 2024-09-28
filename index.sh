@@ -696,7 +696,12 @@ deployServerSsh() (
 
         # Verify the app is running correctly and forward the exit code accordingly
         ./index.sh dockerVerifyAppIsRunning
-        exit \$?
+        declare dockerStartedExitCode=\$?
+
+        # Delete old images since AWS free tier only has space for about 3
+        docker rmi \$(docker images -f 'dangling=true' -q)
+
+        exit \$dockerStartedExitCode
     "
 )
 
