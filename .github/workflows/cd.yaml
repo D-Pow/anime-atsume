@@ -164,18 +164,18 @@ jobs:
             exit
           fi
 
-      - name: CD:AWS - Deploy
-        id: cd-aws-deploy
-        uses: ./.github/workflows/actions/deploy-aws
-        with:
-          GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}
-          registryUrl: ${{ env.registryUrl }}
-          AWS_ACCESS_KEY_ID: ${{ env.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ env.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ${{ env.AWS_REGION }}
-          AWS_SSH_KEY: ${{ env.AWS_SSH_KEY }}
-          AWS_INSTANCE_URL: ${{ env.AWS_INSTANCE_URL }}
-          AWS_SERVER_KEYSTORE_PASSWORD: ${{ env.AWS_SERVER_KEYSTORE_PASSWORD }}
+      # - name: CD:AWS - Deploy
+      #   id: cd-aws-deploy
+      #   uses: ./.github/workflows/actions/deploy-aws
+      #   with:
+      #     GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}
+      #     registryUrl: ${{ env.registryUrl }}
+      #     AWS_ACCESS_KEY_ID: ${{ env.AWS_ACCESS_KEY_ID }}
+      #     AWS_SECRET_ACCESS_KEY: ${{ env.AWS_SECRET_ACCESS_KEY }}
+      #     AWS_REGION: ${{ env.AWS_REGION }}
+      #     AWS_SSH_KEY: ${{ env.AWS_SSH_KEY }}
+      #     AWS_INSTANCE_URL: ${{ env.AWS_INSTANCE_URL }}
+      #     AWS_SERVER_KEYSTORE_PASSWORD: ${{ env.AWS_SERVER_KEYSTORE_PASSWORD }}
 
       # - name: CD:Azure - Deploy
       #   id: cd-azure-deploy
