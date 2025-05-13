@@ -90,7 +90,7 @@ ENV HTTPS_PORT=8443
 # Copy build-output files to root dir for ease of use
 RUN if ! [[ -f "${WAR_FILE_FINAL_PATH}" ]]; then \
         if ! [[ -f "${WAR_FILE_BUILD_PATH}" ]]; then \
-            ./index.sh build -frm; \
+            ./index.sh build -Crs; \
         else \
             cp "${WAR_FILE_BUILD_PATH}" "${WAR_FILE_FINAL_PATH}"; \
             cp "${DB_FILE_BUILD_PATH}" "${DB_FILE_FINAL_PATH}"; \

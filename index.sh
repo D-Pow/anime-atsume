@@ -150,32 +150,39 @@ build() (
     Builds the app.
 
     Options:
+        -f  |   Build front-end code in addition to back-end code.
         -c  |   Clean build-output files before building.
-        -f  |   Clean resources as well as build-output files.
+        -C  |   Clean both build-output files and resources.
         -r  |   Copy build output files to app root directory.
-        -m  |   Builds app with headless Selenium instance.
+        -s  |   Builds app with headless Selenium instance.
         -v  |   Verbose build output.
         -h  |   Print this help message and exit.
     "
-    declare _buildCleanFirst=
+    declare _buildFrontEnd=
+    declare _buildClean=
+    declare _buildCleanAll=
     declare _buildCopyFilesToRootDir=
     declare _buildHeadless=
     declare _buildVerbose=
     declare OPTIND=1
 
-    while getopts ":fcrvmh" opt; do
+    while getopts ":fcCrsvh" opt; do
         case "$opt" in
-            c)
-                clean
-                ;;
             f)
-                _buildCleanFirst=true
+                _buildFrontEnd=true
+                ;;
+            c)
+                _buildClean=true
+                ;;
+            C)
+                _buildClean=true
+                _buildCleanAll=true
                 ;;
             r)
                 _buildCopyFilesToRootDir=true
                 ;;
-            m)
-                # `-m` represents "Monocle" which is the headless JavaFX implementation
+            s)
+                # Headless means "Monocle" which is the headless JavaFX implementation
                 _buildHeadless=true
                 ;;
             v)
@@ -196,7 +203,11 @@ build() (
 
     shift $(( OPTIND - 1 ))
 
-    declare _buildGradleOpts="${_buildCleanFirst:+cleanAll} ${_buildHeadless:+-Dheadless=true} ${_buildVerbose:+--console plain}"
+    if [[ -n "$_buildClean" ]]; then
+        clean
+    fi
+
+    declare _buildGradleOpts="${_buildCleanAll:+cleanAll} ${_buildHeadless:+-Dheadless=true} ${_buildVerbose:+--console plain}"
 
     (
         cd "${serverDir}"
