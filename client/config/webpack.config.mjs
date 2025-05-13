@@ -21,8 +21,8 @@ import {
 } from './utils/index.js';
 import babelConfig from './babel.config.js';
 
-import packageJson from '../package.json' assert { type: 'json' };
-import manifestJson from '../src/manifest.json' assert { type: 'json' };
+import packageJson from '../package.json' with { type: 'json' };
+import manifestJson from '../src/manifest.json' with { type: 'json' };
 
 // TODO: https://webpack.js.org/guides/caching
 
