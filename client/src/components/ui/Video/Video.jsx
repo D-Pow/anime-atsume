@@ -92,6 +92,7 @@ function Video(props) {
         return (
             <iframe
                 className={props.className}
+                allowFullScreen
                 ref={videoRef}
                 src={props.src}
                 {...props.videoElementProps}
