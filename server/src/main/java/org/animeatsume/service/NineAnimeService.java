@@ -52,12 +52,6 @@ public class NineAnimeService {
     @Autowired
     private SeleniumService seleniumService; // = new SeleniumService();
 
-//    private SeleniumService seleniumService; // = new SeleniumService();
-
-//    public NineAnimeService() {
-//        seleniumService = new SeleniumService();
-//    }
-
     private static HttpHeaders getSearchHeaders() {
         HttpHeaders headers = new HttpHeaders();
 
