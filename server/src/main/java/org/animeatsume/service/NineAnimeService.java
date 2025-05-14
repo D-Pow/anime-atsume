@@ -226,15 +226,19 @@ public class NineAnimeService {
 
         HttpHeaders getVideoUrlFromHostHeaders = getSearchHeaders();
         getVideoUrlFromHostHeaders.add(HttpHeaders.REFERER, UriParser.getOrigin(url));
+        getVideoUrlFromHostHeaders.add(HttpHeaders.ORIGIN, UriParser.getOrigin(episodeHostUrl));
 
         // `Location` header excludes "https:" but maintains "//website.com"
-        String videoUrl = "https:" + CorsProxy.doCorsRequest(
+        HttpHeaders videoHostUrlLocation = CorsProxy.doCorsRequest(
             HttpMethod.GET,
             URI.create(episodeHostUrl),
             URI.create(UriParser.getOrigin(episodeHostUrl)),
             null,
             getVideoUrlFromHostHeaders
-        ).getHeaders().getLocation().toString();
+        ).getHeaders();
+        String videoUrl = videoHostUrlLocation.getLocation() == null
+            ? episodeHostUrl
+            : "https:" + videoHostUrlLocation.getLocation().toString();
 
         ResponseEntity<String> videoResponse = CorsProxy.doCorsRequest(
             HttpMethod.GET,
@@ -262,6 +266,11 @@ public class NineAnimeService {
             .map(li -> li.attr("data-video"))
             .filter(videoHostUrl -> !videoHostUrl.isBlank())
             .toList();
+
+        if (hostUrls.isEmpty()) {
+            return new VideoSearchResult(videoUrl, "", false, true);
+        }
+
         String primaryHostUrl = hostUrls.get(0);
 
         io.webfolder.ui4j.api.dom.Element videoElem = this.seleniumService.clickOn(primaryHostUrl, "video");
