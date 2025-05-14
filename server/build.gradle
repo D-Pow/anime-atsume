@@ -40,7 +40,7 @@ plugins {
     id 'java-gradle-plugin'  // Add Gradle internal classes to classpath; Necessary to expose classes as `public` classes to the parent/build.gradle files importing this
 
     /*  Language and IDE plugins  */
-    id 'org.openjfx.javafxplugin' version '0.0.13'  // Gradle plugin to use/package JavaFX .jar files in our app since Java >= 11 doesn't include JavaFX
+    id 'org.openjfx.javafxplugin' version '0.1.0'  // Gradle plugin to use/package JavaFX .jar files in our app since Java >= 11 doesn't include JavaFX
     id 'groovy'
     id 'idea'
 
