@@ -203,11 +203,23 @@ build() (
 
     shift $(( OPTIND - 1 ))
 
-    if [[ -n "$_buildClean" ]]; then
+    if [[ -n "$_buildCleanAll" ]]; then
+        (
+            cd "${serverDir}"
+            ./gradlew "${_buildVerbose:+--console=plain}" cleanAll
+        )
+    elif [[ -n "$_buildClean" ]]; then
         clean
     fi
 
-    declare _buildGradleOpts="${_buildCleanAll:+cleanAll} ${_buildHeadless:+-Dheadless=true} ${_buildVerbose:+--console plain}"
+    if [[ -n "$_buildFrontEnd" ]]; then
+        (
+            cd "${clientDir}"
+            npm run build
+        )
+    fi
+
+    declare _buildGradleOpts="${_buildHeadless:+-Dheadless=true} ${_buildVerbose:+--console=plain}"
 
     (
         cd "${serverDir}"
