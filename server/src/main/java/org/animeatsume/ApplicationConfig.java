@@ -67,7 +67,7 @@ public class ApplicationConfig {
         // ApplicationConfig.ANIME_TITLE_SEARCH_CACHE_NAME = ANIME_TITLE_SEARCH_CACHE_NAME;
         ApplicationConfig.logEnvVars = logEnvVars;
 
-        log.debug("CACHE_NAMES: {}", CACHE_NAMES);
+        log.debug("CACHE_NAMES: {}", (Object[]) CACHE_NAMES);
         log.debug("ANIME_TITLE_SEARCH_CACHE_NAME: {}", ANIME_TITLE_SEARCH_CACHE_NAME);
     }
 
@@ -120,7 +120,7 @@ public class ApplicationConfig {
     //  - https://www.javadevjournal.com/spring-boot/3-ways-to-configure-multiple-cache-managers-in-spring-boot/
     @Bean
     public CacheManager cacheManager(@Value("${org.animeatsume.cache.cache-names}") String[] cacheNames) {
-        log.info("Caching activated for cache names: {}", cacheNames);
+        log.info("Caching activated for cache names: {}", (Object[]) cacheNames);
 
         return new ConcurrentMapCacheManager(cacheNames);
     }
