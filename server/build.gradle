@@ -630,6 +630,14 @@ wrapper {
     distributionType = Wrapper.DistributionType.ALL
 }
 
+tasks.register("downloadJavaFX") {
+    description "Downloads JavaFX SDK and unzips it to the specified directory.";
+
+    doLast {
+        downloadJavaFX();
+    }
+}
+
 tasks.register("wrapperVersion") {
     description "Prints current Gradle wrapper version, updates the version (-Pu|-Pupgrade[=desiredVersion], default: latest), or lists available versions (-Pl).";
 
