@@ -1,9 +1,10 @@
+import { forwardRef } from 'react';
 import PropTypes from 'prop-types';
 
 import Spinner from '@/components/ui/Spinner';
 import { useKeyboardEvent } from '@/utils/Hooks';
 
-function SearchBar(props) {
+function SearchBar(props, inputRef) {
     const handleTyping = ({ target: { value }}) => {
         props.handleTyping(value);
     };
@@ -36,6 +37,7 @@ function SearchBar(props) {
                         placeholder={'e.g. "Kimi no na wa"'}
                         value={props.value}
                         onChange={handleTyping}
+                        ref={inputRef}
                     />
                     <div className={'input-group-append'}>
                         <button className={'btn btn-outline-secondary remove-focus-highlight'} onClick={() => props.handleSubmit()}>
@@ -66,4 +68,4 @@ SearchBar.defaultProps = {
     handleSubmit: () => {},
 };
 
-export default SearchBar;
+export default forwardRef(SearchBar);

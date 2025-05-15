@@ -1,11 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, createRef } from 'react';
 import { Link } from 'react-router-dom';
 
 import { fetchKitsuTitleSearch } from '@/services/KitsuAnimeSearchService';
 import PageCornerLink from '@/components/ui/PageCornerLink';
 import SearchBar from '@/components/ui/SearchBar';
 import KitsuSearchResults from '@/components/ui/KitsuSearch/KitsuSearchResults';
-import { useQueryParams } from '@/utils/Hooks';
+import { useWindowEvent, useQueryParams } from '@/utils/Hooks';
 import { LINKS } from '@/utils/Constants';
 import { ReactComponent as GitHubLogo } from '@/assets/github_logo.svg';
 
@@ -20,6 +20,18 @@ function Home() {
     const [ kitsuResults, setKitsuResults ] = useState(null);
     const [ showSpinner, setShowSpinner ] = useState(false);
     const [ queryParams, setQueryParam ] = useQueryParams();
+    const [ keyDown, setKeyDown ] = useWindowEvent('keydown');
+    const searchInputRef = createRef();
+
+    useEffect(() => {
+        // Note: We can't use `docuement.hasFocus()` here because that returns true even if the <input> isn't
+        // focused but the document itself is.
+        if (keyDown?.key === '/' && !document.querySelector(':focus')) {
+            keyDown.preventDefault(); // Prevent the slash from entering the input field
+            searchInputRef?.current?.focus?.(); // Focus the input field
+            setKeyDown(null); // Prevent the event from being triggered again
+        }
+    }, [ keyDown, searchInputRef, setKeyDown ]);
 
     const handleSubmit = async textToSearch => {
         const query = textToSearch ? textToSearch : typedText;
@@ -90,6 +102,7 @@ function Home() {
                 focusOnLoad={!queryParams[searchQueryParam]}
                 handleTyping={setTypedText}
                 handleSubmit={handleSubmit}
+                ref={searchInputRef}
             />
             <KitsuSearchResults
                 anchorImageFunc={anchorHrefFunction}
