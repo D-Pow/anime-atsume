@@ -193,7 +193,7 @@ public class NineAnimeService {
 
         List<VideoSearchResult> episodeHosts = episodeAnchors.stream().map(anchor -> {
             // Remove leading zeros via casting to int, e.g. "001" -> "1"
-            String episodeTitle = String.valueOf(Integer.parseInt(anchor.getTitle()));
+            String episodeTitle = String.valueOf(anchor.getTitle());
             String episodeInfoSearchUrl = getEpisodePageUrl(showId, anchor.getTitle()).toString();
 
             return new VideoSearchResult(episodeInfoSearchUrl, episodeTitle);
