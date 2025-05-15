@@ -158,17 +158,17 @@ export function useWindowEvent(
     const [ eventState, setEventState ] = useState(initialEventState);
     const isUsingOwnEventHandler = typeof handleEvent === typeof (() => {});
 
-    function eventListener(event) {
-        const newEventState = nestedEventField ? event[nestedEventField] : event;
-
-        if (isUsingOwnEventHandler) {
-            handleEvent(eventState, setEventState, newEventState);
-        } else {
-            setEventState(newEventState);
-        }
-    }
-
     useEffect(() => {
+        function eventListener(event) {
+            const newEventState = nestedEventField ? event[nestedEventField] : event;
+
+            if (isUsingOwnEventHandler) {
+                handleEvent(eventState, setEventState, newEventState);
+            } else {
+                setEventState(newEventState);
+            }
+        }
+
         window.addEventListener(eventType, eventListener);
 
         return () => {
